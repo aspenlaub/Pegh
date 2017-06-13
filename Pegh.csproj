@@ -61,6 +61,10 @@
       <Project>{60edcaae-15a7-486a-a7e1-7ee6cf285520}</Project>
       <Name>Pegh.Interfaces</Name>
     </ProjectReference>
+    <ProjectReference Include="TestEntities\Pegh.TestEntities.csproj">
+      <Project>{983d072e-f8cd-4be0-8b92-cbc22471df0d}</Project>
+      <Name>Pegh.TestEntities</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -3,5 +3,7 @@
         IAssemblyRepository AssemblyRepository { get; }
         IFolderHelper FolderHelper { get; }
         IPeghEnvironment PeghEnvironment { get; }
+        IXmlDeserializer XmlDeserializer { get; }
+        IXmlSerializer XmlSerializer { get; }
     }
 }
