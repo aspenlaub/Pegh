@@ -46,6 +46,7 @@
     <Compile Include="AssemblyRepository.cs" />
     <Compile Include="ComponentProvider.cs" />
     <Compile Include="FolderHelper.cs" />
+    <Compile Include="PeghEnvironment.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

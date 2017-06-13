@@ -26,5 +26,6 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
 
         public IAssemblyRepository AssemblyRepository { get { return DefaultComponent<IAssemblyRepository, AssemblyRepository>(() => new AssemblyRepository(this)); } }
         public IFolderHelper FolderHelper { get { return DefaultComponent<IFolderHelper, FolderHelper>(); } }
+        public IPeghEnvironment PeghEnvironment { get { return DefaultComponent<IPeghEnvironment, PeghEnvironment>(); } }
     }
 }

@@ -7,7 +7,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         public string Folder { get; }
 
         public AssemblyRepository(IComponentProvider components) {
-            Folder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Aspenlaub.Net\AssemblyRepository";
+            Folder = components.PeghEnvironment.RootWorkFolder + @"\AssemblyRepository";
             components.FolderHelper.CreateIfNecessary(Folder);
         }
 

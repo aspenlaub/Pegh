@@ -2,5 +2,6 @@
     public interface IComponentProvider {
         IAssemblyRepository AssemblyRepository { get; }
         IFolderHelper FolderHelper { get; }
+        IPeghEnvironment PeghEnvironment { get; }
     }
 }
