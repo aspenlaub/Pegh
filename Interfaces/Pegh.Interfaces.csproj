@@ -49,6 +49,7 @@
     <Compile Include="IGuid.cs" />
     <Compile Include="ISecret.cs" />
     <Compile Include="IPeghEnvironment.cs" />
+    <Compile Include="ISecretRepository.cs" />
     <Compile Include="ISetGuid.cs" />
     <Compile Include="IXmlDeserializer.cs" />
     <Compile Include="IXmlSerializer.cs" />
