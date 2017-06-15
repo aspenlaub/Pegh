@@ -13,10 +13,17 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
 
         public void AddToRepositoryIfNecessary(Type t) {
             var sourceFileFullName = t.Assembly.Location;
-            AddToRepositoryIfNecessary(sourceFileFullName);
+
+            AddToRepositoryIfNecessary(sourceFileFullName, ".dll");
+            AddToRepositoryIfNecessary(sourceFileFullName, ".pdb");
         }
 
-        public void AddToRepositoryIfNecessary(string sourceFileFullName) {
+        public void AddToRepositoryIfNecessary(string sourceFileFullName, string ending) {
+            if (sourceFileFullName == null) { return; }
+
+            if (!string.IsNullOrEmpty(ending)) {
+                sourceFileFullName = sourceFileFullName.Replace(".dll", ending);
+            }
             if (sourceFileFullName.Contains(@"\Debug\")  && !sourceFileFullName.EndsWith(".Test.dll")) { return; }
 
             var shortName = sourceFileFullName.Substring(sourceFileFullName.LastIndexOf('\\') + 1);

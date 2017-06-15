@@ -40,7 +40,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             sut.AddToRepositoryIfNecessary(GetType());
             Assert.IsTrue(File.Exists(assemblyRepositoryFileName));
             File.Delete(assemblyRepositoryFileName);
-            sut.AddToRepositoryIfNecessary(@"C:\This\Folder\Does\Not\Exist\Debug\Something.dll");
+            sut.AddToRepositoryIfNecessary(@"C:\This\Folder\Does\Not\Exist\Debug\Something.dll", "");
         }
 
         [TestMethod]
@@ -90,6 +90,13 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Assert.IsTrue(success);
             Assert.AreEqual(oldNumberOfRepositoryFiles + 1, numberOfRepositoryFiles);
             Assert.AreEqual(0, numberOfCopiedFiles);
+        }
+
+        [TestMethod]
+        public void NoExceptionWhenTryingToAddWithoutAFileName() {
+            var componentProvider = new ComponentProvider();
+            var sut = new AssemblyRepository(componentProvider);
+            sut.AddToRepositoryIfNecessary(null, "");
         }
     }
 }
