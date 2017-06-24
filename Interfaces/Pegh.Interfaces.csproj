@@ -47,14 +47,16 @@
     <Compile Include="IComponentProvider.cs" />
     <Compile Include="IFolderHelper.cs" />
     <Compile Include="IGuid.cs" />
+    <Compile Include="IPowershellFunction.cs" />
+    <Compile Include="IPowershellSecret.cs" />
     <Compile Include="ISecret.cs" />
     <Compile Include="IPeghEnvironment.cs" />
     <Compile Include="ISecretRepository.cs" />
+    <Compile Include="ISecretResult.cs" />
     <Compile Include="ISetGuid.cs" />
     <Compile Include="IXmlDeserializer.cs" />
     <Compile Include="IXmlSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SecretTypes.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

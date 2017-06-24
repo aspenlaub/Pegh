@@ -60,14 +60,20 @@
     <Compile Include="ComponentProviderTest.cs" />
     <Compile Include="DirectoryDeleter.cs" />
     <Compile Include="EntityTest.cs" />
+    <Compile Include="FailingSecretStringListEnumerator.cs" />
     <Compile Include="SecretCrewMember.cs" />
     <Compile Include="FolderHelperTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AssemblyRepositoryTest.cs" />
     <Compile Include="SecretRepositoryTest.cs" />
+    <Compile Include="SecretStringListEnumerator.cs" />
     <Compile Include="XmlSerializationTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Entities\Pegh.Entities.csproj">
+      <Project>{97d7bfde-2296-4356-808e-48db07f1debc}</Project>
+      <Name>Pegh.Entities</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\TestEntities\Pegh.TestEntities.csproj">
       <Project>{983d072e-f8cd-4be0-8b92-cbc22471df0d}</Project>
       <Name>Pegh.TestEntities</Name>

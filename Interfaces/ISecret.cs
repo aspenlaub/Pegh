@@ -1,7 +1,5 @@
 ﻿namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces {
-    public interface ISecret<TResult> : IGuid {
-        SecretTypes SecretType { get; }
-        TResult Value { get; set; }
+    public interface ISecret<out TResult> : IGuid where TResult : class, ISecretResult<TResult> {
         TResult DefaultValue { get; }
     }
 }

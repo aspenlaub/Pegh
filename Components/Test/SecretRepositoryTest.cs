@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.TestEntities;
@@ -8,17 +9,21 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
     [TestClass]
     public class SecretRepositoryTest {
         private IComponentProvider ComponentProvider { get; set; }
-        private ISecretRepository Sut { get; set; }
+        private SecretRepository Sut { get; set; }
         private const string SomeFirstName = "Some First Name", SomeSurName = "Some Surname", SomeRank = "Some Rank";
 
         [TestInitialize]
         public void Initialize() {
             ComponentProvider = new ComponentProvider();
-            Sut = ComponentProvider.SecretRepository;
+            Sut = ComponentProvider.SecretRepository as SecretRepository;
             var folder = ComponentProvider.PeghEnvironment.RootWorkFolder + @"\SecretRepository";
             if (Directory.Exists(folder)) { return; }
 
             Directory.CreateDirectory(folder);
+        }
+
+        protected CrewMember GetSecretCrewMember(IGuid secret) {
+            return Sut.Values[secret.Guid] as CrewMember;
         }
 
         [TestMethod]
@@ -30,11 +35,12 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
 
         [TestMethod]
         public void CanGetDefault() {
-            var secret = new SecretCrewMember { Value = new CrewMember { FirstName = SomeFirstName } };
+            var secret = new SecretCrewMember();
+            Sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName };
             Sut.Reset(secret);
-            Assert.AreEqual(SomeFirstName, secret.Value.FirstName);
+            Assert.AreEqual(SomeFirstName, GetSecretCrewMember(secret).FirstName);
             Sut.Get(secret);
-            Assert.AreEqual(SecretCrewMember.DefaultFirstName, secret.Value.FirstName);
+            Assert.AreEqual(SecretCrewMember.DefaultFirstName, GetSecretCrewMember(secret).FirstName);
         }
 
         [TestMethod]
@@ -49,41 +55,51 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
         public void CanGetAfterSetting() {
             var secret = new SecretCrewMember();
             Sut.Reset(secret);
-            secret.Value = new CrewMember { FirstName = SomeFirstName, SurName = SomeSurName, Rank = SomeRank };
+            Sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName, SurName = SomeSurName, Rank = SomeRank };
             Sut.Set(secret);
-            secret.Value = new CrewMember();
-            Assert.IsNull(secret.Value.FirstName);
-            Assert.IsNull(secret.Value.SurName);
-            Assert.IsNull(secret.Value.Rank);
+            Sut.Values[secret.Guid] = new CrewMember();
+            Assert.IsNull(GetSecretCrewMember(secret).FirstName);
+            Assert.IsNull(GetSecretCrewMember(secret).SurName);
+            Assert.IsNull(GetSecretCrewMember(secret).Rank);
             Sut.Get(secret);
-            Assert.AreEqual(SomeFirstName, secret.Value.FirstName);
-            Assert.AreEqual(SomeSurName, secret.Value.SurName);
-            Assert.AreEqual(SomeRank, secret.Value.Rank);
+            Assert.AreEqual(SomeFirstName, GetSecretCrewMember(secret).FirstName);
+            Assert.AreEqual(SomeSurName, GetSecretCrewMember(secret).SurName);
+            Assert.AreEqual(SomeRank, GetSecretCrewMember(secret).Rank);
         }
 
         [TestMethod]
-        public void FixedGetWithNonFixedSecretReturnsDefault() {
-            var secret = new SecretCrewMember { Value = new CrewMember { FirstName = SomeFirstName }};
+        public void CanGetScriptSecret() {
+            var secret = new SecretStringListEnumerator();
             Sut.Reset(secret);
-            secret.SecretType = SecretTypes.Script;
-            Assert.AreEqual(SomeFirstName, secret.Value.FirstName);
-            Sut.Get(secret);
-            Assert.AreEqual(SecretCrewMember.DefaultFirstName, secret.Value.FirstName);
+            var list = TestListOfStrings();
+            var enumeratedList = Sut.Get(secret, list);
+            Assert.IsNotNull(enumeratedList);
+            var i = 0;
+            foreach (var s in enumeratedList) {
+                Assert.AreEqual(list[i], s);
+                i ++;
+            }
         }
 
         [TestMethod]
-        public void ScriptGetWithFixedSecretReturnsDefault() {
-            var secret = new SecretCrewMember { Value = new CrewMember { FirstName = SomeFirstName } };
+        public void CannotGetScriptSecretIfScriptCannotBeRunWithoutErrors() {
+            var secret = new FailingSecretStringListEnumerator();
             Sut.Reset(secret);
-            Sut.Get(secret, SomeFirstName);
-            Assert.AreEqual(SecretCrewMember.DefaultFirstName, secret.Value.FirstName);
+            var list = TestListOfStrings();
+            var enumeratedList = Sut.Get(secret, list);
+            Assert.IsNull(enumeratedList);
         }
 
-        [TestMethod, ExpectedException(typeof(NotImplementedException))]
-        public void ScriptGetWithScriptSecretIsNotImplementedYet() {
-            var secret = new SecretCrewMember { Value = new CrewMember { FirstName = SomeFirstName }, SecretType = SecretTypes.Script };
-            Sut.Reset(secret);
-            Sut.Get(secret, SomeFirstName);
+        private static List<string> TestListOfStrings() {
+            var list = new List<string> {
+                "This",
+                "is",
+                "not",
+                "a",
+                "list",
+                Guid.NewGuid().ToString()
+            };
+            return list;
         }
     }
 }
