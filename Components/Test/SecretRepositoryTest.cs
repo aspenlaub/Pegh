@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.TestEntities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -16,10 +17,15 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
         public void Initialize() {
             ComponentProvider = new ComponentProvider();
             Sut = ComponentProvider.SecretRepository as SecretRepository;
-            var folder = ComponentProvider.PeghEnvironment.RootWorkFolder + @"\SecretRepository";
-            if (Directory.Exists(folder)) { return; }
+            SecretRepositoryFolder();
+        }
 
-            Directory.CreateDirectory(folder);
+        private string SecretRepositoryFolder() {
+            var folder = ComponentProvider.PeghEnvironment.RootWorkFolder + @"\SecretRepository";
+            if (!Directory.Exists(folder)) {
+                Directory.CreateDirectory(folder);
+            }
+            return folder;
         }
 
         protected CrewMember GetSecretCrewMember(IGuid secret) {
@@ -49,6 +55,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Sut.Reset(secret);
             Sut.Set(secret);
             Assert.IsTrue(Sut.Exists(secret));
+            CleanUpSecretRepository();
         }
 
         [TestMethod]
@@ -65,6 +72,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Assert.AreEqual(SomeFirstName, GetSecretCrewMember(secret).FirstName);
             Assert.AreEqual(SomeSurName, GetSecretCrewMember(secret).SurName);
             Assert.AreEqual(SomeRank, GetSecretCrewMember(secret).Rank);
+            CleanUpSecretRepository();
         }
 
         [TestMethod]
@@ -100,6 +108,15 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
                 Guid.NewGuid().ToString()
             };
             return list;
+        }
+
+        private void CleanUpSecretRepository() {
+            var secrets = new List<IGuid> { new SecretCrewMember(), new SecretStringListEnumerator() };
+            var folder = SecretRepositoryFolder();
+            foreach (var files in secrets.Select(secret => Directory.GetFiles(folder, secret.Guid + "*.*").ToList())) {
+                Assert.IsTrue(files.Count < 2);
+                files.ForEach(f => File.Delete(f));
+            }
         }
     }
 }
