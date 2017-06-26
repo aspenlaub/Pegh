@@ -19,6 +19,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             CanUseEntity<StarShip>();
             CanUseEntity<CrewMember>();
             CanUsePowershellFunction<int, string>();
+            CanUseEntity<ShouldDefaultSecretsBeStored>();
         }
 
         protected void CanUseEntity<T>() where T : class, new() {

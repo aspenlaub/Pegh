@@ -52,6 +52,7 @@
     <Compile Include="ISecret.cs" />
     <Compile Include="IPeghEnvironment.cs" />
     <Compile Include="ISecretRepository.cs" />
+    <Compile Include="IShouldDefaultSecretsBeStored.cs" />
     <Compile Include="ISecretResult.cs" />
     <Compile Include="ISetGuid.cs" />
     <Compile Include="IXmlDeserializer.cs" />

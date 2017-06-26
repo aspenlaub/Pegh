@@ -8,10 +8,13 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
     public class SecretRepository : ISecretRepository {
         private readonly IComponentProvider vComponentProvider;
         internal readonly Dictionary<string, object> Values;
+        internal readonly SecretShouldDefaultSecretsBeStored SecretShouldDefaultSecretsBeStored;
 
         public SecretRepository(IComponentProvider componentProvider) {
             vComponentProvider = componentProvider;
             Values = new Dictionary<string, object>();
+            SecretShouldDefaultSecretsBeStored = new SecretShouldDefaultSecretsBeStored();
+            Get(SecretShouldDefaultSecretsBeStored);
         }
 
         public void Set<TResult>(ISecret<TResult> secret) where TResult : class, ISecretResult<TResult> {
@@ -29,14 +32,28 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             return value;
         }
 
-        public void Get<TResult>(ISecret<TResult> secret) where TResult : class, ISecretResult<TResult> {
+        public TResult Get<TResult>(ISecret<TResult> secret) where TResult : class, ISecretResult<TResult> {
+            TResult valueOrDefault;
+
             var fileName = FileName(secret);
             if (!File.Exists(fileName)) {
-                Values[secret.Guid] = secret.DefaultValue;
-                return;
+                valueOrDefault = ValueOrDefault(secret);
+                Values[secret.Guid] = valueOrDefault;
+                var shouldDefaultSecretsBeStored = ValueOrDefault(SecretShouldDefaultSecretsBeStored);
+                if (!shouldDefaultSecretsBeStored.AutomaticallySaveDefaulSecretIfAbsent) { return valueOrDefault; }
+
+                Set(secret);
+                return valueOrDefault;
             }
 
-            Values[secret.Guid] = vComponentProvider.XmlDeserializer.Deserialize<TResult>(File.ReadAllText(fileName));
+            if (Values.ContainsKey(secret.Guid)) {
+                valueOrDefault = ValueOrDefault(secret);
+                return valueOrDefault;
+            }
+
+            valueOrDefault = vComponentProvider.XmlDeserializer.Deserialize<TResult>(File.ReadAllText(fileName));
+            Values[secret.Guid] = valueOrDefault;
+            return valueOrDefault;
         }
 
         public TResult Get<TArgument, TResult>(IPowershellSecret<TArgument, TResult> secret, TArgument arg) where TResult : class {
@@ -65,6 +82,10 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         }
 
         public void Reset<TResult>(ISecret<TResult> secret) where TResult : class, ISecretResult<TResult> {
+            if (Values.ContainsKey(secret.Guid)) {
+                Values.Remove(secret.Guid);
+            }
+
             var fileName = FileName(secret);
             if (!File.Exists(fileName)) { return; }
 
