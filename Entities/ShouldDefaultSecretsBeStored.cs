@@ -2,11 +2,11 @@
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities {
-    public class ShouldDefaultSecretsBeStored : IGuid, ISecretResult<ShouldDefaultSecretsBeStored>, IShouldDefaultSecretsBeStored {
+    public class ShouldDefaultSecretsBeStored : IGuid, ISecretResult<ShouldDefaultSecretsBeStored> {
         [XmlAttribute("guid")]
         public string Guid { get; set; }
 
-        [XmlAttribute("autosavedefault")]
+        [XmlElement("autosavedefault")]
         public bool AutomaticallySaveDefaulSecretIfAbsent { get; set; }
 
         public ShouldDefaultSecretsBeStored() {

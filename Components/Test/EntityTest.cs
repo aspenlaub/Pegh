@@ -27,10 +27,10 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
         }
 
         protected void CanUsePowershellFunction<TArgument, TResult>() {
-            CanUseEntity<PowershellFunction<TArgument, TResult>, IPowershellFunction<TArgument, TResult>>(new List<string>());
+            CanUseEntity<PowershellFunction<TArgument, TResult>, PowershellFunction<TArgument, TResult>>(new List<string>());
         }
 
-        protected void CanUseEntity<T, TClone>(IEnumerable<string> excludeProperties) where T : new() where TClone : class {
+        protected void CanUseEntity<T, TClone>(IEnumerable<string> excludeProperties) where T : new() where TClone : class, new() {
             var sut = new T();
             var clone = default(TClone);
             var canClone = sut is ISecretResult<TClone>;

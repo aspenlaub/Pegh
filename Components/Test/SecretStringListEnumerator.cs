@@ -3,9 +3,9 @@ using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
-    public class SecretStringListEnumerator : IPowershellSecret<IList<string>, IEnumerable<string>> {
+    public class SecretStringListEnumerator : ISecret<PowershellFunction<IList<string>, IEnumerable<string>>> {
         private static PowershellFunction<IList<string>, IEnumerable<string>> vDefaultPowershellFunction;
-        public IPowershellFunction<IList<string>, IEnumerable<string>> DefaultValue {
+        public PowershellFunction<IList<string>, IEnumerable<string>> DefaultValue {
             get {
                 return vDefaultPowershellFunction ??
                        (vDefaultPowershellFunction = new PowershellFunction<IList<string>, IEnumerable<string>> {

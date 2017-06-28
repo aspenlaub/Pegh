@@ -42,12 +42,13 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
 
         [TestMethod]
         public void CanGetDefault() {
+            SetShouldDefaultSecretsBeStored(true);
             var secret = new SecretCrewMember();
             Sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName };
             Sut.Reset(secret);
             Assert.IsNull(GetSecretCrewMember(secret));
-            Sut.Get(secret);
-            Assert.AreEqual(SecretCrewMember.DefaultFirstName, GetSecretCrewMember(secret).FirstName);
+            var crewMember = Sut.Get(secret);
+            Assert.AreEqual(SecretCrewMember.DefaultFirstName, crewMember.FirstName);
             CleanUpSecretRepository();
         }
 
@@ -131,12 +132,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
 
         [TestMethod]
         public void DefaultSecretIsSavedIfSecretSaysSo() {
-            var shouldDefaultSecretsBeStored = ShouldDefaultSecretsBeStored();
-            if (!shouldDefaultSecretsBeStored.AutomaticallySaveDefaulSecretIfAbsent) {
-                shouldDefaultSecretsBeStored.AutomaticallySaveDefaulSecretIfAbsent = true;
-                shouldDefaultSecretsBeStored = ShouldDefaultSecretsBeStored();
-                Assert.IsTrue(shouldDefaultSecretsBeStored.AutomaticallySaveDefaulSecretIfAbsent);
-            }
+            SetShouldDefaultSecretsBeStored(true);
 
             var secret = new SecretCrewMember();
             Sut.Reset(secret);
@@ -147,12 +143,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
 
         [TestMethod]
         public void DefaultSecretIsNotSavedIfSecretSaysNo() {
-            var shouldDefaultSecretsBeStored = ShouldDefaultSecretsBeStored();
-            if (shouldDefaultSecretsBeStored.AutomaticallySaveDefaulSecretIfAbsent) {
-                shouldDefaultSecretsBeStored.AutomaticallySaveDefaulSecretIfAbsent = false;
-                shouldDefaultSecretsBeStored = ShouldDefaultSecretsBeStored();
-                Assert.IsTrue(shouldDefaultSecretsBeStored.AutomaticallySaveDefaulSecretIfAbsent);
-            }
+            SetShouldDefaultSecretsBeStored(false);
 
             var secret = new SecretCrewMember();
             Sut.Reset(secret);
@@ -161,11 +152,86 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             CleanUpSecretRepository();
         }
 
+        [TestMethod]
+        public void DefaultSecretIsNotReturnedIfSecretSaysItShouldNotBeSaved() {
+            SetShouldDefaultSecretsBeStored(false);
+
+            var secret = new SecretCrewMember();
+            Sut.Reset(secret);
+            Assert.IsNull(Sut.Get(secret));
+            CleanUpSecretRepository();
+        }
+
+        [TestMethod]
+        public void DefaultSecretIsNotCachedIfSecretSaysItShouldNotBeSaved() {
+            SetShouldDefaultSecretsBeStored(false);
+
+            var secret = new SecretCrewMember();
+            Sut.Reset(secret);
+            Sut.Get(secret);
+            Assert.IsFalse(Sut.Values.ContainsKey(secret.Guid));
+            CleanUpSecretRepository();
+        }
+
+        private void SetShouldDefaultSecretsBeStored(bool shouldThey) {
+            var shouldDefaultSecretsBeStored = ShouldDefaultSecretsBeStored();
+            if (shouldThey == shouldDefaultSecretsBeStored.AutomaticallySaveDefaulSecretIfAbsent) {
+                return;
+            }
+
+            shouldDefaultSecretsBeStored.AutomaticallySaveDefaulSecretIfAbsent = shouldThey;
+            shouldDefaultSecretsBeStored = ShouldDefaultSecretsBeStored();
+            Assert.AreEqual(shouldThey, shouldDefaultSecretsBeStored.AutomaticallySaveDefaulSecretIfAbsent);
+        }
+
         private ShouldDefaultSecretsBeStored ShouldDefaultSecretsBeStored() {
             var secret = new SecretShouldDefaultSecretsBeStored();
             var shouldDefaultSecretsBeStored = Sut.Get(secret);
             Assert.IsNotNull(shouldDefaultSecretsBeStored);
             return shouldDefaultSecretsBeStored;
+        }
+
+        [TestMethod]
+        public void DefaultScriptSecretIsSavedIfSecretSaysSo() {
+            SetShouldDefaultSecretsBeStored(true);
+
+            var secret = new SecretStringListEnumerator();
+            Sut.Reset(secret);
+            Sut.Get(secret);
+            Assert.IsTrue(Sut.Exists(secret));
+            CleanUpSecretRepository();
+        }
+
+        [TestMethod]
+        public void DefaultScriptSecretIsNotSavedIfSecretSaysNo() {
+            SetShouldDefaultSecretsBeStored(false);
+
+            var secret = new SecretStringListEnumerator();
+            Sut.Reset(secret);
+            Sut.Get(secret);
+            Assert.IsFalse(Sut.Exists(secret));
+            CleanUpSecretRepository();
+        }
+
+        [TestMethod]
+        public void DefaultScriptSecretIsNotReturnedIfSecretSaysItShouldNotBeSaved() {
+            SetShouldDefaultSecretsBeStored(false);
+
+            var secret = new SecretStringListEnumerator();
+            Sut.Reset(secret);
+            Assert.IsNull(Sut.Get(secret));
+            CleanUpSecretRepository();
+        }
+
+        [TestMethod]
+        public void DefaultScriptSecretIsNotCachedIfSecretSaysItShouldNotBeSaved() {
+            SetShouldDefaultSecretsBeStored(false);
+
+            var secret = new SecretStringListEnumerator();
+            Sut.Reset(secret);
+            Sut.Get(secret);
+            Assert.IsFalse(Sut.Values.ContainsKey(secret.Guid));
+            CleanUpSecretRepository();
         }
     }
 }

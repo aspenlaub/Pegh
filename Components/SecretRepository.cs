@@ -17,14 +17,16 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             Get(SecretShouldDefaultSecretsBeStored);
         }
 
-        public void Set<TResult>(ISecret<TResult> secret) where TResult : class, ISecretResult<TResult> {
-            var value = ValueOrDefault(secret);
-            var xml = vComponentProvider.XmlSerializer.Serialize(value);
+        public void Set<TResult>(ISecret<TResult> secret) where TResult : class, ISecretResult<TResult>, new() {
+            var valueOrDefault = ValueOrDefault(secret);
+            var xml = vComponentProvider.XmlSerializer.Serialize(valueOrDefault);
             var fileName = FileName(secret);
             File.WriteAllText(fileName, xml);
+            Values[secret.Guid] = valueOrDefault;
         }
 
-        private TResult ValueOrDefault<TResult>(ISecret<TResult> secret) where TResult : class, ISecretResult<TResult> {
+        private TResult ValueOrDefault<TResult>(ISecret<TResult> secret)
+                where TResult : class, ISecretResult<TResult> {
             if (!Values.ContainsKey(secret.Guid)) {
                 Values[secret.Guid] = secret.DefaultValue.Clone();
             }
@@ -32,18 +34,16 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             return value;
         }
 
-        public TResult Get<TResult>(ISecret<TResult> secret) where TResult : class, ISecretResult<TResult> {
+        public TResult Get<TResult>(ISecret<TResult> secret) where TResult : class, ISecretResult<TResult>, new() {
             TResult valueOrDefault;
 
             var fileName = FileName(secret);
             if (!File.Exists(fileName)) {
-                valueOrDefault = ValueOrDefault(secret);
-                Values[secret.Guid] = valueOrDefault;
                 var shouldDefaultSecretsBeStored = ValueOrDefault(SecretShouldDefaultSecretsBeStored);
-                if (!shouldDefaultSecretsBeStored.AutomaticallySaveDefaulSecretIfAbsent) { return valueOrDefault; }
+                if (!shouldDefaultSecretsBeStored.AutomaticallySaveDefaulSecretIfAbsent) { return null; }
 
                 Set(secret);
-                return valueOrDefault;
+                return ValueOrDefault(secret);
             }
 
             if (Values.ContainsKey(secret.Guid)) {
@@ -56,7 +56,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             return valueOrDefault;
         }
 
-        public TResult Get<TArgument, TResult>(IPowershellSecret<TArgument, TResult> secret, TArgument arg) where TResult : class {
+        public TResult Get<TArgument, TResult>(ISecret<IPowershellFunction<TArgument, TResult>> secret, TArgument arg) where TResult : class {
             var powershellFunction = ValueOrDefault(secret);
             var script = "Param(\r\n"
                          + "\t[Parameter(Mandatory=$true)]\r\n"
@@ -81,7 +81,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             }
         }
 
-        public void Reset<TResult>(ISecret<TResult> secret) where TResult : class, ISecretResult<TResult> {
+        public void Reset(IGuid secret) {
             if (Values.ContainsKey(secret.Guid)) {
                 Values.Remove(secret.Guid);
             }
@@ -92,7 +92,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             File.Delete(fileName);
         }
 
-        public bool Exists<TResult>(ISecret<TResult> secret) where TResult : class, ISecretResult<TResult> {
+        public bool Exists(IGuid secret) {
             return File.Exists(FileName(secret));
         }
 
