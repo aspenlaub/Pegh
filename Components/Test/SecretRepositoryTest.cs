@@ -80,10 +80,12 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
 
         [TestMethod]
         public void CanGetScriptSecret() {
+            SetShouldDefaultSecretsBeStored(true);
+
             var secret = new SecretStringListEnumerator();
             Sut.Reset(secret);
             var list = TestListOfStrings();
-            var enumeratedList = Sut.Get(secret, list);
+            var enumeratedList = Sut.ExecutePowershellFunction(Sut.Get(secret), list);
             Assert.IsNotNull(enumeratedList);
             var i = 0;
             foreach (var s in enumeratedList) {
@@ -94,10 +96,12 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
 
         [TestMethod]
         public void CannotGetScriptSecretIfScriptCannotBeRunWithoutErrors() {
+            SetShouldDefaultSecretsBeStored(true);
+
             var secret = new FailingSecretStringListEnumerator();
             Sut.Reset(secret);
             var list = TestListOfStrings();
-            var enumeratedList = Sut.Get(secret, list);
+            var enumeratedList = Sut.ExecutePowershellFunction(Sut.Get(secret), list);
             Assert.IsNull(enumeratedList);
         }
 
@@ -231,6 +235,25 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Sut.Reset(secret);
             Sut.Get(secret);
             Assert.IsFalse(Sut.Values.ContainsKey(secret.Guid));
+            CleanUpSecretRepository();
+        }
+
+        [TestMethod]
+        public void SavedScriptSecretIsUsedDuringExecution() {
+            SetShouldDefaultSecretsBeStored(true);
+
+            var secret = new SecretStringListEnumerator();
+            Sut.Reset(secret);
+            var script = Sut.Get(secret);
+            const string addedString = "/* This script has been altered */";
+            Assert.IsFalse(script.Script.StartsWith(addedString));
+            script.Script = addedString + "\r\n" + script.Script;
+            Sut.Set(secret);
+            Sut.Values.Clear();
+            Sut.ValueOrDefault(secret);
+            script = (PowershellFunction<IList<string>, IEnumerable<string>>)Sut.Values[secret.Guid];
+            var scriptText = script.Script;
+            Assert.IsTrue(scriptText.StartsWith(addedString));
             CleanUpSecretRepository();
         }
     }

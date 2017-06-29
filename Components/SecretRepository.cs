@@ -25,13 +25,21 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             Values[secret.Guid] = valueOrDefault;
         }
 
-        private TResult ValueOrDefault<TResult>(ISecret<TResult> secret)
+        internal TResult ValueOrDefault<TResult>(ISecret<TResult> secret)
                 where TResult : class, ISecretResult<TResult> {
-            if (!Values.ContainsKey(secret.Guid)) {
-                Values[secret.Guid] = secret.DefaultValue.Clone();
+            if (Values.ContainsKey(secret.Guid)) {
+                return Values[secret.Guid] as TResult;
             }
-            var value = Values[secret.Guid] as TResult;
-            return value;
+
+            var fileName = FileName(secret);
+            if (File.Exists(fileName)) {
+                Values[secret.Guid] = vComponentProvider.XmlDeserializer.Deserialize<TResult>(File.ReadAllText(fileName));
+                return (TResult) Values[secret.Guid];
+            }
+
+            var clone = secret.DefaultValue.Clone();
+            Values[secret.Guid] = clone;
+            return clone;
         }
 
         public TResult Get<TResult>(ISecret<TResult> secret) where TResult : class, ISecretResult<TResult>, new() {
@@ -56,8 +64,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             return valueOrDefault;
         }
 
-        public TResult Get<TArgument, TResult>(ISecret<IPowershellFunction<TArgument, TResult>> secret, TArgument arg) where TResult : class {
-            var powershellFunction = ValueOrDefault(secret);
+        public TResult ExecutePowershellFunction<TArgument, TResult>(IPowershellFunction<TArgument, TResult> powershellFunction, TArgument arg) where TResult : class {
             var script = "Param(\r\n"
                          + "\t[Parameter(Mandatory=$true)]\r\n"
                          + "\t$secretArgument\r\n"
