@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pegh.TestEntities", "TestEn
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pegh.Entities", "Entities\Pegh.Entities.csproj", "{97D7BFDE-2296-4356-808E-48DB07F1DEBC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pegh.Entities.Test", "Entities\Test\Pegh.Entities.Test.csproj", "{FBC8EBD2-B3CD-4ADC-93AB-1FC59800AB29}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,10 @@ Global
 		{97D7BFDE-2296-4356-808E-48DB07F1DEBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97D7BFDE-2296-4356-808E-48DB07F1DEBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97D7BFDE-2296-4356-808E-48DB07F1DEBC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBC8EBD2-B3CD-4ADC-93AB-1FC59800AB29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBC8EBD2-B3CD-4ADC-93AB-1FC59800AB29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBC8EBD2-B3CD-4ADC-93AB-1FC59800AB29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBC8EBD2-B3CD-4ADC-93AB-1FC59800AB29}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -49,6 +49,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
                 if (File.GetLastWriteTime(destinationFileFullName) == File.GetLastWriteTime(repositoryFileFullName)) { continue; }
 
                 File.Copy(repositoryFileFullName, destinationFileFullName, true);
+                File.SetLastWriteTime(destinationFileFullName, File.GetLastWriteTime(repositoryFileFullName));
                 numberOfCopiedFiles ++;
             }
 

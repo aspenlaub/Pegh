@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System.Xml;
+using System.Xml.Serialization;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities {
@@ -7,16 +8,26 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities {
         [XmlAttribute("guid")]
         public string Guid { get; set; }
 
-        [XmlAttribute("functionname")]
+        [XmlElement("functionname")]
         public string FunctionName { get; set; }
 
-        [XmlAttribute("script")]
+        [XmlIgnore]
         public string Script { get; set; }
 
-        [XmlAttribute("argumenttype")]
+        [XmlElement("script")]
+        public XmlCDataSection SerializedScript {
+            get {
+                return new XmlDocument().CreateCDataSection(Script);
+            }
+            set {
+                Script = value.Value;
+            }
+        }
+
+        [XmlElement("argumenttype")]
         public string ArgumentType { get; set; }
 
-        [XmlAttribute("resulttype")]
+        [XmlElement("resulttype")]
         public string ResultType { get; set; }
 
        public PowershellFunction() {

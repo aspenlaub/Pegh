@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
+using System.Xml;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.TestEntities;
 
-namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
+namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities.Test {
     [TestClass]
     public class EntityTest {
         [TestMethod]
@@ -69,7 +69,11 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
         }
 
         private static void CheckEquality<TClone>(bool equalityExpected, object value, PropertyInfo property, TClone clone) {
-            if (equalityExpected) {
+            var section = value as XmlCDataSection;
+            if (section != null) {
+                var valueProperty = typeof(XmlCDataSection).GetProperty("Value");
+                CheckEquality(equalityExpected, section.Value, valueProperty, property.GetValue(clone));
+            } else if (equalityExpected) {
                 Assert.AreEqual(value, property.GetValue(clone));
             }
             else {
