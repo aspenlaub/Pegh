@@ -45,6 +45,8 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         public TResult Get<TResult>(ISecret<TResult> secret) where TResult : class, ISecretResult<TResult>, new() {
             TResult valueOrDefault;
 
+            SaveSample(secret);
+
             var fileName = FileName(secret);
             if (!File.Exists(fileName)) {
                 var shouldDefaultSecretsBeStored = ValueOrDefault(SecretShouldDefaultSecretsBeStored);
@@ -104,7 +106,19 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         }
 
         private string FileName(IGuid secret) {
-            return vComponentProvider.PeghEnvironment.RootWorkFolder + @"\SecretRepository\" + secret.Guid + @".xml";
+            return FileName(secret, false);
+        }
+
+        private string FileName(IGuid secret, bool sample) {
+            return vComponentProvider.PeghEnvironment.RootWorkFolder + (sample ? @"\SecretSamples\" : @"\SecretRepository\") + secret.Guid + @".xml";
+        }
+
+        public void SaveSample<TResult>(ISecret<TResult> secret) where TResult : class, ISecretResult<TResult>, new() {
+            var fileName = FileName(secret, true);
+            if (File.Exists(fileName)) { return; }
+
+            var xml = vComponentProvider.XmlSerializer.Serialize(secret.DefaultValue);
+            File.WriteAllText(fileName, xml);
         }
     }
 }

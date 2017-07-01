@@ -18,11 +18,12 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
         public void Initialize() {
             ComponentProvider = new ComponentProvider();
             Sut = ComponentProvider.SecretRepository as SecretRepository;
-            SecretRepositoryFolder();
+            SecretRepositoryFolder(false);
+            SecretRepositoryFolder(true);
         }
 
-        private string SecretRepositoryFolder() {
-            var folder = ComponentProvider.PeghEnvironment.RootWorkFolder + @"\SecretRepository";
+        private string SecretRepositoryFolder(bool sample) {
+            var folder = ComponentProvider.PeghEnvironment.RootWorkFolder + (sample ? @"\SecretSamples" : @"\SecretRepository");
             if (!Directory.Exists(folder)) {
                 Directory.CreateDirectory(folder);
             }
@@ -103,6 +104,8 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             var list = TestListOfStrings();
             var enumeratedList = Sut.ExecutePowershellFunction(Sut.Get(secret), list);
             Assert.IsNull(enumeratedList);
+
+            CleanUpSecretRepository();
         }
 
         private static List<string> TestListOfStrings() {
@@ -118,9 +121,8 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
         }
 
         private void CleanUpSecretRepository() {
-            var secrets = new List<IGuid> { new SecretCrewMember(), new SecretStringListEnumerator() };
-            var folder = SecretRepositoryFolder();
-            foreach (var files in secrets.Select(secret => Directory.GetFiles(folder, secret.Guid + "*.*").ToList())) {
+            var secrets = new List<IGuid> { new SecretCrewMember(), new SecretStringListEnumerator(), new FailingSecretStringListEnumerator() };
+            foreach (var files in new[] { false, true }.Select(sample => SecretRepositoryFolder(sample)).SelectMany(folder => secrets.Select(secret => Directory.GetFiles(folder, secret.Guid + "*.*").ToList()))) {
                 Assert.IsTrue(files.Count < 2);
                 files.ForEach(f => File.Delete(f));
             }
@@ -254,6 +256,32 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             script = (PowershellFunction<IList<string>, IEnumerable<string>>)Sut.Values[secret.Guid];
             var scriptText = script.Script;
             Assert.IsTrue(scriptText.StartsWith(addedString));
+            CleanUpSecretRepository();
+        }
+
+        [TestMethod]
+        public void DefaultSecretSampleIsSavedIfSecretSaysSo() {
+            SetShouldDefaultSecretsBeStored(true);
+            CleanUpSecretRepository();
+
+            var secret = new SecretCrewMember();
+            var folder = SecretRepositoryFolder(true);
+            Assert.AreEqual(0, Directory.GetFiles(folder, secret.Guid + "*.*").Length);
+            Sut.SaveSample(secret);
+            Assert.AreEqual(1, Directory.GetFiles(folder, secret.Guid + "*.*").Length);
+            CleanUpSecretRepository();
+        }
+
+        [TestMethod]
+        public void DefaultSecretSampleIsSavedEvenIfSecretSaysNo() {
+            SetShouldDefaultSecretsBeStored(false);
+            CleanUpSecretRepository();
+
+            var secret = new SecretCrewMember();
+            var folder = SecretRepositoryFolder(true);
+            Assert.AreEqual(0, Directory.GetFiles(folder, secret.Guid + "*.*").Length);
+            Sut.SaveSample(secret);
+            Assert.AreEqual(1, Directory.GetFiles(folder, secret.Guid + "*.*").Length);
             CleanUpSecretRepository();
         }
     }
