@@ -284,5 +284,18 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Assert.AreEqual(1, Directory.GetFiles(folder, secret.Guid + "*.*").Length);
             CleanUpSecretRepository();
         }
+
+        [TestMethod]
+        public void CanGetLongSecretString() {
+            SetShouldDefaultSecretsBeStored(true);
+
+            var secret = new SecretLongSecretString();
+            var longSecretString = Sut.Get(secret);
+            Assert.AreEqual(128, longSecretString.LongString.Length);
+
+            secret = new SecretLongSecretString();
+            Assert.AreEqual(128, secret.DefaultValue.LongString.Length);
+            Assert.AreNotEqual(longSecretString.LongString, secret.DefaultValue.LongString);
+        }
     }
 }

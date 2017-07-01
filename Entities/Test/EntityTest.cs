@@ -20,6 +20,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities.Test {
             CanUseEntity<CrewMember>();
             CanUsePowershellFunction<int, string>();
             CanUseEntity<ShouldDefaultSecretsBeStored>();
+            CanUseEntity<LongSecretString>();
         }
 
         protected void CanUseEntity<T>() where T : class, new() {
