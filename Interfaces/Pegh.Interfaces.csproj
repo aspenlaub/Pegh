@@ -48,6 +48,7 @@
     <Compile Include="IFolderHelper.cs" />
     <Compile Include="IGuid.cs" />
     <Compile Include="IPowershellFunction.cs" />
+    <Compile Include="IPrimeNumberGenerator.cs" />
     <Compile Include="ISecret.cs" />
     <Compile Include="IPeghEnvironment.cs" />
     <Compile Include="ISecretRepository.cs" />

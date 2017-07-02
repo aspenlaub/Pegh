@@ -51,6 +51,7 @@
     <Compile Include="ComponentProvider.cs" />
     <Compile Include="FolderHelper.cs" />
     <Compile Include="PeghEnvironment.cs" />
+    <Compile Include="PrimeNumberGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SecretRepository.cs" />
     <Compile Include="XmlDeserializer.cs" />
