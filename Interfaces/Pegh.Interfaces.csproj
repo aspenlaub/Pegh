@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="IAssemblyRepository.cs" />
     <Compile Include="IComponentProvider.cs" />
+    <Compile Include="IDisguiser.cs" />
     <Compile Include="IFolderHelper.cs" />
     <Compile Include="IGuid.cs" />
     <Compile Include="IPowershellFunction.cs" />
