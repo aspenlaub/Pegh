@@ -27,6 +27,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         public IAssemblyRepository AssemblyRepository { get { return DefaultComponent<IAssemblyRepository, AssemblyRepository>(() => new AssemblyRepository(this)); } }
         public IFolderHelper FolderHelper { get { return DefaultComponent<IFolderHelper, FolderHelper>(); } }
         public IPeghEnvironment PeghEnvironment { get { return DefaultComponent<IPeghEnvironment, PeghEnvironment>(); } }
+        public IPrimeNumberGenerator PrimeNumberGenerator { get { return DefaultComponent<IPrimeNumberGenerator, PrimeNumberGenerator>(); } }
         public ISecretRepository SecretRepository { get { return DefaultComponent<ISecretRepository, SecretRepository>(() => new SecretRepository(this)); } }
         public IXmlDeserializer XmlDeserializer { get { return DefaultComponent<IXmlDeserializer, XmlDeserializer>(); } }
         public IXmlSerializer XmlSerializer { get { return DefaultComponent<IXmlSerializer, XmlSerializer>(); } }

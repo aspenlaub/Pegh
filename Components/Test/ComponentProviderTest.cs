@@ -8,6 +8,11 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             var sut = new ComponentProvider();
             Assert.IsNotNull(sut.AssemblyRepository);
             Assert.IsNotNull(sut.FolderHelper);
+            Assert.IsNotNull(sut.PeghEnvironment);
+            Assert.IsNotNull(sut.PrimeNumberGenerator);
+            Assert.IsNotNull(sut.SecretRepository);
+            Assert.IsNotNull(sut.XmlDeserializer);
+            Assert.IsNotNull(sut.XmlSerializer);
         }
     }
 }
