@@ -17,9 +17,9 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
         [TestInitialize]
         public void Initialize() {
             ComponentProvider = new ComponentProvider();
-            Sut = ComponentProvider.SecretRepository as SecretRepository;
             SecretRepositoryFolder(false);
             SecretRepositoryFolder(true);
+            Sut = ComponentProvider.SecretRepository as SecretRepository;
         }
 
         private string SecretRepositoryFolder(bool sample) {
