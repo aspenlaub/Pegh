@@ -15,7 +15,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         public Disguiser(IComponentProvider componentProvider) {
             ComponentProvider = componentProvider;
             SecretRepository = componentProvider.SecretRepository;
-            LongString = SecretRepository.Get(new SecretLongSecretString()).LongString;
+            LongString = SecretRepository.Get(new LongSecretString()).TheLongString;
             PrimeNumberGenerator = ComponentProvider.PrimeNumberGenerator;
         }
 

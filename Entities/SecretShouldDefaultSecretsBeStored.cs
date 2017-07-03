@@ -5,7 +5,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities {
 
         private ShouldDefaultSecretsBeStored vDefaultValue;
         public ShouldDefaultSecretsBeStored DefaultValue {
-            get { return vDefaultValue ?? (vDefaultValue = new ShouldDefaultSecretsBeStored { AutomaticallySaveDefaulSecretIfAbsent = true }); }
+            get { return vDefaultValue ?? (vDefaultValue = new ShouldDefaultSecretsBeStored { AutomaticallySaveDefaultSecretIfAbsent = true }); }
         }
 
         public string Guid { get { return "49CAE10D-6BF2-4434-88C1-AD305AEF1838"; } }

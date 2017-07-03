@@ -1,22 +1,25 @@
-﻿using System.Xml.Serialization;
+﻿using System;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities {
-    public class LongSecretString : IGuid, ISecretResult<LongSecretString> {
-        [XmlAttribute("guid")]
-        public string Guid { get; set; }
+    public class LongSecretString : ISecret<LongString> {
+        private LongString vDefaultValue;
 
-        [XmlElement("longstring")]
-        public string LongString { get; set; }
-
-        public LongSecretString() {
-            Guid = System.Guid.NewGuid().ToString();
+        public LongString DefaultValue {
+            get { return vDefaultValue ?? (vDefaultValue = new LongString { TheLongString = GenerateLongString(128) }); }
         }
 
-        public LongSecretString Clone() {
-            var clone = (LongSecretString)MemberwiseClone();
-            clone.Guid = System.Guid.NewGuid().ToString();
-            return clone;
+        public string Guid { get { return "B2C6C45C-C77F-4227-9BC1-62419AC4BB3C"; } }
+
+        private static string GenerateLongString(int length) {
+            const string pool = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!$%/#*.";
+            var s = "";
+            var random = new Random();
+            for (var i = 0; i < length; i++) {
+                s = s + pool[random.Next(pool.Length)];
+            }
+
+            return s;
         }
     }
 }

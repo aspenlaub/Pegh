@@ -43,11 +43,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LongSecretString.cs" />
+    <Compile Include="LongString.cs" />
     <Compile Include="PowershellFunction.cs" />
     <Compile Include="PowershellFunctionResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SecretLongSecretString.cs" />
+    <Compile Include="LongSecretString.cs" />
     <Compile Include="ShouldDefaultSecretsBeStored.cs" />
     <Compile Include="SecretShouldDefaultSecretsBeStored.cs" />
   </ItemGroup>

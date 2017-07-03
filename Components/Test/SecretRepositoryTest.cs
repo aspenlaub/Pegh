@@ -133,7 +133,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             var secret = new SecretShouldDefaultSecretsBeStored();
             var shouldDefaultSecretsBeStored = secret.DefaultValue;
             Assert.IsNotNull(shouldDefaultSecretsBeStored);
-            Assert.IsTrue(shouldDefaultSecretsBeStored.AutomaticallySaveDefaulSecretIfAbsent);
+            Assert.IsTrue(shouldDefaultSecretsBeStored.AutomaticallySaveDefaultSecretIfAbsent);
         }
 
         [TestMethod]
@@ -181,13 +181,13 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
 
         private void SetShouldDefaultSecretsBeStored(bool shouldThey) {
             var shouldDefaultSecretsBeStored = ShouldDefaultSecretsBeStored();
-            if (shouldThey == shouldDefaultSecretsBeStored.AutomaticallySaveDefaulSecretIfAbsent) {
+            if (shouldThey == shouldDefaultSecretsBeStored.AutomaticallySaveDefaultSecretIfAbsent) {
                 return;
             }
 
-            shouldDefaultSecretsBeStored.AutomaticallySaveDefaulSecretIfAbsent = shouldThey;
+            shouldDefaultSecretsBeStored.AutomaticallySaveDefaultSecretIfAbsent = shouldThey;
             shouldDefaultSecretsBeStored = ShouldDefaultSecretsBeStored();
-            Assert.AreEqual(shouldThey, shouldDefaultSecretsBeStored.AutomaticallySaveDefaulSecretIfAbsent);
+            Assert.AreEqual(shouldThey, shouldDefaultSecretsBeStored.AutomaticallySaveDefaultSecretIfAbsent);
         }
 
         private ShouldDefaultSecretsBeStored ShouldDefaultSecretsBeStored() {
@@ -289,13 +289,13 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
         public void CanGetLongSecretString() {
             SetShouldDefaultSecretsBeStored(true);
 
-            var secret = new SecretLongSecretString();
+            var secret = new LongSecretString();
             var longSecretString = Sut.Get(secret);
-            Assert.AreEqual(128, longSecretString.LongString.Length);
+            Assert.AreEqual(128, longSecretString.TheLongString.Length);
 
-            secret = new SecretLongSecretString();
-            Assert.AreEqual(128, secret.DefaultValue.LongString.Length);
-            Assert.AreNotEqual(longSecretString.LongString, secret.DefaultValue.LongString);
+            secret = new LongSecretString();
+            Assert.AreEqual(128, secret.DefaultValue.TheLongString.Length);
+            Assert.AreNotEqual(longSecretString.TheLongString, secret.DefaultValue.TheLongString);
         }
     }
 }

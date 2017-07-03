@@ -10,10 +10,10 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
         public void CanDisguise() {
             var componentProviderMock = new Mock<IComponentProvider>();
 
-            var secretLongString = new LongSecretString {LongString = "A12BCD3456./*EFG78HI"};
+            var secretLongString = new LongString {TheLongString = "A12BCD3456./*EFG78HI"};
 
             var secretRepositoryMock = new Mock<ISecretRepository>();
-            secretRepositoryMock.Setup(repository => repository.Get(It.IsAny<SecretLongSecretString>())).Returns(secretLongString);
+            secretRepositoryMock.Setup(repository => repository.Get(It.IsAny<LongSecretString>())).Returns(secretLongString);
             componentProviderMock.Setup(c => c.SecretRepository).Returns(secretRepositoryMock.Object);
 
             componentProviderMock.Setup(c => c.PrimeNumberGenerator).Returns(new PrimeNumberGenerator());

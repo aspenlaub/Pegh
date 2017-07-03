@@ -50,7 +50,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             var fileName = FileName(secret);
             if (!File.Exists(fileName)) {
                 var shouldDefaultSecretsBeStored = ValueOrDefault(SecretShouldDefaultSecretsBeStored);
-                if (!shouldDefaultSecretsBeStored.AutomaticallySaveDefaulSecretIfAbsent) { return null; }
+                if (!shouldDefaultSecretsBeStored.AutomaticallySaveDefaultSecretIfAbsent) { return null; }
 
                 Set(secret);
                 return ValueOrDefault(secret);
