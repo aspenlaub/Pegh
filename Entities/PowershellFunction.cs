@@ -3,6 +3,7 @@ using System.Xml.Serialization;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities {
+    [XmlRoot("PowershellFunction")]
     public class PowershellFunction<TArgument, TResult> : IPowershellFunction<TArgument, TResult>, ISecretResult<PowershellFunction<TArgument, TResult>> {
 
         [XmlAttribute("guid")]
