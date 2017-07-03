@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -59,8 +59,13 @@
     <Compile Include="EntityTest.cs" />
     <Compile Include="PowershellFunctionTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SecretPassphraseFunctionTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Components\Pegh.Components.csproj">
+      <Project>{6D7A0D2A-6BF6-4633-8122-B7FDCE4C4F74}</Project>
+      <Name>Pegh.Components</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Interfaces\Pegh.Interfaces.csproj">
       <Project>{60edcaae-15a7-486a-a7e1-7ee6cf285520}</Project>
       <Name>Pegh.Interfaces</Name>

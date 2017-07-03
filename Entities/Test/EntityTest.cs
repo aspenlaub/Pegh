@@ -21,6 +21,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities.Test {
             CanUsePowershellFunction<int, string>();
             CanUseEntity<ShouldDefaultSecretsBeStored>();
             CanUseEntity<LongString>();
+            CanUseEntity<SecretPassphraseFunctionArgument>();
         }
 
         protected void CanUseEntity<T>() where T : class, new() {

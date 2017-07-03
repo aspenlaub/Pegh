@@ -48,6 +48,8 @@
     <Compile Include="IDisguiser.cs" />
     <Compile Include="IFolderHelper.cs" />
     <Compile Include="IGuid.cs" />
+    <Compile Include="IPassphraseDialog.cs" />
+    <Compile Include="IPassphraseProvider.cs" />
     <Compile Include="IPowershellFunction.cs" />
     <Compile Include="IPrimeNumberGenerator.cs" />
     <Compile Include="ISecret.cs" />

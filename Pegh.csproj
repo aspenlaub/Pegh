@@ -61,6 +61,10 @@
       <Project>{97d7bfde-2296-4356-808e-48db07f1debc}</Project>
       <Name>Pegh.Entities</Name>
     </ProjectReference>
+    <ProjectReference Include="GUI\Pegh.GUI.csproj">
+      <Project>{F8C3AC7C-56D2-4049-8EF3-E10A3B1564AA}</Project>
+      <Name>Pegh.GUI</Name>
+    </ProjectReference>
     <ProjectReference Include="Interfaces\Pegh.Interfaces.csproj">
       <Project>{60edcaae-15a7-486a-a7e1-7ee6cf285520}</Project>
       <Name>Pegh.Interfaces</Name>

@@ -48,6 +48,8 @@
     <Compile Include="PowershellFunctionResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="LongSecretString.cs" />
+    <Compile Include="SecretPassphraseFunction.cs" />
+    <Compile Include="SecretPassphraseFunctionArgument.cs" />
     <Compile Include="ShouldDefaultSecretsBeStored.cs" />
     <Compile Include="SecretShouldDefaultSecretsBeStored.cs" />
   </ItemGroup>

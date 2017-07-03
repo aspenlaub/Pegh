@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Management.Automation;
+using System.Management.Automation.Runspaces;
+using System.Threading;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 
@@ -80,6 +82,11 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             using (var powerShellInstance = PowerShell.Create()) {
                 powerShellInstance.AddScript(script);
                 powerShellInstance.AddParameter("secretArgument", arg);
+                var runSpace = RunspaceFactory.CreateRunspace();
+                runSpace.ApartmentState = ApartmentState.STA;
+                runSpace.ThreadOptions = PSThreadOptions.ReuseThread;
+                runSpace.Open();
+                powerShellInstance.Runspace = runSpace;
                 var invokeResults = powerShellInstance.Invoke();
                 if (powerShellInstance.Streams.Error.Count > 0 || invokeResults.Count != 1) {
                     return null;
