@@ -14,7 +14,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities {
                                     + "\t\tAdd-Type -Path \"Aspenlaub.Net.GitHub.CSharp.Pegh.GUI.dll\"\r\n"
                                     + "\t\t$dialog = New-Object -TypeName \"Aspenlaub.Net.GitHub.CSharp.Pegh.GUI.EnterPassphrase\"\r\n"
                                     + "\t\t$provider = New-Object -TypeName \"Aspenlaub.Net.GitHub.CSharp.Pegh.Components.PassphraseProvider\"\r\n"
-                                    + "\t\t$result.Result = $provider.Passphrase($dialog)\r\n"
+                                    + "\t\t$result.Result = $provider.Passphrase(\"" + Guid + "\", \"Enter Passphrase\", \"Need passphrase to read/write encrypted secret/-s\", { $dialog })\r\n"
                                     + "\t} else {\r\n"
                                     + "\t\t$result.Result = $arg.PassphraseIfUserIsNotPresent\r\n"
                                     + "\t}\r\n"

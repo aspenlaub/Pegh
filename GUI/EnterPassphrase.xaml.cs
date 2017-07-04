@@ -28,5 +28,22 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.GUI {
         public string Passphrase() {
             return PassPhraseTextBox.Password == RepeatPassPhraseTextBox.Password ? PassPhraseTextBox.Password : "";
         }
+
+        public void SetTitle(string title) {
+            Title = title;
+        }
+
+        public void SetDescription(string description) {
+            DescriptionLabel.Content = description;
+        }
+
+        public void BringToFront() {
+            Topmost = true;
+        }
+
+        public void ClearPassphrases() {
+            PassPhraseTextBox.Password = "";
+            RepeatPassPhraseTextBox.Password = "";
+        }
     }
 }

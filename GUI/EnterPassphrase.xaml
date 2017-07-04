@@ -4,9 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Enter Passphrase" SizeToContent="WidthAndHeight">
+        Title="(Missing title)" SizeToContent="WidthAndHeight">
     <StackPanel Background="DarkGoldenrod">
-        <Label Foreground="Gold" Height="26">Need passphrase to read encrypted secret/-s</Label>
+        <Label Name="DescriptionLabel" Foreground="Gold" Height="26">(Missing Description)</Label>
         <Label Foreground="Gold" Height="26">Passphrase</Label>
         <PasswordBox Name="PassPhraseTextBox" Foreground="DarkGoldenrod" Margin="5" Background="Gold" Height="26" Width="400"/>
         <Label Foreground="Gold" Height="26">Repeat passphrase</Label>
