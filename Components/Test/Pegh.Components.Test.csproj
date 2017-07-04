@@ -68,6 +68,7 @@
     <Compile Include="ComponentProviderTest.cs" />
     <Compile Include="DirectoryDeleter.cs" />
     <Compile Include="DisguiserTest.cs" />
+    <Compile Include="EncryptedSecretCrewMember.cs" />
     <Compile Include="FailingSecretStringListEnumerator.cs" />
     <Compile Include="PassphraseProviderTest.cs" />
     <Compile Include="PrimeNumberGeneratorTest.cs" />

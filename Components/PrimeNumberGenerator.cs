@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
@@ -8,17 +9,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             var candidate = 2;
             while (result.Count < n) {
                 candidate ++;
-                var prime = true;
-                for (var j = 2; j <= candidate / 2; j++) {
-                    if (candidate % j != 0) {
-                        continue;
-                    }
-
-                    prime = false;
-                    break;
-                }
-
-                if (!prime) { continue; }
+                if (result.Any(j => candidate % j == 0)) { continue; }
 
                 result.Add(candidate);
             }

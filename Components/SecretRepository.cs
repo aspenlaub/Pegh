@@ -1,29 +1,37 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
+using System.Text;
 using System.Threading;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
+using Ionic.Zip;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
     public class SecretRepository : ISecretRepository {
-        private readonly IComponentProvider vComponentProvider;
+        protected readonly IComponentProvider ComponentProvider;
         internal readonly Dictionary<string, object> Values;
         internal readonly SecretShouldDefaultSecretsBeStored SecretShouldDefaultSecretsBeStored;
 
+        public bool IsUserPresent { get; internal set; }
+        public string PassphraseIfUserIsNotPresent { get; internal set; }
+
         public SecretRepository(IComponentProvider componentProvider) {
-            vComponentProvider = componentProvider;
+            ComponentProvider = componentProvider;
             Values = new Dictionary<string, object>();
             SecretShouldDefaultSecretsBeStored = new SecretShouldDefaultSecretsBeStored();
+            IsUserPresent = true;
             Get(SecretShouldDefaultSecretsBeStored);
         }
 
         public void Set<TResult>(ISecret<TResult> secret) where TResult : class, ISecretResult<TResult>, new() {
             var valueOrDefault = ValueOrDefault(secret);
-            var xml = vComponentProvider.XmlSerializer.Serialize(valueOrDefault);
-            var fileName = FileName(secret);
-            File.WriteAllText(fileName, xml);
+            var xml = ComponentProvider.XmlSerializer.Serialize(valueOrDefault);
+            var encrypted = secret is IEncryptedSecret<TResult>;
+            WriteToFile(secret, xml, false, encrypted);
             Values[secret.Guid] = valueOrDefault;
         }
 
@@ -33,9 +41,10 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
                 return Values[secret.Guid] as TResult;
             }
 
-            var fileName = FileName(secret);
-            if (File.Exists(fileName)) {
-                Values[secret.Guid] = vComponentProvider.XmlDeserializer.Deserialize<TResult>(File.ReadAllText(fileName));
+            var encrypted = secret is IEncryptedSecret<TResult>;
+            if (File.Exists(FileName(secret, false, encrypted))) {
+                var xml = ReadFromFile(secret, false, encrypted);
+                Values[secret.Guid] = ComponentProvider.XmlDeserializer.Deserialize<TResult>(xml);
                 return (TResult) Values[secret.Guid];
             }
 
@@ -49,7 +58,8 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
 
             SaveSample(secret);
 
-            var fileName = FileName(secret);
+            var encrypted = secret is IEncryptedSecret<TResult>;
+            var fileName = FileName(secret, false, encrypted);
             if (!File.Exists(fileName)) {
                 var shouldDefaultSecretsBeStored = ValueOrDefault(SecretShouldDefaultSecretsBeStored);
                 if (!shouldDefaultSecretsBeStored.AutomaticallySaveDefaultSecretIfAbsent) { return null; }
@@ -63,7 +73,10 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
                 return valueOrDefault;
             }
 
-            valueOrDefault = vComponentProvider.XmlDeserializer.Deserialize<TResult>(File.ReadAllText(fileName));
+            var xml = ReadFromFile(secret, false, encrypted);
+            if (string.IsNullOrEmpty(xml)) { return null; }
+
+            valueOrDefault = ComponentProvider.XmlDeserializer.Deserialize<TResult>(xml);
             Values[secret.Guid] = valueOrDefault;
             return valueOrDefault;
         }
@@ -97,35 +110,89 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             }
         }
 
-        public void Reset(IGuid secret) {
+        internal void Reset(IGuid secret, bool encrypted) {
             if (Values.ContainsKey(secret.Guid)) {
                 Values.Remove(secret.Guid);
             }
 
-            var fileName = FileName(secret);
+            var fileName = FileName(secret, false, encrypted);
             if (!File.Exists(fileName)) { return; }
 
             File.Delete(fileName);
         }
 
-        public bool Exists(IGuid secret) {
-            return File.Exists(FileName(secret));
+        internal bool Exists(IGuid secret, bool encrypted) {
+            return File.Exists(FileName(secret, false, encrypted));
         }
 
-        private string FileName(IGuid secret) {
-            return FileName(secret, false);
-        }
-
-        private string FileName(IGuid secret, bool sample) {
-            return vComponentProvider.PeghEnvironment.RootWorkFolder + (sample ? @"\SecretSamples\" : @"\SecretRepository\") + secret.Guid + @".xml";
-        }
-
-        public void SaveSample<TResult>(ISecret<TResult> secret) where TResult : class, ISecretResult<TResult>, new() {
-            var fileName = FileName(secret, true);
+        internal void SaveSample<TResult>(ISecret<TResult> secret) where TResult : class, ISecretResult<TResult>, new() {
+            var encrypted = secret is IEncryptedSecret<TResult>;
+            var fileName = FileName(secret, true, encrypted);
             if (File.Exists(fileName)) { return; }
 
-            var xml = vComponentProvider.XmlSerializer.Serialize(secret.DefaultValue);
+            var xml = ComponentProvider.XmlSerializer.Serialize(secret.DefaultValue);
             File.WriteAllText(fileName, xml);
+        }
+
+        private void WriteToFile(IGuid secret, string xml, bool sample, bool encrypted) {
+            var fileName = FileName(secret, sample, encrypted);
+            if (!encrypted) {
+                File.WriteAllText(fileName, xml);
+                return;
+            }
+
+            var disguisedPassphrase = GetDisguisedPassphrase();
+            if (string.IsNullOrEmpty(disguisedPassphrase)) { return; }
+
+            var unencryptedFileName = FileName(secret, sample, false);
+            unencryptedFileName = unencryptedFileName.Substring(unencryptedFileName.LastIndexOf("\\", StringComparison.Ordinal) + 1);
+            using (var zipFile = new ZipFile(fileName) { Encryption = EncryptionAlgorithm.WinZipAes256, Password = disguisedPassphrase }) {
+                zipFile.AddEntry(unencryptedFileName, xml);
+                zipFile.Save();
+                zipFile.Dispose();
+            }
+        }
+
+        private string ReadFromFile(IGuid secret, bool sample, bool encrypted) {
+            var fileName = FileName(secret, sample, encrypted);
+            if (!encrypted) {
+                return File.ReadAllText(fileName);
+            }
+
+            var disguisedPassphrase = GetDisguisedPassphrase();
+            if (string.IsNullOrEmpty(disguisedPassphrase)) { return ""; }
+
+            var unencryptedFileName = FileName(secret, sample, false);
+            unencryptedFileName = unencryptedFileName.Substring(unencryptedFileName.LastIndexOf("\\", StringComparison.Ordinal) + 1);
+            var xml = "";
+            using (var zipFile = ZipFile.Read(fileName)) {
+                var zipEntry = zipFile.FirstOrDefault(f => f.FileName == unencryptedFileName);
+                if (zipEntry != null) {
+                    using (var stream = new MemoryStream()) {
+                        try {
+                            zipEntry.ExtractWithPassword(stream, disguisedPassphrase);
+                            xml = Encoding.UTF8.GetString(stream.ToArray());
+                        }
+                        catch {
+                            // ignored
+                        }
+                    }
+                }
+                zipFile.Dispose();
+            }
+
+            return xml;
+        }
+
+        private string FileName(IGuid secret, bool sample, bool encrypted) {
+            return ComponentProvider.PeghEnvironment.RootWorkFolder + (sample ? @"\SecretSamples\" : @"\SecretRepository\") + secret.Guid + (encrypted ? @".7zip" : @".xml");
+        }
+
+        private string GetDisguisedPassphrase() {
+            var passphraseFunction = Get(new SecretPassphraseFunction());
+            var passphraseFunctionArgument = new SecretPassphraseFunctionArgument { IsUserPresent = IsUserPresent, PassphraseIfUserIsNotPresent = PassphraseIfUserIsNotPresent };
+            var passphrase = ExecutePowershellFunction(passphraseFunction, passphraseFunctionArgument);
+            return string.IsNullOrEmpty(passphrase) ? "" : ComponentProvider.Disguiser.Disguise(passphrase);
         }
     }
 }
