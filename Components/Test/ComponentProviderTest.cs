@@ -15,6 +15,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Assert.IsNotNull(sut.SecretRepository);
             Assert.IsNotNull(sut.XmlDeserializer);
             Assert.IsNotNull(sut.XmlSerializer);
+            Assert.IsNotNull(sut.XmlSchemer);
         }
     }
 }

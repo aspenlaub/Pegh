@@ -35,8 +35,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             Values[secret.Guid] = valueOrDefault;
         }
 
-        internal TResult ValueOrDefault<TResult>(ISecret<TResult> secret)
-                where TResult : class, ISecretResult<TResult> {
+        internal TResult ValueOrDefault<TResult>(ISecret<TResult> secret) where TResult : class, ISecretResult<TResult>, new() {
             if (Values.ContainsKey(secret.Guid)) {
                 return Values[secret.Guid] as TResult;
             }
@@ -132,12 +131,17 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
 
             var xml = ComponentProvider.XmlSerializer.Serialize(secret.DefaultValue);
             File.WriteAllText(fileName, xml);
+            File.WriteAllText(fileName.Replace(".xml", ".xsd"), ComponentProvider.XmlSchemer.Create(typeof(TResult)));
         }
 
-        private void WriteToFile(IGuid secret, string xml, bool sample, bool encrypted) {
+        // ReSharper disable once SuggestBaseTypeForParameter
+        internal void WriteToFile<TResult>(ISecret<TResult> secret, string xml, bool sample, bool encrypted) where TResult : class, ISecretResult<TResult>, new() {
+            if (!ComponentProvider.XmlSchemer.Valid(xml, typeof(TResult))) { return; }
+
             var fileName = FileName(secret, sample, encrypted);
             if (!encrypted) {
                 File.WriteAllText(fileName, xml);
+                File.WriteAllText(fileName.Replace(".xml", ".xsd"), ComponentProvider.XmlSchemer.Create(typeof(TResult)));
                 return;
             }
 
@@ -153,10 +157,14 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             }
         }
 
-        private string ReadFromFile(IGuid secret, bool sample, bool encrypted) {
+        // ReSharper disable once SuggestBaseTypeForParameter
+        private string ReadFromFile<TResult>(ISecret<TResult> secret, bool sample, bool encrypted) where TResult : class, ISecretResult<TResult>, new() {
+            var xml = "";
+
             var fileName = FileName(secret, sample, encrypted);
             if (!encrypted) {
-                return File.ReadAllText(fileName);
+                xml = File.ReadAllText(fileName);
+                return ComponentProvider.XmlSchemer.Valid(xml, typeof(TResult)) ? xml : "";
             }
 
             var disguisedPassphrase = GetDisguisedPassphrase();
@@ -164,7 +172,6 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
 
             var unencryptedFileName = FileName(secret, sample, false);
             unencryptedFileName = unencryptedFileName.Substring(unencryptedFileName.LastIndexOf("\\", StringComparison.Ordinal) + 1);
-            var xml = "";
             using (var zipFile = ZipFile.Read(fileName)) {
                 var zipEntry = zipFile.FirstOrDefault(f => f.FileName == unencryptedFileName);
                 if (zipEntry != null) {
@@ -181,7 +188,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
                 zipFile.Dispose();
             }
 
-            return xml;
+            return ComponentProvider.XmlSchemer.Valid(xml, typeof(TResult)) ? xml : "";
         }
 
         private string FileName(IGuid secret, bool sample, bool encrypted) {

@@ -15,7 +15,20 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities {
         [XmlIgnore]
         public string Script { get; set; }
 
-        [XmlElement("script")]
+        /*
+        [XmlText]
+        public XmlNode[] SerializedScript {
+            get {
+                return new XmlNode[] { new XmlDocument().CreateCDataSection(Script) };
+            }
+            set {
+                var cdata = value[0] as XmlCDataSection;
+                Script = cdata?.Data;
+            }
+        }
+        */
+
+        [XmlElement("script", typeof(XmlCDataSection))]
         public XmlCDataSection SerializedScript {
             get {
                 return new XmlDocument().CreateCDataSection(Script);

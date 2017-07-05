@@ -128,7 +128,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
         private void CleanUpSecretRepository() {
             var secrets = new List<IGuid> { new SecretCrewMember(), new SecretStringListEnumerator(), new FailingSecretStringListEnumerator(), new EncryptedSecretCrewMember() };
             foreach (var files in new[] { false, true }.Select(sample => SecretRepositoryFolder(sample)).SelectMany(folder => secrets.Select(secret => Directory.GetFiles(folder, secret.Guid + "*.*").ToList()))) {
-                Assert.IsTrue(files.Count < 2);
+                Assert.IsTrue(files.Count < 3);
                 files.ForEach(f => File.Delete(f));
             }
         }
@@ -273,7 +273,8 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             var folder = SecretRepositoryFolder(true);
             Assert.AreEqual(0, Directory.GetFiles(folder, secret.Guid + "*.*").Length);
             Sut.SaveSample(secret);
-            Assert.AreEqual(1, Directory.GetFiles(folder, secret.Guid + "*.*").Length);
+            Assert.AreEqual(1, Directory.GetFiles(folder, secret.Guid + "*.xml").Length);
+            Assert.AreEqual(1, Directory.GetFiles(folder, secret.Guid + "*.xsd").Length);
             CleanUpSecretRepository();
         }
 
@@ -286,7 +287,8 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             var folder = SecretRepositoryFolder(true);
             Assert.AreEqual(0, Directory.GetFiles(folder, secret.Guid + "*.*").Length);
             Sut.SaveSample(secret);
-            Assert.AreEqual(1, Directory.GetFiles(folder, secret.Guid + "*.*").Length);
+            Assert.AreEqual(1, Directory.GetFiles(folder, secret.Guid + "*.xml").Length);
+            Assert.AreEqual(1, Directory.GetFiles(folder, secret.Guid + "*.xsd").Length);
             CleanUpSecretRepository();
         }
 
@@ -358,6 +360,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             componentProviderMock.Setup(c => c.PeghEnvironment).Returns(ComponentProvider.PeghEnvironment);
             componentProviderMock.Setup(c => c.XmlDeserializer).Returns(ComponentProvider.XmlDeserializer);
             componentProviderMock.Setup(c => c.XmlSerializer).Returns(ComponentProvider.XmlSerializer);
+            componentProviderMock.Setup(c => c.XmlSchemer).Returns(ComponentProvider.XmlSchemer);
             var disguiserMock = new Mock<IDisguiser>();
             disguiserMock.Setup(d => d.Disguise(It.IsAny<string>())).Returns("");
             componentProviderMock.Setup(c => c.Disguiser).Returns(disguiserMock.Object);
@@ -384,6 +387,17 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Assert.IsNull(GetSecretCrewMember(secret));
             Sut.Get(secret);
             Assert.IsNull(GetSecretCrewMember(secret));
+            CleanUpSecretRepository();
+        }
+
+        [TestMethod]
+        public void DoesNotExistAfterTryingToSaveInvalidXml() {
+            var secret = new SecretCrewMember();
+            Sut.Reset(secret, false);
+            var valueOrDefault = secret.DefaultValue;
+            var xml = ComponentProvider.XmlSerializer.Serialize(valueOrDefault).Replace("Crew", "Curfew");
+            Sut.WriteToFile(secret, xml, false, false);
+            Assert.IsFalse(Sut.Exists(secret, false));
             CleanUpSecretRepository();
         }
     }

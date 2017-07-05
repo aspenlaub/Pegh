@@ -78,6 +78,7 @@
     <Compile Include="AssemblyRepositoryTest.cs" />
     <Compile Include="SecretRepositoryTest.cs" />
     <Compile Include="SecretStringListEnumerator.cs" />
+    <Compile Include="XmlSchemerTest.cs" />
     <Compile Include="XmlSerializationTest.cs" />
   </ItemGroup>
   <ItemGroup>

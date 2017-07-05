@@ -9,5 +9,6 @@
         ISecretRepository SecretRepository { get; }
         IXmlDeserializer XmlDeserializer { get; }
         IXmlSerializer XmlSerializer { get; }
+        IXmlSchemer XmlSchemer { get; }
     }
 }

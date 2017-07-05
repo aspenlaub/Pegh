@@ -59,6 +59,7 @@
     <Compile Include="ISecretResult.cs" />
     <Compile Include="ISetGuid.cs" />
     <Compile Include="IXmlDeserializer.cs" />
+    <Compile Include="IXmlSchemer.cs" />
     <Compile Include="IXmlSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
