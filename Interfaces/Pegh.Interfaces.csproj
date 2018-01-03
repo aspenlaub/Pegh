@@ -44,7 +44,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IAssemblyRepository.cs" />
     <Compile Include="IComponentProvider.cs" />
     <Compile Include="IDisguiser.cs" />
     <Compile Include="IEncryptedSecret.cs" />

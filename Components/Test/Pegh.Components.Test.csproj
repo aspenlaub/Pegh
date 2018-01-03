@@ -81,7 +81,6 @@
     <Compile Include="SecretCrewMember.cs" />
     <Compile Include="FolderHelperTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="AssemblyRepositoryTest.cs" />
     <Compile Include="SecretRepositoryTest.cs" />
     <Compile Include="SecretStringListEnumerator.cs" />
     <Compile Include="XmlSchemerTest.cs" />

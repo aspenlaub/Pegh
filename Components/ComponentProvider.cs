@@ -24,7 +24,6 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             return (T)DefaultComponents[typeof(T)];
         }
 
-        public IAssemblyRepository AssemblyRepository { get { return DefaultComponent<IAssemblyRepository, AssemblyRepository>(() => new AssemblyRepository(this)); } }
         public IDisguiser Disguiser { get { return DefaultComponent<IDisguiser, Disguiser>(() => new Disguiser(this)); } }
         public IFolderHelper FolderHelper { get { return DefaultComponent<IFolderHelper, FolderHelper>(); } }
         public IPassphraseProvider PassphraseProvider { get { return DefaultComponent<IPassphraseProvider, PassphraseProvider>(); } }

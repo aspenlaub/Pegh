@@ -52,7 +52,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyRepository.cs" />
     <Compile Include="ComponentProvider.cs" />
     <Compile Include="Disguiser.cs" />
     <Compile Include="FolderHelper.cs" />

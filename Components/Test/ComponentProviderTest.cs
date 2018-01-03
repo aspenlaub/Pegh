@@ -6,7 +6,6 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
         [TestMethod]
         public void ComponentsAreProvided() {
             var sut = new ComponentProvider();
-            Assert.IsNotNull(sut.AssemblyRepository);
             Assert.IsNotNull(sut.Disguiser);
             Assert.IsNotNull(sut.FolderHelper);
             Assert.IsNotNull(sut.PassphraseProvider);
