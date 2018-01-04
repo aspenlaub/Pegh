@@ -10,7 +10,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pegh.Components.Test", "Com
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pegh.Interfaces", "Interfaces\Pegh.Interfaces.csproj", "{60EDCAAE-15A7-486A-A7E1-7EE6CF285520}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pegh.SampleEntities", "TestEntities\Pegh.SampleEntities.csproj", "{983D072E-F8CD-4BE0-8B92-CBC22471DF0D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pegh.SampleEntities", "SampleEntities\Pegh.SampleEntities.csproj", "{983D072E-F8CD-4BE0-8B92-CBC22471DF0D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pegh.Entities", "Entities\Pegh.Entities.csproj", "{97D7BFDE-2296-4356-808E-48DB07F1DEBC}"
 EndProject
