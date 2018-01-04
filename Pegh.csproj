@@ -37,6 +37,7 @@
     <WarningLevel>4</WarningLevel>
     <IntermediateOutputPath>..\PeghBin\obj\Release\</IntermediateOutputPath>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <RunOctoPack>true</RunOctoPack>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
