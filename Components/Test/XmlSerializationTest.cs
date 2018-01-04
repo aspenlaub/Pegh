@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Aspenlaub.Net.GitHub.CSharp.Pegh.TestEntities;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

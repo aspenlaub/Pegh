@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace Aspenlaub.Net.GitHub.CSharp.Pegh.TestEntities {
+namespace Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities {
     [XmlRoot("StarFleets", Namespace = "http://www.aspenlaub.net")]
     public class ParallelUniverses {
         [XmlElement("StarFleet")]

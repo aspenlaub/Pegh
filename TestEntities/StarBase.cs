@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Xml.Serialization;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
-namespace Aspenlaub.Net.GitHub.CSharp.Pegh.TestEntities {
+namespace Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities {
     public class StarBase : IGuid, INotifyPropertyChanged {
 
         [XmlAttribute("guid")]

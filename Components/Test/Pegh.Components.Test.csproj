@@ -91,9 +91,9 @@
       <Project>{97d7bfde-2296-4356-808e-48db07f1debc}</Project>
       <Name>Pegh.Entities</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\TestEntities\Pegh.TestEntities.csproj">
+    <ProjectReference Include="..\..\TestEntities\Pegh.SampleEntities.csproj">
       <Project>{983d072e-f8cd-4be0-8b92-cbc22471df0d}</Project>
-      <Name>Pegh.TestEntities</Name>
+      <Name>Pegh.SampleEntities</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Interfaces\Pegh.Interfaces.csproj">
       <Project>{60edcaae-15a7-486a-a7e1-7ee6cf285520}</Project>

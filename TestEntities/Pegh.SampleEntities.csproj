@@ -7,8 +7,8 @@
     <ProjectGuid>{983D072E-F8CD-4BE0-8B92-CBC22471DF0D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Aspenlaub.Net.GitHub.CSharp.Pegh.TestEntities</RootNamespace>
-    <AssemblyName>Aspenlaub.Net.GitHub.CSharp.Pegh.TestEntities</AssemblyName>
+    <RootNamespace>Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities</RootNamespace>
+    <AssemblyName>Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

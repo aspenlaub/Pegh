@@ -1,5 +1,5 @@
 ﻿using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
-using Aspenlaub.Net.GitHub.CSharp.Pegh.TestEntities;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
     public class EncryptedSecretCrewMember : IEncryptedSecret<CrewMember> {

@@ -5,8 +5,8 @@ using System.Linq;
 using System.Reflection;
 using System.Xml;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Aspenlaub.Net.GitHub.CSharp.Pegh.TestEntities;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities.Test {
     [TestClass]

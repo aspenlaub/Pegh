@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
-using Aspenlaub.Net.GitHub.CSharp.Pegh.TestEntities;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 

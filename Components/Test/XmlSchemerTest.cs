@@ -1,4 +1,4 @@
-﻿using Aspenlaub.Net.GitHub.CSharp.Pegh.TestEntities;
+﻿using Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
