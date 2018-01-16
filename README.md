@@ -1,6 +1,6 @@
 # Pegh
 
-Summary: a small library that I use as a foundation for my GitHub projects.
+Summary: a small library that I use as a foundation for my GitHub projects. It allows me to keep objects and algorithms secret, i.e. they are not published on github.
 
 ## What does *Pegh* mean?
 
