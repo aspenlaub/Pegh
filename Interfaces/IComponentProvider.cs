@@ -4,6 +4,7 @@
         IFolderHelper FolderHelper { get; }
         IPassphraseProvider PassphraseProvider { get; }
         IPeghEnvironment PeghEnvironment { get; }
+        IPowershellExecuter PowershellExecuter { get; }
         IPrimeNumberGenerator PrimeNumberGenerator { get; }
         ISecretRepository SecretRepository { get; }
         IXmlDeserializer XmlDeserializer { get; }

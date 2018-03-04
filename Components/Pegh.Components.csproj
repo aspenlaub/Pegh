@@ -57,6 +57,7 @@
     <Compile Include="FolderHelper.cs" />
     <Compile Include="PassphraseProvider.cs" />
     <Compile Include="PeghEnvironment.cs" />
+    <Compile Include="PowershellExecuter.cs" />
     <Compile Include="PrimeNumberGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SecretRepository.cs" />

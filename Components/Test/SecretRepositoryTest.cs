@@ -361,6 +361,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             componentProviderMock.Setup(c => c.XmlDeserializer).Returns(ComponentProvider.XmlDeserializer);
             componentProviderMock.Setup(c => c.XmlSerializer).Returns(ComponentProvider.XmlSerializer);
             componentProviderMock.Setup(c => c.XmlSchemer).Returns(ComponentProvider.XmlSchemer);
+            componentProviderMock.Setup(c => c.PowershellExecuter).Returns(ComponentProvider.PowershellExecuter);
             var disguiserMock = new Mock<IDisguiser>();
             disguiserMock.Setup(d => d.Disguise(It.IsAny<string>())).Returns("");
             componentProviderMock.Setup(c => c.Disguiser).Returns(disguiserMock.Object);

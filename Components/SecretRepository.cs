@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Management.Automation;
-using System.Management.Automation.Runspaces;
 using System.Text;
-using System.Threading;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 using Ionic.Zip;
@@ -81,32 +78,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         }
 
         public TResult ExecutePowershellFunction<TArgument, TResult>(IPowershellFunction<TArgument, TResult> powershellFunction, TArgument arg) where TResult : class {
-            var script = "Param(\r\n"
-                         + "\t[Parameter(Mandatory=$true)]\r\n"
-                         + "\t$secretArgument\r\n"
-                         + ")\r\n\r\n"
-                         + "Add-Type -Path \""
-                         + typeof(PowershellFunctionResult).Assembly.Location
-                         + "\"\r\n\r\n"
-                         + powershellFunction.Script
-                         + "\r\n\r\n"
-                         + powershellFunction.FunctionName + "($secretArgument)\r\n";
-            using (var powerShellInstance = PowerShell.Create()) {
-                powerShellInstance.AddScript(script);
-                powerShellInstance.AddParameter("secretArgument", arg);
-                var runSpace = RunspaceFactory.CreateRunspace();
-                runSpace.ApartmentState = ApartmentState.STA;
-                runSpace.ThreadOptions = PSThreadOptions.ReuseThread;
-                runSpace.Open();
-                powerShellInstance.Runspace = runSpace;
-                var invokeResults = powerShellInstance.Invoke();
-                if (powerShellInstance.Streams.Error.Count > 0 || invokeResults.Count != 1) {
-                    return null;
-                }
-
-                var invokeResult = invokeResults[0].BaseObject as PowershellFunctionResult;
-                return invokeResult?.Result as TResult;
-            }
+            return ComponentProvider.PowershellExecuter.ExecutePowershellFunction(powershellFunction, arg);
         }
 
         internal void Reset(IGuid secret, bool encrypted) {
