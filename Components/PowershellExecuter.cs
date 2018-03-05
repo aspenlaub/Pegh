@@ -59,7 +59,8 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             runSpaceInvoker.Invoke("Set-ExecutionPolicy Unrestricted -Scope CurrentUser");
             var pipeline = runspace.CreatePipeline();
             var scriptCommand = new Command(powershellScriptFileName, true, false);
-            scriptCommand.Parameters.Add(new CommandParameter("ServerfilePath", folder));
+            pipeline.Commands.AddScript(folder[0] + ":");
+            pipeline.Commands.AddScript("cd \"" + folder + "\"");
             pipeline.Commands.Add(scriptCommand);
             try {
                 pipeline.Invoke();
