@@ -9,7 +9,9 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             var sut = new FolderHelper();
             var folder = Path.GetTempPath() + @"\Folder\Helper\Test";
             Assert.IsTrue(folder.Contains("Temp"));
-            Directory.Delete(folder, true);
+            if (Directory.Exists(folder)) {
+                Directory.Delete(folder, true);
+            }
             Assert.IsFalse(Directory.Exists(folder));
             sut.CreateIfNecessary(folder);
             Assert.IsTrue(Directory.Exists(folder));
