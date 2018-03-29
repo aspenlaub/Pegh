@@ -1,0 +1,20 @@
+﻿<Window x:Class="Aspenlaub.Net.GitHub.CSharp.Pegh.GUI.EnterPassphrase"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="(Missing title)" SizeToContent="WidthAndHeight">
+    <StackPanel Background="DarkGoldenrod">
+        <Label Name="DescriptionLabel" Foreground="Gold" Height="26">(Missing Description)</Label>
+        <Label Foreground="Gold" Height="26">Passphrase</Label>
+        <PasswordBox Name="PassPhraseTextBox" Foreground="DarkGoldenrod" Margin="5" Background="Gold" Height="26" Width="400"/>
+        <Label Foreground="Gold" Height="26">Repeat passphrase</Label>
+        <PasswordBox Name="RepeatPassPhraseTextBox" Foreground="DarkGoldenrod" Margin="5" Background="Gold" Height="26" PasswordChanged="RepeatPassPhraseTextBox_OnPasswordChanged" />
+        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+            <Button Name="Okay" Height="26" Margin="5" IsDefault="True" Padding="20,0,20,0" Click="Okay_OnClick">_Okay</Button>
+            <Button Name="Cancel" Height="26" Margin="5" IsCancel="True" Click="Cancel_OnClick" Padding="20,0,20,0">_Cancel</Button>
+            <Label Foreground="Gold" Height="26" Name="PassPhraseError" />
+        </StackPanel>
+    </StackPanel>
+</Window>
