@@ -1,5 +1,7 @@
 #load "solution.cake"
 #addin nuget:?package=Cake.Git
+#addin nuget:?package=Nuget.Core
+#addin nuget:?package=DotNetZip
 #addin nuget:https://www.aspenlaub.net/nuget/?package=Aspenlaub.Net.GitHub.CSharp.Shatilaya
 
 using Folder = Aspenlaub.Net.GitHub.CSharp.Shatilaya.Entities.Folder;
@@ -8,6 +10,7 @@ using FolderUpdateMethod = Aspenlaub.Net.GitHub.CSharp.Shatilaya.Interfaces.Fold
 using ErrorsAndInfos = Aspenlaub.Net.GitHub.CSharp.Shatilaya.Interfaces.ErrorsAndInfos;
 using FolderExtensions = Aspenlaub.Net.GitHub.CSharp.Shatilaya.FolderExtensions;
 using Regex = System.Text.RegularExpressions.Regex;
+using ComponentProvider = Aspenlaub.Net.GitHub.CSharp.Shatilaya.ComponentProvider;
 
 masterDebugBinFolder = MakeAbsolute(Directory(masterDebugBinFolder)).FullPath;
 masterReleaseBinFolder = MakeAbsolute(Directory(masterReleaseBinFolder)).FullPath;
@@ -26,9 +29,12 @@ var tempCakeBuildFileName = tempFolder + "/build.cake.new";
 var checkIfBuildCakeIsOutdated = true;
 var doDebugCompilation = true;
 var doReleaseCompilation = true;
+var doNugetPush = true;
+var solutionId = solution.Substring(solution.LastIndexOf('/') + 1).Replace(".sln", "");
 
 Setup(ctx => { 
   Information("Solution is: " + solution);
+  Information("Solution ID is: " + solutionId);
   Information("Target is: " + target);
   Information("Artifacts folder is: " + artifactsFolder);
   Information("Current GIT branch is: " + currentGitBranch.FriendlyName);
@@ -161,9 +167,26 @@ Task("CreateNuGetPackage")
         Properties = new Dictionary<string, string> { { "Configuration", "Release" } }
       };
 
-	  var solutionId = solution.Substring(solution.LastIndexOf('/') + 1).Replace(".sln", "");
       NuGetPack("./src/" + solutionId + ".csproj", nuGetPackSettings);
 	}
+  });
+
+Task("PushNuGetPackage")
+  .WithCriteria(() => doDebugCompilation && doReleaseCompilation && doNugetPush && currentGitBranch.FriendlyName == "master")
+  .Description("Push nuget package")
+  .Does(() => {
+    var componentProvider = new ComponentProvider();
+	var nugetPackageToPushFinder = componentProvider.NugetPackageToPushFinder;
+	string packageFileFullName, feedUrl, apiKey;
+	var finderErrorsAndInfos = new ErrorsAndInfos();
+	nugetPackageToPushFinder.FindPackageToPush(new Folder(masterReleaseBinFolder.Replace('/', '\\')), solution.Replace('/', '\\'), out packageFileFullName, out feedUrl, out apiKey, finderErrorsAndInfos);
+    if (finderErrorsAndInfos.Errors.Any()) {
+	  throw new Exception(string.Join("\r\n", finderErrorsAndInfos.Errors));
+	}
+    if (packageFileFullName != "" && feedUrl != "" && apiKey != "") {
+      Information("Pushing " + packageFileFullName + " to " + feedUrl + "..");
+      NuGetPush(packageFileFullName, new NuGetPushSettings { Source = feedUrl });
+    }
   });
 
 Task("Default")
@@ -177,6 +200,7 @@ Task("Default")
   .IsDependentOn("RunTestsOnReleaseArtifacts")
   .IsDependentOn("CopyReleaseArtifacts")
   .IsDependentOn("CreateNuGetPackage")
+  .IsDependentOn("PushNuGetPackage")
   .Does(() => {
   });
 
