@@ -104,7 +104,6 @@
     <Compile Include="PowershellExecuterTest.cs" />
     <Compile Include="PrimeNumberGeneratorTest.cs" />
     <Compile Include="SecretCrewMember.cs" />
-    <Compile Include="FolderHelperTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SecretRepositoryTest.cs" />
     <Compile Include="SecretStringListEnumerator.cs" />

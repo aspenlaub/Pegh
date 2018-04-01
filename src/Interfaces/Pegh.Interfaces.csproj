@@ -47,7 +47,6 @@
     <Compile Include="IFolder.cs" />
     <Compile Include="IFolderDeleteGates.cs" />
     <Compile Include="IFolderDeleter.cs" />
-    <Compile Include="IFolderHelper.cs" />
     <Compile Include="IFolderUpdater.cs" />
     <Compile Include="IGuid.cs" />
     <Compile Include="IPassphraseDialog.cs" />

@@ -7,7 +7,8 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
         public void ComponentsAreProvided() {
             var sut = new ComponentProvider();
             Assert.IsNotNull(sut.Disguiser);
-            Assert.IsNotNull(sut.FolderHelper);
+            Assert.IsNotNull(sut.FolderDeleter);
+            Assert.IsNotNull(sut.FolderUpdater);
             Assert.IsNotNull(sut.PassphraseProvider);
             Assert.IsNotNull(sut.PeghEnvironment);
             Assert.IsNotNull(sut.PrimeNumberGenerator);

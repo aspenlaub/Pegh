@@ -35,5 +35,19 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities.Test {
             parentFolder = parentFolder.ParentFolder();
             Assert.IsNull(parentFolder);
         }
+
+        [TestMethod]
+        public void FolderIsCreatedIfNecessary() {
+            var folder = new Folder(Path.GetTempPath() + @"\Folder\Helper\Test");
+            Assert.IsTrue(folder.FullName.Contains("Temp"));
+            if (folder.Exists()) {
+                Directory.Delete(folder.FullName, true);
+            }
+            Assert.IsFalse(folder.Exists());
+            folder.CreateIfNecessary();
+            Assert.IsTrue(folder.Exists());
+            folder.CreateIfNecessary();
+            Assert.IsTrue(folder.Exists());
+        }
     }
 }

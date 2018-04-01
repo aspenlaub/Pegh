@@ -52,7 +52,6 @@
     <Compile Include="ComponentProvider.cs" />
     <Compile Include="Disguiser.cs" />
     <Compile Include="FolderDeleter.cs" />
-    <Compile Include="FolderHelper.cs" />
     <Compile Include="FolderUpdater.cs" />
     <Compile Include="PassphraseProvider.cs" />
     <Compile Include="PeghEnvironment.cs" />

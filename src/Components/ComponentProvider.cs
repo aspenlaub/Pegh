@@ -25,7 +25,8 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         }
 
         public IDisguiser Disguiser { get { return DefaultComponent<IDisguiser, Disguiser>(() => new Disguiser(this)); } }
-        public IFolderHelper FolderHelper { get { return DefaultComponent<IFolderHelper, FolderHelper>(); } }
+        public IFolderDeleter FolderDeleter { get { return DefaultComponent<IFolderDeleter, FolderDeleter>(); } }
+        public IFolderUpdater FolderUpdater { get { return DefaultComponent<IFolderUpdater, FolderUpdater>(); } }
         public IPassphraseProvider PassphraseProvider { get { return DefaultComponent<IPassphraseProvider, PassphraseProvider>(); } }
         public IPeghEnvironment PeghEnvironment { get { return DefaultComponent<IPeghEnvironment, PeghEnvironment>(); } }
         public IPowershellExecuter PowershellExecuter { get { return DefaultComponent<IPowershellExecuter, PowershellExecuter>(); } }

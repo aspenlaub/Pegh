@@ -1,7 +1,8 @@
 ﻿namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces {
     public interface IComponentProvider {
         IDisguiser Disguiser { get; }
-        IFolderHelper FolderHelper { get; }
+        IFolderDeleter FolderDeleter { get; }
+        IFolderUpdater FolderUpdater { get; }
         IPassphraseProvider PassphraseProvider { get; }
         IPeghEnvironment PeghEnvironment { get; }
         IPowershellExecuter PowershellExecuter { get; }

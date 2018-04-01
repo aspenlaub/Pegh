@@ -28,5 +28,12 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh {
         public static IFolder GitSubFolder(this IFolder folder) {
             return folder.SubFolder(".git");
         }
+
+        public static void CreateIfNecessary(this IFolder folder) {
+            if (Directory.Exists(folder.FullName)) { return; }
+
+            Directory.CreateDirectory(folder.FullName);
+        }
+
     }
 }
