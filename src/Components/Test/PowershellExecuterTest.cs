@@ -10,7 +10,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
         public void CanRunPowershellScript() {
             var sut = new PowershellExecuter();
             var fileName = Path.GetTempPath() + @"\helloworld.ps1";
-            File.WriteAllText(fileName, "$s = \"Hello World\"");
+            File.WriteAllText(fileName, @"$s = ""Hello World""");
             IList<string> errors;
             sut.ExecutePowershellScriptFile(fileName, out errors);
             Assert.IsTrue(!errors.Any());
@@ -20,7 +20,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
         public void CannotRunInvalidPowershellScript() {
             var sut = new PowershellExecuter();
             var fileName = Path.GetTempPath() + @"\helloworld.ps1";
-            File.WriteAllText(fileName, "$s = Hello World\"");
+            File.WriteAllText(fileName, @"$s = Hello World""");
             IList<string> errors;
             sut.ExecutePowershellScriptFile(fileName, out errors);
             Assert.IsTrue(errors.Any());
@@ -30,7 +30,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
         public void CannotRunPowershellScriptThatWritesErrors() {
             var sut = new PowershellExecuter();
             var fileName = Path.GetTempPath() + @"\helloworld.ps1";
-            File.WriteAllText(fileName, "Write-Error(\"Hello World\")");
+            File.WriteAllText(fileName, @"Write-Error(""Hello World"")");
             IList<string> errors;
             sut.ExecutePowershellScriptFile(fileName, out errors);
             Assert.AreEqual(1, errors.Count);
@@ -41,11 +41,14 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
         public void PowershellScriptIsRunInItsFolder() {
             var sut = new PowershellExecuter();
             var fileName = Path.GetTempPath() + @"\helloworld.ps1";
-            var script = new List<string>();
-            script.Add("$path = (Resolve-Path .\\).Path + \"\\\"");
-            script.Add("if ($path -eq \"" + Path.GetTempPath() + "\") { Write-Output \"Path OK\"} else { Write-Error (\"Path Not OK \" + $path) }");
-            script.Add("$path = (Split-Path $MyInvocation.MyCommand.Path -Parent) + \"\\\"");
-            script.Add("if ($path -eq \"" + Path.GetTempPath() + "\") { Write-Output \"CommandPath OK\"} else { Write-Error (\"CommandPath Not OK \" + $path) }");
+            var script = new List<string> {
+                "$path = (Resolve-Path .\\).Path + \"\\\"",
+                "if ($path -eq \"" + Path.GetTempPath() +
+                "\") { Write-Output \"Path OK\"} else { Write-Error (\"Path Not OK \" + $path) }",
+                "$path = (Split-Path $MyInvocation.MyCommand.Path -Parent) + \"\\\"",
+                "if ($path -eq \"" + Path.GetTempPath() +
+                "\") { Write-Output \"CommandPath OK\"} else { Write-Error (\"CommandPath Not OK \" + $path) }"
+            };
             File.WriteAllText(fileName, string.Join("\r\n", script));
             IList<string> errors;
             sut.ExecutePowershellScriptFile(fileName, out errors);
