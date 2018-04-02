@@ -4,11 +4,11 @@
 #addin nuget:?package=DotNetZip
 #addin nuget:https://www.aspenlaub.net/nuget/?package=Aspenlaub.Net.GitHub.CSharp.Shatilaya
 
-using Folder = Aspenlaub.Net.GitHub.CSharp.Shatilaya.Entities.Folder;
-using FolderUpdater = Aspenlaub.Net.GitHub.CSharp.Shatilaya.FolderUpdater;
-using FolderUpdateMethod = Aspenlaub.Net.GitHub.CSharp.Shatilaya.Interfaces.FolderUpdateMethod;
-using ErrorsAndInfos = Aspenlaub.Net.GitHub.CSharp.Shatilaya.Interfaces.ErrorsAndInfos;
-using FolderExtensions = Aspenlaub.Net.GitHub.CSharp.Shatilaya.FolderExtensions;
+using Folder = Aspenlaub.Net.GitHub.CSharp.Pegh.Entities.Folder;
+using FolderUpdater = Aspenlaub.Net.GitHub.CSharp.Pegh.Components.FolderUpdater;
+using FolderUpdateMethod = Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces.FolderUpdateMethod;
+using ErrorsAndInfos = Aspenlaub.Net.GitHub.CSharp.Pegh.Entities.ErrorsAndInfos;
+using FolderExtensions = Aspenlaub.Net.GitHub.CSharp.Pegh.FolderExtensions;
 using Regex = System.Text.RegularExpressions.Regex;
 using ComponentProvider = Aspenlaub.Net.GitHub.CSharp.Shatilaya.ComponentProvider;
 
