@@ -31,6 +31,8 @@ var doDebugCompilation = true;
 var doReleaseCompilation = true;
 var doNugetPush = true;
 var solutionId = solution.Substring(solution.LastIndexOf('/') + 1).Replace(".sln", "");
+var componentProvider = new ComponentProvider();
+var checkForUncommittedChanges = true;
 
 Setup(ctx => { 
   Information("Solution is: " + solution);
@@ -80,6 +82,30 @@ Task("Restore")
        throw new Exception(string.Format("Nuget configuration file \"{0}\" not found", configFile));
     }
     NuGetRestore(solution, new NuGetRestoreSettings { ConfigFile = configFile });
+  });
+
+Task("UpdateNuspec")
+  .Description("Update nuspec if necessary")
+  .Does(() => {
+    var solutionFileFullName = solution.Replace('/', '\\');
+    var nuSpecFile = solutionFileFullName.Replace(".sln", ".nuspec");
+	var nuSpecErrorsAndInfos = new ErrorsAndInfos();
+    var headTipIdSha = componentProvider.GitUtilities.HeadTipIdSha(new Folder(MakeAbsolute(DirectoryPath.FromString(".")).FullPath));
+	componentProvider.NuSpecCreator.CreateNuSpecFileIfRequiredOrPresent(true, solutionFileFullName, new List<string> { headTipIdSha }, nuSpecErrorsAndInfos);
+    if (nuSpecErrorsAndInfos.Errors.Any()) {
+	  throw new Exception(string.Join("\r\n", nuSpecErrorsAndInfos.Errors));
+	}
+  });
+
+Task("VerifyThatThereAreNoUncommittedChanges")
+  .WithCriteria(() => checkForUncommittedChanges)
+  .Description("Verify that there are no uncommitted changes")
+  .Does(() => {
+    var uncommittedErrorsAndInfos = new ErrorsAndInfos();
+    componentProvider.GitUtilities.VerifyThatThereAreNoUncommittedChanges(new Folder(MakeAbsolute(DirectoryPath.FromString(".")).FullPath), uncommittedErrorsAndInfos);
+    if (uncommittedErrorsAndInfos.Errors.Any()) {
+	  throw new Exception(string.Join("\r\n", uncommittedErrorsAndInfos.Errors));
+	}
   });
 
 Task("DebugBuild")
@@ -175,7 +201,6 @@ Task("PushNuGetPackage")
   .WithCriteria(() => doDebugCompilation && doReleaseCompilation && doNugetPush && currentGitBranch.FriendlyName == "master")
   .Description("Push nuget package")
   .Does(() => {
-    var componentProvider = new ComponentProvider();
 	var nugetPackageToPushFinder = componentProvider.NugetPackageToPushFinder;
 	string packageFileFullName, feedUrl, apiKey;
 	var finderErrorsAndInfos = new ErrorsAndInfos();
@@ -193,6 +218,8 @@ Task("Default")
   .IsDependentOn("UpdateBuildCake")
   .IsDependentOn("Clean")
   .IsDependentOn("Restore")
+  .IsDependentOn("UpdateNuspec")
+  .IsDependentOn("VerifyThatThereAreNoUncommittedChanges")
   .IsDependentOn("DebugBuild")
   .IsDependentOn("RunTestsOnDebugArtifacts")
   .IsDependentOn("CopyDebugArtifacts")

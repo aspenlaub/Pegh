@@ -51,7 +51,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Pegh.nuspec" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Entities\Pegh.Entities.csproj">
