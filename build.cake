@@ -16,22 +16,27 @@ masterDebugBinFolder = MakeAbsolute(Directory(masterDebugBinFolder)).FullPath;
 masterReleaseBinFolder = MakeAbsolute(Directory(masterReleaseBinFolder)).FullPath;
 
 var target = Argument("target", "Default");
+
 var artifactsFolder = MakeAbsolute(Directory("./artifacts")).FullPath;
 var debugArtifactsFolder = MakeAbsolute(Directory("./artifacts/Debug")).FullPath;
 var releaseArtifactsFolder = MakeAbsolute(Directory("./artifacts/Release")).FullPath;
 var objFolder = MakeAbsolute(Directory("./temp/obj")).FullPath;
-var currentGitBranch = GitBranchCurrent(DirectoryPath.FromString("."));
 var testResultsFolder = MakeAbsolute(Directory("./TestResults")).FullPath;
-var latestBuildCakeUrl = "https://raw.githubusercontent.com/aspenlaub/Shatilaya/master/build.cake?g=" + System.Guid.NewGuid();
-var buildCakeFileName = MakeAbsolute(Directory(".")).FullPath + "/build.cake";
 var tempFolder = MakeAbsolute(Directory("./temp")).FullPath;
+var repositoryFolder = MakeAbsolute(DirectoryPath.FromString(".")).FullPath;
+
+var buildCakeFileName = MakeAbsolute(Directory(".")).FullPath + "/build.cake";
 var tempCakeBuildFileName = tempFolder + "/build.cake.new";
+
+var solutionId = solution.Substring(solution.LastIndexOf('/') + 1).Replace(".sln", "");
+var currentGitBranch = GitBranchCurrent(DirectoryPath.FromString("."));
+var latestBuildCakeUrl = "https://raw.githubusercontent.com/aspenlaub/Shatilaya/master/build.cake?g=" + System.Guid.NewGuid();
+var componentProvider = new ComponentProvider();
+
 var checkIfBuildCakeIsOutdated = true;
 var doDebugCompilation = true;
 var doReleaseCompilation = true;
 var doNugetPush = true;
-var solutionId = solution.Substring(solution.LastIndexOf('/') + 1).Replace(".sln", "");
-var componentProvider = new ComponentProvider();
 var checkForUncommittedChanges = true;
 
 Setup(ctx => { 
@@ -90,7 +95,7 @@ Task("UpdateNuspec")
     var solutionFileFullName = solution.Replace('/', '\\');
     var nuSpecFile = solutionFileFullName.Replace(".sln", ".nuspec");
 	var nuSpecErrorsAndInfos = new ErrorsAndInfos();
-    var headTipIdSha = componentProvider.GitUtilities.HeadTipIdSha(new Folder(MakeAbsolute(DirectoryPath.FromString(".")).FullPath));
+    var headTipIdSha = componentProvider.GitUtilities.HeadTipIdSha(new Folder(repositoryFolder));
 	componentProvider.NuSpecCreator.CreateNuSpecFileIfRequiredOrPresent(true, solutionFileFullName, new List<string> { headTipIdSha }, nuSpecErrorsAndInfos);
     if (nuSpecErrorsAndInfos.Errors.Any()) {
 	  throw new Exception(string.Join("\r\n", nuSpecErrorsAndInfos.Errors));
@@ -102,7 +107,7 @@ Task("VerifyThatThereAreNoUncommittedChanges")
   .Description("Verify that there are no uncommitted changes")
   .Does(() => {
     var uncommittedErrorsAndInfos = new ErrorsAndInfos();
-    componentProvider.GitUtilities.VerifyThatThereAreNoUncommittedChanges(new Folder(MakeAbsolute(DirectoryPath.FromString(".")).FullPath), uncommittedErrorsAndInfos);
+    componentProvider.GitUtilities.VerifyThatThereAreNoUncommittedChanges(new Folder(repositoryFolder), uncommittedErrorsAndInfos);
     if (uncommittedErrorsAndInfos.Errors.Any()) {
 	  throw new Exception(string.Join("\r\n", uncommittedErrorsAndInfos.Errors));
 	}
@@ -204,7 +209,7 @@ Task("PushNuGetPackage")
 	var nugetPackageToPushFinder = componentProvider.NugetPackageToPushFinder;
 	string packageFileFullName, feedUrl, apiKey;
 	var finderErrorsAndInfos = new ErrorsAndInfos();
-	nugetPackageToPushFinder.FindPackageToPush(new Folder(masterReleaseBinFolder.Replace('/', '\\')), solution.Replace('/', '\\'), out packageFileFullName, out feedUrl, out apiKey, finderErrorsAndInfos);
+	nugetPackageToPushFinder.FindPackageToPush(new Folder(masterReleaseBinFolder.Replace('/', '\\')), new Folder(repositoryFolder.Replace('/', '\\')), solution.Replace('/', '\\'), out packageFileFullName, out feedUrl, out apiKey, finderErrorsAndInfos);
     if (finderErrorsAndInfos.Errors.Any()) {
 	  throw new Exception(string.Join("\r\n", finderErrorsAndInfos.Errors));
 	}
