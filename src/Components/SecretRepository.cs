@@ -21,6 +21,14 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             Values = new Dictionary<string, object>();
             SecretShouldDefaultSecretsBeStored = new SecretShouldDefaultSecretsBeStored();
             IsUserPresent = true;
+            var folder = ComponentProvider.PeghEnvironment.RootWorkFolder + @"\SecretSamples\";
+            if (!Directory.Exists(folder)) {
+                Directory.CreateDirectory(folder);
+            }
+            folder = ComponentProvider.PeghEnvironment.RootWorkFolder + @"\SecretRepository\";
+            if (!Directory.Exists(folder)) {
+                Directory.CreateDirectory(folder);
+            }
             Get(SecretShouldDefaultSecretsBeStored);
         }
 

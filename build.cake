@@ -16,6 +16,7 @@ masterDebugBinFolder = MakeAbsolute(Directory(masterDebugBinFolder)).FullPath;
 masterReleaseBinFolder = MakeAbsolute(Directory(masterReleaseBinFolder)).FullPath;
 
 var target = Argument("target", "Default");
+var toolsVersion = 14;
 
 var artifactsFolder = MakeAbsolute(Directory("./artifacts")).FullPath;
 var debugArtifactsFolder = MakeAbsolute(Directory("./artifacts/Debug")).FullPath;
@@ -131,7 +132,12 @@ Task("DebugBuild")
 Task("RunTestsOnDebugArtifacts")
   .Description("Run unit tests on Debug artifacts")
   .Does(() => {
-    MSTest(debugArtifactsFolder + "/*.Test.dll", new MSTestSettings() { NoIsolation = false });
+    var msTestExe = componentProvider.ExecutableFinder.FindMsTestExe(toolsVersion);
+	if (msTestExe == "") {
+      VSTest(debugArtifactsFolder + "/*.Test.dll", new VSTestSettings() { Logger = "trx", InIsolation = true });
+	} else {
+      MSTest(debugArtifactsFolder + "/*.Test.dll", new MSTestSettings() { NoIsolation = false });
+	}
     CleanDirectory(testResultsFolder); 
     DeleteDirectory(testResultsFolder, new DeleteDirectorySettings { Recursive = false, Force = false });
   });
@@ -167,7 +173,12 @@ Task("ReleaseBuild")
 Task("RunTestsOnReleaseArtifacts")
   .Description("Run unit tests on Release artifacts")
   .Does(() => {
-    MSTest(releaseArtifactsFolder + "/*.Test.dll", new MSTestSettings() { NoIsolation = false });
+    var msTestExe = componentProvider.ExecutableFinder.FindMsTestExe(toolsVersion);
+	if (msTestExe == "") {
+      VSTest(releaseArtifactsFolder + "/*.Test.dll", new VSTestSettings() { Logger = "trx", InIsolation = true });
+	} else {
+      MSTest(releaseArtifactsFolder + "/*.Test.dll", new MSTestSettings() { NoIsolation = false });
+	}
     CleanDirectory(testResultsFolder); 
     DeleteDirectory(testResultsFolder, new DeleteDirectorySettings { Recursive = false, Force = false });
   });
