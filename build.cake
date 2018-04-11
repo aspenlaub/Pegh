@@ -34,12 +34,6 @@ var currentGitBranch = GitBranchCurrent(DirectoryPath.FromString("."));
 var latestBuildCakeUrl = "https://raw.githubusercontent.com/aspenlaub/Shatilaya/master/build.cake?g=" + System.Guid.NewGuid();
 var componentProvider = new ComponentProvider();
 
-var checkIfBuildCakeIsOutdated = true;
-var doDebugCompilation = true;
-var doReleaseCompilation = true;
-var doNugetPush = true;
-var checkForUncommittedChanges = true;
-
 Setup(ctx => { 
   Information("Solution is: " + solution);
   Information("Solution ID is: " + solutionId);
@@ -51,7 +45,6 @@ Setup(ctx => {
 });
 
 Task("UpdateBuildCake")
-  .WithCriteria(() => checkIfBuildCakeIsOutdated)
   .Description("Update build.cake")
   .Does(() => {
     var oldContents = System.IO.File.ReadAllText(buildCakeFileName);
@@ -104,7 +97,6 @@ Task("UpdateNuspec")
   });
 
 Task("VerifyThatThereAreNoUncommittedChanges")
-  .WithCriteria(() => checkForUncommittedChanges)
   .Description("Verify that there are no uncommitted changes")
   .Does(() => {
     var uncommittedErrorsAndInfos = new ErrorsAndInfos();
@@ -115,7 +107,6 @@ Task("VerifyThatThereAreNoUncommittedChanges")
   });
 
 Task("DebugBuild")
-  .WithCriteria(() => doDebugCompilation)
   .Description("Build solution in Debug and clean up intermediate output folder")
   .Does(() => {
     MSBuild(solution, settings 
@@ -143,7 +134,7 @@ Task("RunTestsOnDebugArtifacts")
   });
 
 Task("CopyDebugArtifacts")
-  .WithCriteria(() => doDebugCompilation && currentGitBranch.FriendlyName == "master")
+  .WithCriteria(() => currentGitBranch.FriendlyName == "master")
   .Description("Copy Debug artifacts to master Debug binaries folder")
   .Does(() => {
     var updater = new FolderUpdater();
@@ -156,7 +147,6 @@ Task("CopyDebugArtifacts")
   });
 
 Task("ReleaseBuild")
-  .WithCriteria(() => doDebugCompilation && doReleaseCompilation)
   .Description("Build solution in Release and clean up intermediate output folder")
   .Does(() => {
     MSBuild(solution, settings 
@@ -184,7 +174,7 @@ Task("RunTestsOnReleaseArtifacts")
   });
 
 Task("CopyReleaseArtifacts")
-  .WithCriteria(() => doDebugCompilation && doReleaseCompilation && currentGitBranch.FriendlyName == "master")
+  .WithCriteria(() => currentGitBranch.FriendlyName == "master")
   .Description("Copy Release artifacts to master Release binaries folder")
   .Does(() => {
     var updater = new FolderUpdater();
@@ -197,7 +187,7 @@ Task("CopyReleaseArtifacts")
   });
 
 Task("CreateNuGetPackage")
-  .WithCriteria(() => doDebugCompilation && doReleaseCompilation && currentGitBranch.FriendlyName == "master")
+  .WithCriteria(() => currentGitBranch.FriendlyName == "master")
   .Description("Create nuget package in the master Release binaries folder")
   .Does(() => {
 	var folder = new Folder(masterReleaseBinFolder);
@@ -214,7 +204,7 @@ Task("CreateNuGetPackage")
   });
 
 Task("PushNuGetPackage")
-  .WithCriteria(() => doDebugCompilation && doReleaseCompilation && doNugetPush && currentGitBranch.FriendlyName == "master")
+  .WithCriteria(() => currentGitBranch.FriendlyName == "master")
   .Description("Push nuget package")
   .Does(() => {
 	var nugetPackageToPushFinder = componentProvider.NugetPackageToPushFinder;
@@ -230,21 +220,32 @@ Task("PushNuGetPackage")
     }
   });
 
-Task("Default")
-  .IsDependentOn("UpdateBuildCake")
-  .IsDependentOn("Clean")
-  .IsDependentOn("Restore")
-  .IsDependentOn("UpdateNuspec")
-  .IsDependentOn("VerifyThatThereAreNoUncommittedChanges")
-  .IsDependentOn("DebugBuild")
-  .IsDependentOn("RunTestsOnDebugArtifacts")
-  .IsDependentOn("CopyDebugArtifacts")
-  .IsDependentOn("ReleaseBuild")
-  .IsDependentOn("RunTestsOnReleaseArtifacts")
-  .IsDependentOn("CopyReleaseArtifacts")
-  .IsDependentOn("CreateNuGetPackage")
-  .IsDependentOn("PushNuGetPackage")
+Task("CleanRestoreUpdateNuspec")
+  .IsDependentOn("Clean").IsDependentOn("Restore").IsDependentOn("UpdateNuspec").Does(() => {
+  });
+
+Task("BuildAndTestDebugAndRelease")
+  .IsDependentOn("DebugBuild").IsDependentOn("RunTestsOnDebugArtifacts").IsDependentOn("CopyDebugArtifacts")
+  .IsDependentOn("ReleaseBuild").IsDependentOn("RunTestsOnReleaseArtifacts").IsDependentOn("CopyReleaseArtifacts").Does(() => {
+  });
+
+Task("IgnoreOutdatedBuildCakePendingChangesAndDoNotPush")
+  .IsDependentOn("CleanRestoreUpdateNuspec").IsDependentOn("BuildAndTestDebugAndRelease").IsDependentOn("CreateNuGetPackage").Does(() => {
+  });
+
+Task("IgnoreOutdatedBuildCakePendingChanges")
+  .IsDependentOn("IgnoreOutdatedBuildCakePendingChangesAndDoNotPush").IsDependentOn("PushNuGetPackage").Does(() => {
+  });
+
+Task("IgnoreOutdatedBuildCakeAndDoNotPush")
+  .IsDependentOn("CleanRestoreUpdateNuspec").IsDependentOn("VerifyThatThereAreNoUncommittedChanges")
+  .IsDependentOn("BuildAndTestDebugAndRelease").IsDependentOn("CreateNuGetPackage")
   .Does(() => {
+  });
+
+Task("Default")
+  .IsDependentOn("UpdateBuildCake").IsDependentOn("CleanRestoreUpdateNuspec").IsDependentOn("VerifyThatThereAreNoUncommittedChanges")
+  .IsDependentOn("BuildAndTestDebugAndRelease").IsDependentOn("CreateNuGetPackage").IsDependentOn("PushNuGetPackage").Does(() => {
   });
 
 RunTarget(target);
