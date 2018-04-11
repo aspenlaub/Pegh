@@ -67,7 +67,7 @@ Task("UpdateBuildCake")
     if (Regex.Replace(oldContents, @"\s", "") != Regex.Replace(System.IO.File.ReadAllText(tempCakeBuildFileName), @"\s", "")) {
       System.IO.File.Delete(buildCakeFileName);
       System.IO.File.Move(tempCakeBuildFileName, buildCakeFileName); 
-      throw new Exception("Your build.cake file has been updated. Please retry running it.");
+      throw new Exception("Your build.cake file has been updated. Please check it in and then retry running it.");
     } else {
       System.IO.File.Delete(tempCakeBuildFileName);
 	}
@@ -203,7 +203,7 @@ Task("CreateNuGetPackage")
 	var folder = new Folder(masterReleaseBinFolder);
 	if (!FolderExtensions.LastWrittenFileFullName(folder).EndsWith("nupkg")) {
       var nuGetPackSettings = new NuGetPackSettings {
-        BasePath = masterReleaseBinFolder, 
+        BasePath = "./src/", 
         OutputDirectory = masterReleaseBinFolder, 
         IncludeReferencedProjects = true,
         Properties = new Dictionary<string, string> { { "Configuration", "Release" } }
