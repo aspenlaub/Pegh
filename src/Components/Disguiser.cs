@@ -8,27 +8,30 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
     public class Disguiser : IDisguiser {
         protected IComponentProvider ComponentProvider;
         protected ISecretRepository SecretRepository;
-        protected string LongString;
         protected IPrimeNumberGenerator PrimeNumberGenerator;
         protected IList<int> PrimeNumbers;
 
         public Disguiser(IComponentProvider componentProvider) {
             ComponentProvider = componentProvider;
             SecretRepository = componentProvider.SecretRepository;
-            LongString = SecretRepository.Get(new LongSecretString()).TheLongString;
             PrimeNumberGenerator = ComponentProvider.PrimeNumberGenerator;
         }
 
-        public string Disguise(string s) {
+        protected string LongString(IErrorsAndInfos errorsAndInfos) {
+            return SecretRepository.Get(new LongSecretString(), errorsAndInfos).TheLongString;
+        }
+
+        public string Disguise(string s, IErrorsAndInfos errorsAndInfos) {
             var bytes = Encoding.UTF8.GetBytes(s);
             EnsurePrimeNumbers(bytes);
             long pos = bytes.Length;
             var primePos = bytes.Length;
             var disguised = "";
+            var longString = LongString(errorsAndInfos);
             foreach (var aByte in bytes) {
                 pos = pos + aByte * PrimeNumbers[primePos];
                 primePos = primePos + aByte;
-                disguised = disguised + LongString.Substring((int)(pos % (LongString.Length - 3)), 3);
+                disguised = disguised + longString.Substring((int)(pos % (longString.Length - 3)), 3);
             }
 
             return disguised;

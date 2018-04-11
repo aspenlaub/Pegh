@@ -77,5 +77,14 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Properties {
                 return ResourceManager.GetString("FailedToRename", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A secret has not been defined. Please load sample &quot;{0}&quot;, adjust and then save as &quot;{1}&quot;.
+        /// </summary>
+        internal static string PleaseLoadSecretSampleAdjustAndThenSaveAs {
+            get {
+                return ResourceManager.GetString("PleaseLoadSecretSampleAdjustAndThenSaveAs", resourceCulture);
+            }
+        }
     }
 }

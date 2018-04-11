@@ -1,4 +1,5 @@
-﻿using Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
+﻿using System.Linq;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities.Test {
@@ -10,7 +11,9 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities.Test {
             Assert.IsFalse(string.IsNullOrEmpty(secret.Guid));
             var componentProvider = new ComponentProvider();
             var secretRepository = componentProvider.SecretRepository;
-            secretRepository.Get(secret);
+            var errorsAndInfos = new ErrorsAndInfos();
+            secretRepository.Get(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             const string defaultPassPhrase = "This is not a pass phrase";
             var arg = new SecretPassphraseFunctionArgument { IsUserPresent = false, PassphraseIfUserIsNotPresent = defaultPassPhrase };
             var passPhrase = secretRepository.ExecutePowershellFunction(secret.DefaultValue, arg);

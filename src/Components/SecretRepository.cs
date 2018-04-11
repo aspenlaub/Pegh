@@ -11,7 +11,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
     public class SecretRepository : ISecretRepository {
         protected readonly IComponentProvider ComponentProvider;
         internal readonly Dictionary<string, object> Values;
-        internal readonly SecretShouldDefaultSecretsBeStored SecretShouldDefaultSecretsBeStored;
+        internal SecretShouldDefaultSecretsBeStored SecretShouldDefaultSecretsBeStored;
 
         public bool IsUserPresent { get; internal set; }
         public string PassphraseIfUserIsNotPresent { get; internal set; }
@@ -19,7 +19,6 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         public SecretRepository(IComponentProvider componentProvider) {
             ComponentProvider = componentProvider;
             Values = new Dictionary<string, object>();
-            SecretShouldDefaultSecretsBeStored = new SecretShouldDefaultSecretsBeStored();
             IsUserPresent = true;
             var folder = ComponentProvider.PeghEnvironment.RootWorkFolder + @"\SecretSamples\";
             if (!Directory.Exists(folder)) {
@@ -29,25 +28,24 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             if (!Directory.Exists(folder)) {
                 Directory.CreateDirectory(folder);
             }
-            Get(SecretShouldDefaultSecretsBeStored);
         }
 
-        public void Set<TResult>(ISecret<TResult> secret) where TResult : class, ISecretResult<TResult>, new() {
-            var valueOrDefault = ValueOrDefault(secret);
+        public void Set<TResult>(ISecret<TResult> secret, IErrorsAndInfos errorsAndInfos) where TResult : class, ISecretResult<TResult>, new() {
+            var valueOrDefault = ValueOrDefault(secret, errorsAndInfos);
             var xml = ComponentProvider.XmlSerializer.Serialize(valueOrDefault);
             var encrypted = secret is IEncryptedSecret<TResult>;
-            WriteToFile(secret, xml, false, encrypted);
+            WriteToFile(secret, xml, false, encrypted, errorsAndInfos);
             Values[secret.Guid] = valueOrDefault;
         }
 
-        internal TResult ValueOrDefault<TResult>(ISecret<TResult> secret) where TResult : class, ISecretResult<TResult>, new() {
+        internal TResult ValueOrDefault<TResult>(ISecret<TResult> secret, IErrorsAndInfos errorsAndInfos) where TResult : class, ISecretResult<TResult>, new() {
             if (Values.ContainsKey(secret.Guid)) {
                 return Values[secret.Guid] as TResult;
             }
 
             var encrypted = secret is IEncryptedSecret<TResult>;
             if (File.Exists(FileName(secret, false, encrypted))) {
-                var xml = ReadFromFile(secret, false, encrypted);
+                var xml = ReadFromFile(secret, false, encrypted, errorsAndInfos);
                 Values[secret.Guid] = ComponentProvider.XmlDeserializer.Deserialize<TResult>(xml);
                 return (TResult) Values[secret.Guid];
             }
@@ -57,7 +55,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             return clone;
         }
 
-        public TResult Get<TResult>(ISecret<TResult> secret) where TResult : class, ISecretResult<TResult>, new() {
+        public TResult Get<TResult>(ISecret<TResult> secret, IErrorsAndInfos errorsAndInfos) where TResult : class, ISecretResult<TResult>, new() {
             TResult valueOrDefault;
 
             SaveSample(secret);
@@ -65,19 +63,27 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             var encrypted = secret is IEncryptedSecret<TResult>;
             var fileName = FileName(secret, false, encrypted);
             if (!File.Exists(fileName)) {
-                var shouldDefaultSecretsBeStored = ValueOrDefault(SecretShouldDefaultSecretsBeStored);
-                if (!shouldDefaultSecretsBeStored.AutomaticallySaveDefaultSecretIfAbsent) { return null; }
+                if (SecretShouldDefaultSecretsBeStored == null) {
+                    SecretShouldDefaultSecretsBeStored = new SecretShouldDefaultSecretsBeStored();
+                    Get(SecretShouldDefaultSecretsBeStored, errorsAndInfos);
+                }
+                var shouldDefaultSecretsBeStored = ValueOrDefault(SecretShouldDefaultSecretsBeStored, errorsAndInfos);
+                if (!shouldDefaultSecretsBeStored.AutomaticallySaveDefaultSecretIfAbsent) {
+                    var defaultFileName = FileName(secret, true, encrypted);
+                    errorsAndInfos.Errors.Add(string.Format(Properties.Resources.PleaseLoadSecretSampleAdjustAndThenSaveAs, defaultFileName, fileName));
+                    return null;
+                }
 
-                Set(secret);
-                return ValueOrDefault(secret);
+                Set(secret, errorsAndInfos);
+                return ValueOrDefault(secret, errorsAndInfos);
             }
 
             if (Values.ContainsKey(secret.Guid)) {
-                valueOrDefault = ValueOrDefault(secret);
+                valueOrDefault = ValueOrDefault(secret, errorsAndInfos);
                 return valueOrDefault;
             }
 
-            var xml = ReadFromFile(secret, false, encrypted);
+            var xml = ReadFromFile(secret, false, encrypted, errorsAndInfos);
             if (string.IsNullOrEmpty(xml)) { return null; }
 
             valueOrDefault = ComponentProvider.XmlDeserializer.Deserialize<TResult>(xml);
@@ -115,7 +121,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         }
 
         // ReSharper disable once SuggestBaseTypeForParameter
-        internal void WriteToFile<TResult>(ISecret<TResult> secret, string xml, bool sample, bool encrypted) where TResult : class, ISecretResult<TResult>, new() {
+        internal void WriteToFile<TResult>(ISecret<TResult> secret, string xml, bool sample, bool encrypted, IErrorsAndInfos errorsAndInfos) where TResult : class, ISecretResult<TResult>, new() {
             if (!ComponentProvider.XmlSchemer.Valid(xml, typeof(TResult))) { return; }
 
             var fileName = FileName(secret, sample, encrypted);
@@ -125,7 +131,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
                 return;
             }
 
-            var disguisedPassphrase = GetDisguisedPassphrase();
+            var disguisedPassphrase = GetDisguisedPassphrase(errorsAndInfos);
             if (string.IsNullOrEmpty(disguisedPassphrase)) { return; }
 
             var unencryptedFileName = FileName(secret, sample, false);
@@ -138,7 +144,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         }
 
         // ReSharper disable once SuggestBaseTypeForParameter
-        private string ReadFromFile<TResult>(ISecret<TResult> secret, bool sample, bool encrypted) where TResult : class, ISecretResult<TResult>, new() {
+        private string ReadFromFile<TResult>(ISecret<TResult> secret, bool sample, bool encrypted, IErrorsAndInfos errorsAndInfos) where TResult : class, ISecretResult<TResult>, new() {
             var xml = "";
 
             var fileName = FileName(secret, sample, encrypted);
@@ -147,7 +153,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
                 return ComponentProvider.XmlSchemer.Valid(xml, typeof(TResult)) ? xml : "";
             }
 
-            var disguisedPassphrase = GetDisguisedPassphrase();
+            var disguisedPassphrase = GetDisguisedPassphrase(errorsAndInfos);
             if (string.IsNullOrEmpty(disguisedPassphrase)) { return ""; }
 
             var unencryptedFileName = FileName(secret, sample, false);
@@ -175,11 +181,11 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             return ComponentProvider.PeghEnvironment.RootWorkFolder + (sample ? @"\SecretSamples\" : @"\SecretRepository\") + secret.Guid + (encrypted ? @".7zip" : @".xml");
         }
 
-        private string GetDisguisedPassphrase() {
-            var passphraseFunction = Get(new SecretPassphraseFunction());
+        private string GetDisguisedPassphrase(IErrorsAndInfos errorsAndInfos) {
+            var passphraseFunction = Get(new SecretPassphraseFunction(), errorsAndInfos);
             var passphraseFunctionArgument = new SecretPassphraseFunctionArgument { IsUserPresent = IsUserPresent, PassphraseIfUserIsNotPresent = PassphraseIfUserIsNotPresent };
             var passphrase = ExecutePowershellFunction(passphraseFunction, passphraseFunctionArgument);
-            return string.IsNullOrEmpty(passphrase) ? "" : ComponentProvider.Disguiser.Disguise(passphrase);
+            return string.IsNullOrEmpty(passphrase) ? "" : ComponentProvider.Disguiser.Disguise(passphrase, errorsAndInfos);
         }
     }
 }

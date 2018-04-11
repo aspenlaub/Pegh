@@ -48,12 +48,16 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
 
         [TestMethod]
         public void CanGetDefault() {
-            SetShouldDefaultSecretsBeStored(true);
+            var errorsAndInfos = new ErrorsAndInfos();
+            SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+
             var secret = new SecretCrewMember();
             Sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName };
             Sut.Reset(secret, false);
             Assert.IsNull(GetSecretCrewMember(secret));
-            var crewMember = Sut.Get(secret);
+            var crewMember = Sut.Get(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.AreEqual(SecretCrewMember.DefaultFirstName, crewMember.FirstName);
             CleanUpSecretRepository();
         }
@@ -62,7 +66,9 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
         public void ExistsAfterSetting() {
             var secret = new SecretCrewMember();
             Sut.Reset(secret, false);
-            Sut.Set(secret);
+            var errorsAndInfos = new ErrorsAndInfos();
+            Sut.Set(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsTrue(Sut.Exists(secret, false));
             Sut.Reset(secret, false);
             Assert.IsFalse(Sut.Exists(secret, false));
@@ -74,10 +80,13 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             var secret = new SecretCrewMember();
             Sut.Reset(secret, false);
             Sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName, SurName = SomeSurName, Rank = SomeRank };
-            Sut.Set(secret);
+            var errorsAndInfos = new ErrorsAndInfos();
+            Sut.Set(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Sut.Values.Remove(secret.Guid);
             Assert.IsNull(GetSecretCrewMember(secret));
-            Sut.Get(secret);
+            Sut.Get(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.AreEqual(SomeFirstName, GetSecretCrewMember(secret).FirstName);
             Assert.AreEqual(SomeSurName, GetSecretCrewMember(secret).SurName);
             Assert.AreEqual(SomeRank, GetSecretCrewMember(secret).Rank);
@@ -86,12 +95,15 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
 
         [TestMethod]
         public void CanGetScriptSecret() {
-            SetShouldDefaultSecretsBeStored(true);
+            var errorsAndInfos = new ErrorsAndInfos();
+            SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
 
             var secret = new SecretStringListEnumerator();
             Sut.Reset(secret, false);
             var list = TestListOfStrings();
-            var enumeratedList = Sut.ExecutePowershellFunction(Sut.Get(secret), list);
+            var enumeratedList = Sut.ExecutePowershellFunction(Sut.Get(secret, errorsAndInfos), list);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsNotNull(enumeratedList);
             var i = 0;
             foreach (var s in enumeratedList) {
@@ -102,12 +114,15 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
 
         [TestMethod]
         public void CannotGetScriptSecretIfScriptCannotBeRunWithoutErrors() {
-            SetShouldDefaultSecretsBeStored(true);
+            var errorsAndInfos = new ErrorsAndInfos();
+            SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
 
             var secret = new FailingSecretStringListEnumerator();
             Sut.Reset(secret, false);
             var list = TestListOfStrings();
-            var enumeratedList = Sut.ExecutePowershellFunction(Sut.Get(secret), list);
+            var enumeratedList = Sut.ExecutePowershellFunction(Sut.Get(secret, errorsAndInfos), list);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsNull(enumeratedList);
 
             CleanUpSecretRepository();
@@ -143,121 +158,150 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
 
         [TestMethod]
         public void DefaultSecretIsSavedIfSecretSaysSo() {
-            SetShouldDefaultSecretsBeStored(true);
+            var errorsAndInfos = new ErrorsAndInfos();
+            SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
 
             var secret = new SecretCrewMember();
             Sut.Reset(secret, false);
-            Sut.Get(secret);
+            Sut.Get(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsTrue(Sut.Exists(secret, false));
             CleanUpSecretRepository();
         }
 
         [TestMethod]
         public void DefaultSecretIsNotSavedIfSecretSaysNo() {
-            SetShouldDefaultSecretsBeStored(false);
+            var errorsAndInfos = new ErrorsAndInfos();
+            SetShouldDefaultSecretsBeStored(false, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
 
             var secret = new SecretCrewMember();
             Sut.Reset(secret, false);
-            Sut.Get(secret);
+            Sut.Get(secret, errorsAndInfos);
+            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsFalse(Sut.Exists(secret, false));
             CleanUpSecretRepository();
         }
 
         [TestMethod]
         public void DefaultSecretIsNotReturnedIfSecretSaysItShouldNotBeSaved() {
-            SetShouldDefaultSecretsBeStored(false);
+            var errorsAndInfos = new ErrorsAndInfos();
+            SetShouldDefaultSecretsBeStored(false, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
 
             var secret = new SecretCrewMember();
             Sut.Reset(secret, false);
-            Assert.IsNull(Sut.Get(secret));
+            Assert.IsNull(Sut.Get(secret, errorsAndInfos));
+            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), string.Join("\r\n", errorsAndInfos.Errors));
             CleanUpSecretRepository();
         }
 
         [TestMethod]
         public void DefaultSecretIsNotCachedIfSecretSaysItShouldNotBeSaved() {
-            SetShouldDefaultSecretsBeStored(false);
+            var errorsAndInfos = new ErrorsAndInfos();
+            SetShouldDefaultSecretsBeStored(false, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
 
             var secret = new SecretCrewMember();
             Sut.Reset(secret, false);
-            Sut.Get(secret);
+            Sut.Get(secret, errorsAndInfos);
+            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsFalse(Sut.Values.ContainsKey(secret.Guid));
             CleanUpSecretRepository();
         }
 
-        private void SetShouldDefaultSecretsBeStored(bool shouldThey) {
-            var shouldDefaultSecretsBeStored = ShouldDefaultSecretsBeStored();
+        private void SetShouldDefaultSecretsBeStored(bool shouldThey, IErrorsAndInfos errorsAndInfos) {
+            var shouldDefaultSecretsBeStored = ShouldDefaultSecretsBeStored(errorsAndInfos);
             if (shouldThey == shouldDefaultSecretsBeStored.AutomaticallySaveDefaultSecretIfAbsent) {
                 return;
             }
 
             shouldDefaultSecretsBeStored.AutomaticallySaveDefaultSecretIfAbsent = shouldThey;
-            shouldDefaultSecretsBeStored = ShouldDefaultSecretsBeStored();
+            shouldDefaultSecretsBeStored = ShouldDefaultSecretsBeStored(errorsAndInfos);
             Assert.AreEqual(shouldThey, shouldDefaultSecretsBeStored.AutomaticallySaveDefaultSecretIfAbsent);
         }
 
-        private ShouldDefaultSecretsBeStored ShouldDefaultSecretsBeStored() {
+        private ShouldDefaultSecretsBeStored ShouldDefaultSecretsBeStored(IErrorsAndInfos errorsAndInfos) {
             var secret = new SecretShouldDefaultSecretsBeStored();
-            var shouldDefaultSecretsBeStored = Sut.Get(secret);
+            var shouldDefaultSecretsBeStored = Sut.Get(secret, errorsAndInfos);
             Assert.IsNotNull(shouldDefaultSecretsBeStored);
             return shouldDefaultSecretsBeStored;
         }
 
         [TestMethod]
         public void DefaultScriptSecretIsSavedIfSecretSaysSo() {
-            SetShouldDefaultSecretsBeStored(true);
+            var errorsAndInfos = new ErrorsAndInfos();
+            SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
 
             var secret = new SecretStringListEnumerator();
             Sut.Reset(secret, false);
-            Sut.Get(secret);
+            Sut.Get(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsTrue(Sut.Exists(secret, false));
             CleanUpSecretRepository();
         }
 
         [TestMethod]
         public void DefaultScriptSecretIsNotSavedIfSecretSaysNo() {
-            SetShouldDefaultSecretsBeStored(false);
+            var errorsAndInfos = new ErrorsAndInfos();
+            SetShouldDefaultSecretsBeStored(false, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
 
             var secret = new SecretStringListEnumerator();
             Sut.Reset(secret, false);
-            Sut.Get(secret);
+            Sut.Get(secret, errorsAndInfos);
+            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsFalse(Sut.Exists(secret, false));
             CleanUpSecretRepository();
         }
 
         [TestMethod]
         public void DefaultScriptSecretIsNotReturnedIfSecretSaysItShouldNotBeSaved() {
-            SetShouldDefaultSecretsBeStored(false);
+            var errorsAndInfos = new ErrorsAndInfos();
+            SetShouldDefaultSecretsBeStored(false, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
 
             var secret = new SecretStringListEnumerator();
             Sut.Reset(secret, false);
-            Assert.IsNull(Sut.Get(secret));
+            Assert.IsNull(Sut.Get(secret, errorsAndInfos));
+            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), string.Join("\r\n", errorsAndInfos.Errors));
             CleanUpSecretRepository();
         }
 
         [TestMethod]
         public void DefaultScriptSecretIsNotCachedIfSecretSaysItShouldNotBeSaved() {
-            SetShouldDefaultSecretsBeStored(false);
+            var errorsAndInfos = new ErrorsAndInfos();
+            SetShouldDefaultSecretsBeStored(false, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
 
             var secret = new SecretStringListEnumerator();
             Sut.Reset(secret, false);
-            Sut.Get(secret);
+            Sut.Get(secret, errorsAndInfos);
+            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsFalse(Sut.Values.ContainsKey(secret.Guid));
             CleanUpSecretRepository();
         }
 
         [TestMethod]
         public void SavedScriptSecretIsUsedDuringExecution() {
-            SetShouldDefaultSecretsBeStored(true);
+            var errorsAndInfos = new ErrorsAndInfos();
+            SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
 
             var secret = new SecretStringListEnumerator();
             Sut.Reset(secret, false);
-            var script = Sut.Get(secret);
+            var script = Sut.Get(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             const string addedString = "/* This script has been altered */";
             Assert.IsFalse(script.Script.StartsWith(addedString));
             script.Script = addedString + "\r\n" + script.Script;
-            Sut.Set(secret);
+            Sut.Set(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Sut.Values.Clear();
-            Sut.ValueOrDefault(secret);
+            Sut.ValueOrDefault(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             script = (PowershellFunction<IList<string>, IEnumerable<string>>)Sut.Values[secret.Guid];
             var scriptText = script.Script;
             Assert.IsTrue(scriptText.StartsWith(addedString));
@@ -266,7 +310,9 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
 
         [TestMethod]
         public void DefaultSecretSampleIsSavedIfSecretSaysSo() {
-            SetShouldDefaultSecretsBeStored(true);
+            var errorsAndInfos = new ErrorsAndInfos();
+            SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             CleanUpSecretRepository();
 
             var secret = new SecretCrewMember();
@@ -280,7 +326,9 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
 
         [TestMethod]
         public void DefaultSecretSampleIsSavedEvenIfSecretSaysNo() {
-            SetShouldDefaultSecretsBeStored(false);
+            var errorsAndInfos = new ErrorsAndInfos();
+            SetShouldDefaultSecretsBeStored(false, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             CleanUpSecretRepository();
 
             var secret = new SecretCrewMember();
@@ -294,10 +342,13 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
 
         [TestMethod]
         public void CanGetLongSecretString() {
-            SetShouldDefaultSecretsBeStored(true);
+            var errorsAndInfos = new ErrorsAndInfos();
+            SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
 
             var secret = new LongSecretString();
-            var longSecretString = Sut.Get(secret);
+            var longSecretString = Sut.Get(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.AreEqual(128, longSecretString.TheLongString.Length);
 
             secret = new LongSecretString();
@@ -307,13 +358,17 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
 
         [TestMethod]
         public void CanGetDefaultForEncryptedSecret() {
-            SetShouldDefaultSecretsBeStored(true);
+            var errorsAndInfos = new ErrorsAndInfos();
+            SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+
             var secret = new EncryptedSecretCrewMember();
             Sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName };
             Sut.Reset(secret,  true);
             Assert.IsNull(GetSecretCrewMember(secret));
             Assert.IsFalse(Sut.Exists(secret, true));
-            var crewMember = Sut.Get(secret);
+            var crewMember = Sut.Get(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsTrue(Sut.Exists(secret, true));
             Assert.AreEqual(EncryptedSecretCrewMember.DefaultFirstName, crewMember.FirstName);
             CleanUpSecretRepository();
@@ -324,10 +379,13 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             var secret = new EncryptedSecretCrewMember();
             Sut.Reset(secret, true);
             Sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName, SurName = SomeSurName, Rank = SomeRank };
-            Sut.Set(secret);
+            var errorsAndInfos = new ErrorsAndInfos();
+            Sut.Set(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Sut.Values.Remove(secret.Guid);
             Assert.IsNull(GetSecretCrewMember(secret));
-            Sut.Get(secret);
+            Sut.Get(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.AreEqual(SomeFirstName, GetSecretCrewMember(secret).FirstName);
             Assert.AreEqual(SomeSurName, GetSecretCrewMember(secret).SurName);
             Assert.AreEqual(SomeRank, GetSecretCrewMember(secret).Rank);
@@ -336,14 +394,18 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
 
         [TestMethod]
         public void CanGetDefaultForEncryptedSecretWithoutPassphraseButItIsNotSaved() {
-            SetShouldDefaultSecretsBeStored(true);
+            var errorsAndInfos = new ErrorsAndInfos();
+            SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+
             Sut.PassphraseIfUserIsNotPresent = "";
             var secret = new EncryptedSecretCrewMember();
             Sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName };
             Sut.Reset(secret, true);
             Assert.IsNull(GetSecretCrewMember(secret));
             Assert.IsFalse(Sut.Exists(secret, true));
-            var crewMember = Sut.Get(secret);
+            var crewMember = Sut.Get(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsFalse(Sut.Exists(secret, true));
             Assert.AreEqual(EncryptedSecretCrewMember.DefaultFirstName, crewMember.FirstName);
             CleanUpSecretRepository();
@@ -354,7 +416,9 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             var secret = new EncryptedSecretCrewMember();
             Sut.Reset(secret, true);
             Sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName, SurName = SomeSurName, Rank = SomeRank };
-            Sut.Set(secret);
+            var errorsAndInfos = new ErrorsAndInfos();
+            Sut.Set(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
 
             var componentProviderMock = new Mock<IComponentProvider>();
             componentProviderMock.Setup(c => c.PeghEnvironment).Returns(ComponentProvider.PeghEnvironment);
@@ -363,14 +427,15 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             componentProviderMock.Setup(c => c.XmlSchemer).Returns(ComponentProvider.XmlSchemer);
             componentProviderMock.Setup(c => c.PowershellExecuter).Returns(ComponentProvider.PowershellExecuter);
             var disguiserMock = new Mock<IDisguiser>();
-            disguiserMock.Setup(d => d.Disguise(It.IsAny<string>())).Returns("");
+            disguiserMock.Setup(d => d.Disguise(It.IsAny<string>(), It.IsAny<IErrorsAndInfos>())).Returns("");
             componentProviderMock.Setup(c => c.Disguiser).Returns(disguiserMock.Object);
             Sut = new SecretRepository(componentProviderMock.Object) {
                 IsUserPresent = false,
                 PassphraseIfUserIsNotPresent = Passphrase
             };
             Assert.IsNull(GetSecretCrewMember(secret));
-            Sut.Get(secret);
+            Sut.Get(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsNull(GetSecretCrewMember(secret));
             CleanUpSecretRepository();
         }
@@ -380,13 +445,16 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             var secret = new EncryptedSecretCrewMember();
             Sut.Reset(secret, true);
             Sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName, SurName = SomeSurName, Rank = SomeRank };
-            Sut.Set(secret);
+            var errorsAndInfos = new ErrorsAndInfos();
+            Sut.Set(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Sut = new SecretRepository(ComponentProvider) {
                 IsUserPresent = false,
                 PassphraseIfUserIsNotPresent = Passphrase + Passphrase
             };
             Assert.IsNull(GetSecretCrewMember(secret));
-            Sut.Get(secret);
+            Sut.Get(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsNull(GetSecretCrewMember(secret));
             CleanUpSecretRepository();
         }
@@ -397,7 +465,9 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Sut.Reset(secret, false);
             var valueOrDefault = secret.DefaultValue;
             var xml = ComponentProvider.XmlSerializer.Serialize(valueOrDefault).Replace("Crew", "Curfew");
-            Sut.WriteToFile(secret, xml, false, false);
+            var errorsAndInfos = new ErrorsAndInfos();
+            Sut.WriteToFile(secret, xml, false, false, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsFalse(Sut.Exists(secret, false));
             CleanUpSecretRepository();
         }
