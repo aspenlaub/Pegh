@@ -11,6 +11,7 @@ using ErrorsAndInfos = Aspenlaub.Net.GitHub.CSharp.Pegh.Entities.ErrorsAndInfos;
 using FolderExtensions = Aspenlaub.Net.GitHub.CSharp.Pegh.FolderExtensions;
 using Regex = System.Text.RegularExpressions.Regex;
 using ComponentProvider = Aspenlaub.Net.GitHub.CSharp.Shatilaya.ComponentProvider;
+using DeveloperSettingsSecret = Aspenlaub.Net.GitHub.CSharp.Shatilaya.Entities.DeveloperSettingsSecret;
 
 masterDebugBinFolder = MakeAbsolute(Directory(masterDebugBinFolder)).FullPath;
 masterReleaseBinFolder = MakeAbsolute(Directory(masterReleaseBinFolder)).FullPath;
@@ -35,6 +36,7 @@ var latestBuildCakeUrl = "https://raw.githubusercontent.com/aspenlaub/Shatilaya/
 var componentProvider = new ComponentProvider();
 
 Setup(ctx => { 
+  Information("Repository folder is: " + repositoryFolder);
   Information("Solution is: " + solution);
   Information("Solution ID is: " + solutionId);
   Information("Target is: " + target);
@@ -81,6 +83,19 @@ Task("Restore")
        throw new Exception(string.Format("Nuget configuration file \"{0}\" not found", configFile));
     }
     NuGetRestore(solution, new NuGetRestoreSettings { ConfigFile = configFile });
+  });
+
+Task("Pull")
+  .Description("Pull latest changes")
+  .Does(() => {
+    var developerSettingsSecret = new DeveloperSettingsSecret();
+    var pullErrorsAndInfos = new ErrorsAndInfos();
+    var developerSettings = componentProvider.PeghComponentProvider.SecretRepository.Get(developerSettingsSecret, pullErrorsAndInfos);
+    if (pullErrorsAndInfos.Errors.Any()) {
+	  throw new Exception(string.Join("\r\n", pullErrorsAndInfos.Errors));
+	}
+
+	GitPull(repositoryFolder, developerSettings.Author, developerSettings.Email);
   });
 
 Task("UpdateNuspec")
@@ -220,32 +235,41 @@ Task("PushNuGetPackage")
     }
   });
 
-Task("CleanRestoreUpdateNuspec")
-  .IsDependentOn("Clean").IsDependentOn("Restore").IsDependentOn("UpdateNuspec").Does(() => {
+Task("CleanRestorePullUpdateNuspec")
+  .Description("Clean, restore packages, pull changes, update nuspec")
+  .IsDependentOn("Clean").IsDependentOn("Restore").IsDependentOn("Pull").IsDependentOn("UpdateNuspec").Does(() => {
   });
 
 Task("BuildAndTestDebugAndRelease")
+  .Description("Build and test debug and release configuration")
   .IsDependentOn("DebugBuild").IsDependentOn("RunTestsOnDebugArtifacts").IsDependentOn("CopyDebugArtifacts")
   .IsDependentOn("ReleaseBuild").IsDependentOn("RunTestsOnReleaseArtifacts").IsDependentOn("CopyReleaseArtifacts").Does(() => {
   });
 
 Task("IgnoreOutdatedBuildCakePendingChangesAndDoNotPush")
-  .IsDependentOn("CleanRestoreUpdateNuspec").IsDependentOn("BuildAndTestDebugAndRelease").IsDependentOn("CreateNuGetPackage").Does(() => {
+  .Description("Default except check for outdated build.cake, except check for pending changes and except nuget push")
+  .IsDependentOn("CleanRestorePullUpdateNuspec").IsDependentOn("BuildAndTestDebugAndRelease").IsDependentOn("CreateNuGetPackage").Does(() => {
   });
 
 Task("IgnoreOutdatedBuildCakePendingChanges")
+  .Description("Default except check for outdated build.cake and except check for pending changes")
   .IsDependentOn("IgnoreOutdatedBuildCakePendingChangesAndDoNotPush").IsDependentOn("PushNuGetPackage").Does(() => {
   });
 
 Task("IgnoreOutdatedBuildCakeAndDoNotPush")
-  .IsDependentOn("CleanRestoreUpdateNuspec").IsDependentOn("VerifyThatThereAreNoUncommittedChanges")
+  .Description("Default except check for outdated build.cake and except nuget push")
+  .IsDependentOn("CleanRestorePullUpdateNuspec").IsDependentOn("VerifyThatThereAreNoUncommittedChanges")
   .IsDependentOn("BuildAndTestDebugAndRelease").IsDependentOn("CreateNuGetPackage")
   .Does(() => {
   });
 
+Task("LittleThings")
+  .Description("Default but do not build or test in debug or release, and do not create or push nuget package")
+  .IsDependentOn("UpdateBuildCake").IsDependentOn("CleanRestorePullUpdateNuspec").IsDependentOn("VerifyThatThereAreNoUncommittedChanges").Does(() => {
+  });
+
 Task("Default")
-  .IsDependentOn("UpdateBuildCake").IsDependentOn("CleanRestoreUpdateNuspec").IsDependentOn("VerifyThatThereAreNoUncommittedChanges")
-  .IsDependentOn("BuildAndTestDebugAndRelease").IsDependentOn("CreateNuGetPackage").IsDependentOn("PushNuGetPackage").Does(() => {
+  .IsDependentOn("LittleThings").IsDependentOn("BuildAndTestDebugAndRelease").IsDependentOn("CreateNuGetPackage").IsDependentOn("PushNuGetPackage").Does(() => {
   });
 
 RunTarget(target);
