@@ -61,7 +61,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A secret has been enhanced, &apos;{0}&apos; is not found in &quot;{0}&quot;, copy it from &quot;{1}&quot; and adjust it.
+        ///   Looks up a localized string similar to A secret has been enhanced, &apos;{0}&apos; is not found in &quot;{1}&quot;, copy it from &quot;{2}&quot; and adjust it.
         /// </summary>
         internal static string AddedPropertyNotFoundInLoadedSecret {
             get {
