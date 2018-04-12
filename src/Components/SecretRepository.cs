@@ -58,7 +58,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         public TResult Get<TResult>(ISecret<TResult> secret, IErrorsAndInfos errorsAndInfos) where TResult : class, ISecretResult<TResult>, new() {
             TResult valueOrDefault;
 
-            SaveSample(secret);
+            SaveSample(secret, false);
 
             var encrypted = secret is IEncryptedSecret<TResult>;
             var fileName = FileName(secret, false, encrypted);
@@ -69,6 +69,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
                 }
                 var shouldDefaultSecretsBeStored = ValueOrDefault(SecretShouldDefaultSecretsBeStored, errorsAndInfos);
                 if (!shouldDefaultSecretsBeStored.AutomaticallySaveDefaultSecretIfAbsent) {
+                    SaveSample(secret, true);
                     var defaultFileName = FileName(secret, true, encrypted);
                     errorsAndInfos.Errors.Add(string.Format(Properties.Resources.PleaseLoadSecretSampleAdjustAndThenSaveAs, defaultFileName, fileName));
                     return null;
@@ -87,6 +88,12 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             if (string.IsNullOrEmpty(xml)) { return null; }
 
             valueOrDefault = ComponentProvider.XmlDeserializer.Deserialize<TResult>(xml);
+            foreach (var property in valueOrDefault.GetType().GetProperties().Where(p => p.GetValue(valueOrDefault) == null)) {
+                SaveSample(secret, true);
+                var defaultFileName = FileName(secret, true, encrypted);
+                errorsAndInfos.Errors.Add(string.Format(Properties.Resources.AddedPropertyNotFoundInLoadedSecret, property.Name, fileName, defaultFileName));
+            }
+
             Values[secret.Guid] = valueOrDefault;
             return valueOrDefault;
         }
@@ -110,12 +117,14 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             return File.Exists(FileName(secret, false, encrypted));
         }
 
-        internal void SaveSample<TResult>(ISecret<TResult> secret) where TResult : class, ISecretResult<TResult>, new() {
+        internal void SaveSample<TResult>(ISecret<TResult> secret, bool update) where TResult : class, ISecretResult<TResult>, new() {
             var encrypted = secret is IEncryptedSecret<TResult>;
             var fileName = FileName(secret, true, encrypted);
-            if (File.Exists(fileName)) { return; }
+            if (File.Exists(fileName) && !update) { return; }
 
             var xml = ComponentProvider.XmlSerializer.Serialize(secret.DefaultValue);
+            if (File.Exists(fileName) && File.ReadAllText(fileName) == xml) { return; }
+
             File.WriteAllText(fileName, xml);
             File.WriteAllText(fileName.Replace(".xml", ".xsd"), ComponentProvider.XmlSchemer.Create(typeof(TResult)));
         }

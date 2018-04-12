@@ -318,7 +318,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             var secret = new SecretCrewMember();
             var folder = SecretRepositoryFolder(true);
             Assert.AreEqual(0, Directory.GetFiles(folder, secret.Guid + "*.*").Length);
-            Sut.SaveSample(secret);
+            Sut.SaveSample(secret, false);
             Assert.AreEqual(1, Directory.GetFiles(folder, secret.Guid + "*.xml").Length);
             Assert.AreEqual(1, Directory.GetFiles(folder, secret.Guid + "*.xsd").Length);
             CleanUpSecretRepository();
@@ -334,7 +334,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             var secret = new SecretCrewMember();
             var folder = SecretRepositoryFolder(true);
             Assert.AreEqual(0, Directory.GetFiles(folder, secret.Guid + "*.*").Length);
-            Sut.SaveSample(secret);
+            Sut.SaveSample(secret, false);
             Assert.AreEqual(1, Directory.GetFiles(folder, secret.Guid + "*.xml").Length);
             Assert.AreEqual(1, Directory.GetFiles(folder, secret.Guid + "*.xsd").Length);
             CleanUpSecretRepository();
