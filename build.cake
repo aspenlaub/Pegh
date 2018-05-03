@@ -136,7 +136,13 @@ Task("VerifyThatMasterBranchDoesNotHaveOpenPullRequests")
   .Description("Verify that the master branch does not have open pull requests")
   .Does(() => {
     var noPullRequestsErrorsAndInfos = new ErrorsAndInfos();
-    if (componentProvider.GitHubUtilities.HasOpenPullRequest(new Folder(repositoryFolder), noPullRequestsErrorsAndInfos)) {
+	bool thereAreOpenPullRequests;
+	if (solutionSpecialSettingsDictionary.ContainsKey("PullRequestsToIgnore")) {
+	  thereAreOpenPullRequests = componentProvider.GitHubUtilities.HasOpenPullRequest(new Folder(repositoryFolder), solutionSpecialSettingsDictionary["PullRequestsToIgnore"], noPullRequestsErrorsAndInfos);
+	} else {
+	  thereAreOpenPullRequests = componentProvider.GitHubUtilities.HasOpenPullRequest(new Folder(repositoryFolder), noPullRequestsErrorsAndInfos);
+	}
+    if (thereAreOpenPullRequests) {
 	  throw new Exception("There are open pull requests");
 	}
     if (noPullRequestsErrorsAndInfos.Errors.Any()) {
