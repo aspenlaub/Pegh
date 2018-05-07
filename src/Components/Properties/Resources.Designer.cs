@@ -88,6 +88,24 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Schema &quot;{0}&quot; is invalid.
+        /// </summary>
+        internal static string InvalidSchema {
+            get {
+                return ResourceManager.GetString("InvalidSchema", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;{0}&quot; is not valid according to &quot;{1}&quot; ({2}).
+        /// </summary>
+        internal static string InvalidXml {
+            get {
+                return ResourceManager.GetString("InvalidXml", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A secret has not been defined. Please load sample &quot;{0}&quot;, adjust and then save as &quot;{1}&quot;.
         /// </summary>
         internal static string PleaseLoadSecretSampleAdjustAndThenSaveAs {

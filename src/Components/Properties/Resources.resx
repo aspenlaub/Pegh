@@ -126,6 +126,12 @@
   <data name="FailedToRename" xml:space="preserve">
     <value>Failed to rename "{0}" into "{1}"</value>
   </data>
+  <data name="InvalidSchema" xml:space="preserve">
+    <value>Schema "{0}" is invalid</value>
+  </data>
+  <data name="InvalidXml" xml:space="preserve">
+    <value>"{0}" is not valid according to "{1}" ({2})</value>
+  </data>
   <data name="PleaseLoadSecretSampleAdjustAndThenSaveAs" xml:space="preserve">
     <value>A secret has not been defined. Please load sample "{0}", adjust and then save as "{1}"</value>
   </data>

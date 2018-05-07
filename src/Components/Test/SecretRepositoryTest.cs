@@ -467,7 +467,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             var xml = ComponentProvider.XmlSerializer.Serialize(valueOrDefault).Replace("Crew", "Curfew");
             var errorsAndInfos = new ErrorsAndInfos();
             Sut.WriteToFile(secret, xml, false, false, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsTrue(errorsAndInfos.Errors.All(e => e.Contains("The \'http://www.aspenlaub.net:CurfewMember\' element is not declared")), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsFalse(Sut.Exists(secret, false));
             CleanUpSecretRepository();
         }

@@ -1,9 +1,14 @@
-﻿using Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities;
+﻿using System.Linq;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
     [TestClass]
     public class XmlSchemerTest {
+        protected const string CrewMemberSecretGuid = "E3C83BAF-AF26-0DCB-5C06-71CE6118C956";
+        protected const string StarShipSecretGuid = "B5FCC87A-2EB2-2DFC-005C-ECBBB8EFF432";
+
         [TestMethod]
         public void CanCreateXmlSchema() {
             var sut = new XmlSchemer();
@@ -19,10 +24,15 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             var serializer = new XmlSerializer();
             var crewMember = new CrewMember { FirstName = "B'Elanna", SurName = "Torres", Rank = "Lieutenant" };
             var xml = serializer.Serialize(crewMember);
-            Assert.IsTrue(sut.Valid(xml, typeof(CrewMember)));
-            Assert.IsFalse(sut.Valid(xml, typeof(StarShip)));
+            var errorsAndInfos = new ErrorsAndInfos();
+            Assert.IsTrue(sut.Valid(CrewMemberSecretGuid, xml, typeof(CrewMember), errorsAndInfos));
+            Assert.IsFalse(errorsAndInfos.AnyErrors(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(sut.Valid(StarShipSecretGuid, xml, typeof(StarShip), errorsAndInfos));
+            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("The \'http://www.aspenlaub.net:CrewMember\' element is not declared")));
             var xsd = sut.Create(typeof(CrewMember)).Replace("firstname", "worstname");
-            Assert.IsFalse(sut.Valid(xml, xsd, typeof(CrewMember)));
+            errorsAndInfos = new ErrorsAndInfos();
+            Assert.IsFalse(sut.Valid(CrewMemberSecretGuid, xml, xsd, typeof(CrewMember), errorsAndInfos));
+            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("The \'firstname\' attribute is not declared")));
         }
     }
 }

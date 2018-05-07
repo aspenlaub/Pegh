@@ -131,7 +131,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
 
         // ReSharper disable once SuggestBaseTypeForParameter
         internal void WriteToFile<TResult>(ISecret<TResult> secret, string xml, bool sample, bool encrypted, IErrorsAndInfos errorsAndInfos) where TResult : class, ISecretResult<TResult>, new() {
-            if (!ComponentProvider.XmlSchemer.Valid(xml, typeof(TResult))) { return; }
+            if (!ComponentProvider.XmlSchemer.Valid(secret.Guid, xml, typeof(TResult), errorsAndInfos)) { return; }
 
             var fileName = FileName(secret, sample, encrypted);
             if (!encrypted) {
@@ -159,7 +159,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             var fileName = FileName(secret, sample, encrypted);
             if (!encrypted) {
                 xml = File.ReadAllText(fileName);
-                return ComponentProvider.XmlSchemer.Valid(xml, typeof(TResult)) ? xml : "";
+                return ComponentProvider.XmlSchemer.Valid(secret.Guid, xml, typeof(TResult), errorsAndInfos) ? xml : "";
             }
 
             var disguisedPassphrase = GetDisguisedPassphrase(errorsAndInfos);
@@ -183,7 +183,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
                 zipFile.Dispose();
             }
 
-            return ComponentProvider.XmlSchemer.Valid(xml, typeof(TResult)) ? xml : "";
+            return ComponentProvider.XmlSchemer.Valid(secret.Guid, xml, typeof(TResult), errorsAndInfos) ? xml : "";
         }
 
         private string FileName(IGuid secret, bool sample, bool encrypted) {

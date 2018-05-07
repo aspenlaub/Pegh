@@ -44,11 +44,11 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             return xsd;
         }
 
-        public bool Valid(string xml, Type t) {
-            return Valid(xml, Create(t), t);
+        public bool Valid(string secretGuid, string xml, Type t, IErrorsAndInfos errorsAndInfos) {
+            return Valid(secretGuid, xml, Create(t), t, errorsAndInfos);
         }
 
-        internal bool Valid(string xml, string xsd, Type t) {
+        internal bool Valid(string secretGuid, string xml, string xsd, Type t, IErrorsAndInfos errorsAndInfos) {
             if (xml == "") {
                 return false;
             }
@@ -68,8 +68,11 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             var settings = new XmlReaderSettings();
             if (schemaIsValid) {
                 settings.Schemas.Add(compiledXmlSchema);
+            } else {
+                errorsAndInfos.Errors.Add(string.Format(Properties.Resources.InvalidSchema, $"{secretGuid}.xsd"));
             }
             settings.ValidationEventHandler += (sender, args) => {
+                errorsAndInfos.Errors.Add(string.Format(Properties.Resources.InvalidXml, $"{secretGuid}.xml", $"{secretGuid}.xsd", args.Message));
                 schemaIsValid = false;
             };
             settings.ValidationType = ValidationType.Schema;
