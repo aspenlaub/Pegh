@@ -2,7 +2,7 @@
 #addin nuget:?package=Newtonsoft.Json
 #addin nuget:?package=Cake.Git
 #addin nuget:?package=Nuget.Core
-#addin nuget:?package=DotNetZip
+#addin nuget:?package=DotNetZip&version=1.10.1
 #addin nuget:https://www.aspenlaub.net/nuget/?package=Aspenlaub.Net.GitHub.CSharp.Shatilaya
 
 using Folder = Aspenlaub.Net.GitHub.CSharp.Pegh.Entities.Folder;
