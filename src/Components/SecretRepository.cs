@@ -88,14 +88,26 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             if (string.IsNullOrEmpty(xml)) { return null; }
 
             valueOrDefault = ComponentProvider.XmlDeserializer.Deserialize<TResult>(xml);
-            foreach (var property in valueOrDefault.GetType().GetProperties().Where(p => p.GetValue(valueOrDefault) == null)) {
-                SaveSample(secret, true);
-                var defaultFileName = FileName(secret, true, encrypted);
-                errorsAndInfos.Errors.Add(string.Format(Properties.Resources.AddedPropertyNotFoundInLoadedSecret, property.Name, fileName, defaultFileName));
+            if (!IsGenericType(valueOrDefault.GetType())) {
+                foreach (var property in valueOrDefault.GetType().GetProperties().Where(p => p.GetValue(valueOrDefault) == null)) {
+                    SaveSample(secret, true);
+                    var defaultFileName = FileName(secret, true, encrypted);
+                    errorsAndInfos.Errors.Add(string.Format(Properties.Resources.AddedPropertyNotFoundInLoadedSecret, property.Name, fileName, defaultFileName));
+                }
             }
 
             Values[secret.Guid] = valueOrDefault;
             return valueOrDefault;
+        }
+
+        protected static bool IsGenericType(Type t) {
+            while (t != null) {
+                if (t.IsGenericType) { return true; }
+
+                t = t.BaseType;
+            }
+
+            return false;
         }
 
         public TResult ExecutePowershellFunction<TArgument, TResult>(IPowershellFunction<TArgument, TResult> powershellFunction, TArgument arg) where TResult : class {

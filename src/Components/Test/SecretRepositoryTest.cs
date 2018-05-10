@@ -39,6 +39,10 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             return Sut.Values.ContainsKey(secret.Guid) ? Sut.Values[secret.Guid] as CrewMember : null;
         }
 
+        protected ListOfElements GetSecretListOfElements(IGuid secret) {
+            return Sut.Values.ContainsKey(secret.Guid) ? Sut.Values[secret.Guid] as ListOfElements : null;
+        }
+
         [TestMethod]
         public void DoesNotExistInRepositoryAfterRemoval() {
             var secret = new SecretCrewMember();
@@ -469,6 +473,27 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Sut.WriteToFile(secret, xml, false, false, errorsAndInfos);
             Assert.IsTrue(errorsAndInfos.Errors.All(e => e.Contains("The \'http://www.aspenlaub.net:CurfewMember\' element is not declared")), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsFalse(Sut.Exists(secret, false));
+            CleanUpSecretRepository();
+        }
+
+        [TestMethod]
+        public void CanSetAndGetSecretListOfElements() {
+            var secret = new SecretListOfElements();
+            Sut.Reset(secret, false);
+            var listOfElements = new ListOfElements { new ListElement { Value = "One" }, new ListElement { Value = "Two" }};
+            Sut.Values[secret.Guid] = listOfElements;
+            var errorsAndInfos = new ErrorsAndInfos();
+            Sut.Set(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Sut = new SecretRepository(ComponentProvider) {
+                IsUserPresent = false,
+                PassphraseIfUserIsNotPresent = Passphrase + Passphrase
+            };
+            Sut.Get(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            listOfElements = GetSecretListOfElements(secret);
+            Assert.AreEqual(2, listOfElements.Count);
+            Assert.AreEqual("Two", listOfElements[1].Value);
             CleanUpSecretRepository();
         }
     }
