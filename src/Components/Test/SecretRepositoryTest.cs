@@ -145,7 +145,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
         }
 
         private void CleanUpSecretRepository() {
-            var secrets = new List<IGuid> { new SecretCrewMember(), new SecretStringListEnumerator(), new FailingSecretStringListEnumerator(), new EncryptedSecretCrewMember() };
+            var secrets = new List<IGuid> { new SecretCrewMember(), new SecretStringListEnumerator(), new FailingSecretStringListEnumerator(), new EncryptedSecretCrewMember(), new SecretListOfElements() };
             foreach (var files in new[] { false, true }.Select(sample => SecretRepositoryFolder(sample)).SelectMany(folder => secrets.Select(secret => Directory.GetFiles(folder, secret.Guid + "*.*").ToList()))) {
                 Assert.IsTrue(files.Count < 3);
                 files.ForEach(f => File.Delete(f));
