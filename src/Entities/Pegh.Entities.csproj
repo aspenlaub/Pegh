@@ -51,6 +51,8 @@
     <Compile Include="LongSecretString.cs" />
     <Compile Include="SecretPassphraseFunction.cs" />
     <Compile Include="SecretPassphraseFunctionArgument.cs" />
+    <Compile Include="SecretStringDecrypterFunction.cs" />
+    <Compile Include="SecretStringEncrypterFunction.cs" />
     <Compile Include="ShouldDefaultSecretsBeStored.cs" />
     <Compile Include="SecretShouldDefaultSecretsBeStored.cs" />
   </ItemGroup>
