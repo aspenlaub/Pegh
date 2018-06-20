@@ -25,27 +25,28 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
                 powerShellInstance.AddScript(script);
                 powerShellInstance.AddParameter("secretArgument", arg);
 
-                var runSpace = RunspaceFactory.CreateRunspace();
-                runSpace.ApartmentState = ApartmentState.STA;
-                runSpace.ThreadOptions = PSThreadOptions.ReuseThread;
-                runSpace.Open();
-                powerShellInstance.Runspace = runSpace;
-                Collection<PSObject> invokeResults;
-                try {
-                    invokeResults = powerShellInstance.Invoke();
-                    if (powerShellInstance.Streams.Error.Count > 0) {
+                using (var runSpace = RunspaceFactory.CreateRunspace()) {
+                    runSpace.ApartmentState = ApartmentState.STA;
+                    runSpace.ThreadOptions = PSThreadOptions.ReuseThread;
+                    runSpace.Open();
+                    powerShellInstance.Runspace = runSpace;
+                    Collection<PSObject> invokeResults;
+                    try {
+                        invokeResults = powerShellInstance.Invoke();
+                        if (powerShellInstance.Streams.Error.Count > 0) {
+                            return null;
+                        }
+                    } catch {
                         return null;
                     }
-                } catch {
-                    return null;
-                }
 
-                if (invokeResults.Count != 1) {
-                    return null;
-                }
+                    if (invokeResults.Count != 1) {
+                        return null;
+                    }
 
-                var invokeResult = invokeResults[0].BaseObject as PowershellFunctionResult;
-                return invokeResult?.Result as TResult;
+                    var invokeResult = invokeResults[0].BaseObject as PowershellFunctionResult;
+                    return invokeResult?.Result as TResult;
+                }
             }
         }
 
