@@ -12,23 +12,54 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
     [TestClass]
     public class SecretRepositoryTest {
         private IComponentProvider ComponentProvider { get; set; }
+        private IComponentProvider AlternativeComponentProvider { get; set; }
+        private IFolder AppDataSpecialFolder { get; set; }
         private SecretRepository Sut { get; set; }
+        private SecretRepository AlternativeSut { get; set; }
         private const string SomeFirstName = "Some First Name", SomeSurName = "Some Surname", SomeRank = "Some Rank";
         private const string Passphrase = "DbDy38Dk973-5DeC9-4A.10-A7$45-DB§66C15!!05B80";
 
         [TestInitialize]
         public void Initialize() {
             ComponentProvider = new ComponentProvider();
-            SecretRepositoryFolder(false);
-            SecretRepositoryFolder(true);
+            AlternativeComponentProvider = new ComponentProvider();
+            AppDataSpecialFolder = new Folder(Path.GetTempPath() + @"NoSecrets");
+            if (AppDataSpecialFolder.Exists()) {
+                var deleter = new FolderDeleter();
+                deleter.DeleteFolder(AppDataSpecialFolder);
+            }
+            AppDataSpecialFolder.CreateIfNecessary();
+            AlternativeComponentProvider.SetAppDataSpecialFolder(AppDataSpecialFolder);
+
+            SecretRepositoryFolder(false, false);
+            SecretRepositoryFolder(true, false);
+            SecretRepositoryFolder(false, true);
+            SecretRepositoryFolder(true, true);
+
             Sut = ComponentProvider.SecretRepository as SecretRepository;
             Assert.IsNotNull(Sut);
             Sut.IsUserPresent = false;
             Sut.PassphraseIfUserIsNotPresent = Passphrase;
+
+            AlternativeSut = AlternativeComponentProvider.SecretRepository as SecretRepository;
+            Assert.IsNotNull(AlternativeSut);
+            AlternativeSut.IsUserPresent = false;
+            AlternativeSut.PassphraseIfUserIsNotPresent = Passphrase;
         }
 
-        private string SecretRepositoryFolder(bool sample) {
-            var folder = ComponentProvider.PeghEnvironment.RootWorkFolder + (sample ? @"\SecretSamples" : @"\SecretRepository");
+        [ClassCleanup]
+        public static void ClassCleanup() {
+            var folder = new Folder(Path.GetTempPath() + @"NoSecrets");
+            if (!folder.Exists()) { return; }
+
+
+            var deleter = new FolderDeleter();
+            deleter.DeleteFolder(folder);
+        }
+
+        private string SecretRepositoryFolder(bool sample, bool alternative) {
+            var componentProvider = alternative ? AlternativeComponentProvider : ComponentProvider;
+            var folder = componentProvider.PeghEnvironment.RootWorkFolder + (sample ? @"\SecretSamples" : @"\SecretRepository");
             if (!Directory.Exists(folder)) {
                 Directory.CreateDirectory(folder);
             }
@@ -37,6 +68,10 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
 
         protected CrewMember GetSecretCrewMember(IGuid secret) {
             return Sut.Values.ContainsKey(secret.Guid) ? Sut.Values[secret.Guid] as CrewMember : null;
+        }
+
+        protected CrewMember GetAlternativeSecretCrewMember(IGuid secret) {
+            return AlternativeSut.Values.ContainsKey(secret.Guid) ? AlternativeSut.Values[secret.Guid] as CrewMember : null;
         }
 
         protected ListOfElements GetSecretListOfElements(IGuid secret) {
@@ -63,7 +98,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             var crewMember = Sut.Get(secret, errorsAndInfos);
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.AreEqual(SecretCrewMember.DefaultFirstName, crewMember.FirstName);
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
         }
 
         [TestMethod]
@@ -76,7 +111,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Assert.IsTrue(Sut.Exists(secret, false));
             Sut.Reset(secret, false);
             Assert.IsFalse(Sut.Exists(secret, false));
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
         }
 
         [TestMethod]
@@ -94,7 +129,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Assert.AreEqual(SomeFirstName, GetSecretCrewMember(secret).FirstName);
             Assert.AreEqual(SomeSurName, GetSecretCrewMember(secret).SurName);
             Assert.AreEqual(SomeRank, GetSecretCrewMember(secret).Rank);
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
         }
 
         [TestMethod]
@@ -129,7 +164,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsNull(enumeratedList);
 
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
         }
 
         private static List<string> TestListOfStrings() {
@@ -144,9 +179,9 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             return list;
         }
 
-        private void CleanUpSecretRepository() {
+        private void CleanUpSecretRepository(bool alternative) {
             var secrets = new List<IGuid> { new SecretCrewMember(), new SecretStringListEnumerator(), new FailingSecretStringListEnumerator(), new EncryptedSecretCrewMember(), new SecretListOfElements() };
-            foreach (var files in new[] { false, true }.Select(sample => SecretRepositoryFolder(sample)).SelectMany(folder => secrets.Select(secret => Directory.GetFiles(folder, secret.Guid + "*.*").ToList()))) {
+            foreach (var files in new[] { false, true }.Select(sample => SecretRepositoryFolder(sample, alternative)).SelectMany(folder => secrets.Select(secret => Directory.GetFiles(folder, secret.Guid + "*.*").ToList()))) {
                 Assert.IsTrue(files.Count < 3);
                 files.ForEach(f => File.Delete(f));
             }
@@ -171,7 +206,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Sut.Get(secret, errorsAndInfos);
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsTrue(Sut.Exists(secret, false));
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
         }
 
         [TestMethod]
@@ -185,7 +220,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Sut.Get(secret, errorsAndInfos);
             Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsFalse(Sut.Exists(secret, false));
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
         }
 
         [TestMethod]
@@ -198,7 +233,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Sut.Reset(secret, false);
             Assert.IsNull(Sut.Get(secret, errorsAndInfos));
             Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), string.Join("\r\n", errorsAndInfos.Errors));
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
         }
 
         [TestMethod]
@@ -212,7 +247,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Sut.Get(secret, errorsAndInfos);
             Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsFalse(Sut.Values.ContainsKey(secret.Guid));
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
         }
 
         private void SetShouldDefaultSecretsBeStored(bool shouldThey, IErrorsAndInfos errorsAndInfos) {
@@ -244,7 +279,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Sut.Get(secret, errorsAndInfos);
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsTrue(Sut.Exists(secret, false));
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
         }
 
         [TestMethod]
@@ -258,7 +293,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Sut.Get(secret, errorsAndInfos);
             Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsFalse(Sut.Exists(secret, false));
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
         }
 
         [TestMethod]
@@ -271,7 +306,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Sut.Reset(secret, false);
             Assert.IsNull(Sut.Get(secret, errorsAndInfos));
             Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), string.Join("\r\n", errorsAndInfos.Errors));
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
         }
 
         [TestMethod]
@@ -285,7 +320,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Sut.Get(secret, errorsAndInfos);
             Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsFalse(Sut.Values.ContainsKey(secret.Guid));
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
         }
 
         [TestMethod]
@@ -309,7 +344,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             script = (PowershellFunction<IList<string>, IEnumerable<string>>)Sut.Values[secret.Guid];
             var scriptText = script.Script;
             Assert.IsTrue(scriptText.StartsWith(addedString));
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
         }
 
         [TestMethod]
@@ -317,15 +352,15 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             var errorsAndInfos = new ErrorsAndInfos();
             SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
 
             var secret = new SecretCrewMember();
-            var folder = SecretRepositoryFolder(true);
+            var folder = SecretRepositoryFolder(true, false);
             Assert.AreEqual(0, Directory.GetFiles(folder, secret.Guid + "*.*").Length);
             Sut.SaveSample(secret, false);
             Assert.AreEqual(1, Directory.GetFiles(folder, secret.Guid + "*.xml").Length);
             Assert.AreEqual(1, Directory.GetFiles(folder, secret.Guid + "*.xsd").Length);
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
         }
 
         [TestMethod]
@@ -333,15 +368,15 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             var errorsAndInfos = new ErrorsAndInfos();
             SetShouldDefaultSecretsBeStored(false, errorsAndInfos);
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
 
             var secret = new SecretCrewMember();
-            var folder = SecretRepositoryFolder(true);
+            var folder = SecretRepositoryFolder(true, false);
             Assert.AreEqual(0, Directory.GetFiles(folder, secret.Guid + "*.*").Length);
             Sut.SaveSample(secret, false);
             Assert.AreEqual(1, Directory.GetFiles(folder, secret.Guid + "*.xml").Length);
             Assert.AreEqual(1, Directory.GetFiles(folder, secret.Guid + "*.xsd").Length);
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
         }
 
         [TestMethod]
@@ -375,7 +410,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsTrue(Sut.Exists(secret, true));
             Assert.AreEqual(EncryptedSecretCrewMember.DefaultFirstName, crewMember.FirstName);
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
         }
 
         [TestMethod]
@@ -393,7 +428,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Assert.AreEqual(SomeFirstName, GetSecretCrewMember(secret).FirstName);
             Assert.AreEqual(SomeSurName, GetSecretCrewMember(secret).SurName);
             Assert.AreEqual(SomeRank, GetSecretCrewMember(secret).Rank);
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
         }
 
         [TestMethod]
@@ -412,7 +447,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsFalse(Sut.Exists(secret, true));
             Assert.AreEqual(EncryptedSecretCrewMember.DefaultFirstName, crewMember.FirstName);
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
         }
 
         [TestMethod]
@@ -441,7 +476,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Sut.Get(secret, errorsAndInfos);
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsNull(GetSecretCrewMember(secret));
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
         }
 
         [TestMethod]
@@ -460,7 +495,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Sut.Get(secret, errorsAndInfos);
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsNull(GetSecretCrewMember(secret));
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
         }
 
         [TestMethod]
@@ -473,7 +508,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             Sut.WriteToFile(secret, xml, false, false, errorsAndInfos);
             Assert.IsTrue(errorsAndInfos.Errors.All(e => e.Contains("The \'http://www.aspenlaub.net:CurfewMember\' element is not declared")), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsFalse(Sut.Exists(secret, false));
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
         }
 
         [TestMethod]
@@ -494,7 +529,38 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components.Test {
             listOfElements = GetSecretListOfElements(secret);
             Assert.AreEqual(2, listOfElements.Count);
             Assert.AreEqual("Two", listOfElements[1].Value);
-            CleanUpSecretRepository();
+            CleanUpSecretRepository(false);
+        }
+
+        [TestMethod]
+        public void CanWorkWithAlternativePeghEnvironment() {
+            var secret = new SecretCrewMember();
+            Sut.Reset(secret, false);
+            Sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName, SurName = SomeSurName, Rank = SomeRank };
+            var errorsAndInfos = new ErrorsAndInfos();
+            Sut.Set(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+
+            secret = new SecretCrewMember();
+            AlternativeSut.Reset(secret, false);
+            AlternativeSut.Values[secret.Guid] = new CrewMember { FirstName = "ALT " + SomeFirstName, SurName = "ALT" + SomeSurName, Rank = "ALT" + SomeRank };
+            errorsAndInfos = new ErrorsAndInfos();
+            AlternativeSut.Set(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+
+            Sut.Values.Remove(secret.Guid);
+            AlternativeSut.Values.Remove(secret.Guid);
+
+            AlternativeSut.Get(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.AreEqual("ALT " + SomeFirstName, GetAlternativeSecretCrewMember(secret).FirstName);
+
+            Sut.Get(secret, errorsAndInfos);
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.AreEqual(SomeFirstName, GetSecretCrewMember(secret).FirstName);
+
+            CleanUpSecretRepository(false);
+            CleanUpSecretRepository(true);
         }
     }
 }

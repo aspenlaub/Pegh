@@ -1,5 +1,7 @@
 ﻿namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces {
     public interface IComponentProvider {
+        void SetAppDataSpecialFolder(IFolder folder);
+
         IDisguiser Disguiser { get; }
         IFolderDeleter FolderDeleter { get; }
         IFolderUpdater FolderUpdater { get; }

@@ -35,5 +35,13 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         public IXmlDeserializer XmlDeserializer { get { return DefaultComponent<IXmlDeserializer, XmlDeserializer>(); } }
         public IXmlSerializer XmlSerializer { get { return DefaultComponent<IXmlSerializer, XmlSerializer>(); } }
         public IXmlSchemer XmlSchemer { get { return DefaultComponent<IXmlSchemer, XmlSchemer>(); } }
+
+        public void SetAppDataSpecialFolder(IFolder folder) {
+            if (DefaultComponents.ContainsKey(typeof(IPeghEnvironment))) {
+                throw new Exception("Pegh environment has already been set");
+            }
+
+            DefaultComponents[typeof(IPeghEnvironment)] = new PeghEnvironment(folder);
+        }
     }
 }

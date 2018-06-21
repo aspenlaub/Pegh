@@ -8,5 +8,9 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         public PeghEnvironment() {
             RootWorkFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Aspenlaub.Net";
         }
+
+        public PeghEnvironment(IFolder folder) {
+            RootWorkFolder = folder.FullName;
+        }
     }
 }
