@@ -60,6 +60,7 @@
     <Compile Include="ISecretRepository.cs" />
     <Compile Include="ISecretResult.cs" />
     <Compile Include="ISetGuid.cs" />
+    <Compile Include="IStringCrypter.cs" />
     <Compile Include="IXmlDeserializer.cs" />
     <Compile Include="IXmlSchemer.cs" />
     <Compile Include="IXmlSerializer.cs" />

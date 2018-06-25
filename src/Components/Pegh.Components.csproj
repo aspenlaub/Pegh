@@ -64,6 +64,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="SecretRepository.cs" />
+    <Compile Include="StringCrypter.cs" />
     <Compile Include="XmlDeserializer.cs" />
     <Compile Include="XmlSchemer.cs" />
     <Compile Include="XmlSerializer.cs" />

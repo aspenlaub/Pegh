@@ -32,6 +32,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         public IPowershellExecuter PowershellExecuter { get { return DefaultComponent<IPowershellExecuter, PowershellExecuter>(); } }
         public IPrimeNumberGenerator PrimeNumberGenerator { get { return DefaultComponent<IPrimeNumberGenerator, PrimeNumberGenerator>(); } }
         public ISecretRepository SecretRepository { get { return DefaultComponent<ISecretRepository, SecretRepository>(() => new SecretRepository(this)); } }
+        public IStringCrypter StringCrypter { get { return DefaultComponent<IStringCrypter, StringCrypter>(() => new StringCrypter(this)); } }
         public IXmlDeserializer XmlDeserializer { get { return DefaultComponent<IXmlDeserializer, XmlDeserializer>(); } }
         public IXmlSerializer XmlSerializer { get { return DefaultComponent<IXmlSerializer, XmlSerializer>(); } }
         public IXmlSchemer XmlSchemer { get { return DefaultComponent<IXmlSchemer, XmlSchemer>(); } }

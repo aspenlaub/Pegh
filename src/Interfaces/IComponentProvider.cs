@@ -10,6 +10,7 @@
         IPowershellExecuter PowershellExecuter { get; }
         IPrimeNumberGenerator PrimeNumberGenerator { get; }
         ISecretRepository SecretRepository { get; }
+        IStringCrypter StringCrypter { get; }
         IXmlDeserializer XmlDeserializer { get; }
         IXmlSerializer XmlSerializer { get; }
         IXmlSchemer XmlSchemer { get; }
