@@ -12,7 +12,8 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <NuGetPackageImportStamp></NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
     <GenerateBuildInfoConfigFile>false</GenerateBuildInfoConfigFile>
   </PropertyGroup>
@@ -41,16 +42,23 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FolderExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="Components\Pegh.Components.csproj">
+      <Project>{6d7a0d2a-6bf6-4633-8122-b7fdce4c4f74}</Project>
+      <Name>Pegh.Components</Name>
+    </ProjectReference>
     <ProjectReference Include="Entities\Pegh.Entities.csproj">
       <Project>{97d7bfde-2296-4356-808e-48db07f1debc}</Project>
       <Name>Pegh.Entities</Name>
+    </ProjectReference>
+    <ProjectReference Include="GUI\Pegh.GUI.csproj">
+      <Project>{f8c3ac7c-56d2-4049-8ef3-e10a3b1564aa}</Project>
+      <Name>Pegh.GUI</Name>
     </ProjectReference>
     <ProjectReference Include="Interfaces\Pegh.Interfaces.csproj">
       <Project>{60edcaae-15a7-486a-a7e1-7ee6cf285520}</Project>

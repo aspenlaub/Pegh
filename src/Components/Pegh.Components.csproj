@@ -49,6 +49,7 @@
     <Compile Include="ComponentProvider.cs" />
     <Compile Include="Disguiser.cs" />
     <Compile Include="FolderDeleter.cs" />
+    <Compile Include="FolderExtensions.cs" />
     <Compile Include="FolderUpdater.cs" />
     <Compile Include="PassphraseProvider.cs" />
     <Compile Include="PeghEnvironment.cs" />
@@ -74,10 +75,6 @@
     <ProjectReference Include="..\Interfaces\Pegh.Interfaces.csproj">
       <Project>{60edcaae-15a7-486a-a7e1-7ee6cf285520}</Project>
       <Name>Pegh.Interfaces</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Pegh.csproj">
-      <Project>{6e932db0-ba1d-43b7-8fe6-07ee4cb9745b}</Project>
-      <Name>Pegh</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
