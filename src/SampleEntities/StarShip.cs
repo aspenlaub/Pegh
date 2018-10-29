@@ -1,6 +1,6 @@
-using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using System.ComponentModel;
 using System.Xml.Serialization;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities {
     public class StarShip : IGuid, INotifyPropertyChanged {
@@ -9,11 +9,17 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities {
         public string Guid { get; set; }
 
         [XmlAttribute("name")]
-        public string Name { get { return vName; } set { vName = value; OnPropertyChanged(nameof(Name)); } }
+        public string Name {
+            get => vName;
+            set { vName = value; OnPropertyChanged(nameof(Name)); }
+        }
         private string vName;
 
         [XmlElement("CrewMember")]
-        public CrewMembers CrewMembers { get { return vCrewMembers; } set { vCrewMembers = value; OnPropertyChanged(nameof(CrewMembers)); } }
+        public CrewMembers CrewMembers {
+            get => vCrewMembers;
+            set { vCrewMembers = value; OnPropertyChanged(nameof(CrewMembers)); }
+        }
         private CrewMembers vCrewMembers;
 
         public StarShip() {

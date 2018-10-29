@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
@@ -17,17 +18,18 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             PrimeNumberGenerator = ComponentProvider.PrimeNumberGenerator;
         }
 
-        protected string LongString(IErrorsAndInfos errorsAndInfos) {
-            return SecretRepository.Get(new LongSecretString(), errorsAndInfos).TheLongString;
+        protected async Task<string> LongString(IErrorsAndInfos errorsAndInfos) {
+            var secretLongString = await SecretRepository.GetAsync(new LongSecretString(), errorsAndInfos);
+            return secretLongString.TheLongString;
         }
 
-        public string Disguise(string s, IErrorsAndInfos errorsAndInfos) {
+        public async Task<string> Disguise(string s, IErrorsAndInfos errorsAndInfos) {
             var bytes = Encoding.UTF8.GetBytes(s);
             EnsurePrimeNumbers(bytes);
             long pos = bytes.Length;
             var primePos = bytes.Length;
             var disguised = "";
-            var longString = LongString(errorsAndInfos);
+            var longString = await LongString(errorsAndInfos);
             foreach (var aByte in bytes) {
                 pos = pos + aByte * PrimeNumbers[primePos];
                 primePos = primePos + aByte;

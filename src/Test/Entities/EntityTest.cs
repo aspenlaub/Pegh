@@ -19,18 +19,13 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Entities {
             CanUseEntity<StarBase>();
             CanUseEntity<StarShip>();
             CanUseEntity<CrewMember>();
-            CanUsePowershellFunction<int, string>();
             CanUseEntity<ShouldDefaultSecretsBeStored>();
             CanUseEntity<LongString>();
-            CanUseEntity<SecretPassphraseFunctionArgument>();
+            CanUseEntity<CsScript>();
         }
 
         protected void CanUseEntity<T>() where T : class, new() {
             CanUseEntity<T, T>(new List<string>());
-        }
-
-        protected void CanUsePowershellFunction<TArgument, TResult>() {
-            CanUseEntity<PowershellFunction<TArgument, TResult>, PowershellFunction<TArgument, TResult>>(new List<string>());
         }
 
         protected void CanUseEntity<T, TClone>(IEnumerable<string> excludeProperties) where T : new() where TClone : class, new() {
@@ -40,8 +35,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Entities {
             if (canClone) {
                 clone = (sut as ISecretResult<TClone>).Clone();
             }
-            var notifyPropertyChanged = sut as INotifyPropertyChanged;
-            if (notifyPropertyChanged != null) {
+            if (sut is INotifyPropertyChanged notifyPropertyChanged) {
                 notifyPropertyChanged.PropertyChanged += NotifyPropertyChanged_PropertyChanged;
             }
             foreach (var property in typeof(T).GetProperties().Where(p => !excludeProperties.Contains(p.Name))) {

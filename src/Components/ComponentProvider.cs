@@ -24,18 +24,18 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             return (T)DefaultComponents[typeof(T)];
         }
 
+        public ICsScriptExecuter CsScriptExecuter => DefaultComponent<ICsScriptExecuter, CsScriptExecuter>();
         public IDisguiser Disguiser { get { return DefaultComponent<IDisguiser, Disguiser>(() => new Disguiser(this)); } }
-        public IFolderDeleter FolderDeleter { get { return DefaultComponent<IFolderDeleter, FolderDeleter>(); } }
-        public IFolderUpdater FolderUpdater { get { return DefaultComponent<IFolderUpdater, FolderUpdater>(); } }
-        public IPassphraseProvider PassphraseProvider { get { return DefaultComponent<IPassphraseProvider, PassphraseProvider>(); } }
-        public IPeghEnvironment PeghEnvironment { get { return DefaultComponent<IPeghEnvironment, PeghEnvironment>(); } }
-        public IPowershellExecuter PowershellExecuter { get { return DefaultComponent<IPowershellExecuter, PowershellExecuter>(); } }
-        public IPrimeNumberGenerator PrimeNumberGenerator { get { return DefaultComponent<IPrimeNumberGenerator, PrimeNumberGenerator>(); } }
+        public IFolderDeleter FolderDeleter => DefaultComponent<IFolderDeleter, FolderDeleter>();
+        public IFolderUpdater FolderUpdater => DefaultComponent<IFolderUpdater, FolderUpdater>();
+        public IPassphraseProvider PassphraseProvider => DefaultComponent<IPassphraseProvider, PassphraseProvider>();
+        public IPeghEnvironment PeghEnvironment => DefaultComponent<IPeghEnvironment, PeghEnvironment>();
+        public IPrimeNumberGenerator PrimeNumberGenerator => DefaultComponent<IPrimeNumberGenerator, PrimeNumberGenerator>();
         public ISecretRepository SecretRepository { get { return DefaultComponent<ISecretRepository, SecretRepository>(() => new SecretRepository(this)); } }
         public IStringCrypter StringCrypter { get { return DefaultComponent<IStringCrypter, StringCrypter>(() => new StringCrypter(this)); } }
-        public IXmlDeserializer XmlDeserializer { get { return DefaultComponent<IXmlDeserializer, XmlDeserializer>(); } }
-        public IXmlSerializer XmlSerializer { get { return DefaultComponent<IXmlSerializer, XmlSerializer>(); } }
-        public IXmlSchemer XmlSchemer { get { return DefaultComponent<IXmlSchemer, XmlSchemer>(); } }
+        public IXmlDeserializer XmlDeserializer => DefaultComponent<IXmlDeserializer, XmlDeserializer>();
+        public IXmlSerializer XmlSerializer => DefaultComponent<IXmlSerializer, XmlSerializer>();
+        public IXmlSchemer XmlSchemer => DefaultComponent<IXmlSchemer, XmlSchemer>();
 
         public void SetAppDataSpecialFolder(IFolder folder) {
             if (DefaultComponents.ContainsKey(typeof(IPeghEnvironment))) {

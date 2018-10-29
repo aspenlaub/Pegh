@@ -47,3 +47,12 @@ Scenario: Simple large folder beneath c:\temp can be deleted
 	And I ask the folder deleter to double-check this
 	Then the result is yes
 	And the double-check agrees
+
+Scenario: Simple large folder ending with \bin can be deleted
+	Given the folder contains 20 files
+	And the folder ends with \bin
+	When I ask the folder deleter if I am allowed to delete the folder
+	And I ask the folder deleter to double-check this
+	Then the result is yes
+	And the double-check agrees
+

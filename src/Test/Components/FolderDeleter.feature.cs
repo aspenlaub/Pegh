@@ -241,6 +241,34 @@ this.FeatureBackground();
 #line hidden
             this.ScenarioCleanup();
         }
+        
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Simple large folder ending with \\bin can be deleted")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "FolderDeleter")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("FolderDeleter")]
+        public virtual void SimpleLargeFolderEndingWithBinCanBeDeleted()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Simple large folder ending with \\bin can be deleted", null, ((string[])(null)));
+#line 51
+this.ScenarioInitialize(scenarioInfo);
+            this.ScenarioStart();
+#line 6
+this.FeatureBackground();
+#line 52
+ testRunner.Given("the folder contains 20 files", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line 53
+ testRunner.And("the folder ends with \\bin", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 54
+ testRunner.When("I ask the folder deleter if I am allowed to delete the folder", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 55
+ testRunner.And("I ask the folder deleter to double-check this", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 56
+ testRunner.Then("the result is yes", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 57
+ testRunner.And("the double-check agrees", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            this.ScenarioCleanup();
+        }
     }
 }
 #pragma warning restore

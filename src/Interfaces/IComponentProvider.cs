@@ -2,12 +2,12 @@
     public interface IComponentProvider {
         void SetAppDataSpecialFolder(IFolder folder);
 
+        ICsScriptExecuter CsScriptExecuter { get; }
         IDisguiser Disguiser { get; }
         IFolderDeleter FolderDeleter { get; }
         IFolderUpdater FolderUpdater { get; }
         IPassphraseProvider PassphraseProvider { get; }
         IPeghEnvironment PeghEnvironment { get; }
-        IPowershellExecuter PowershellExecuter { get; }
         IPrimeNumberGenerator PrimeNumberGenerator { get; }
         ISecretRepository SecretRepository { get; }
         IStringCrypter StringCrypter { get; }

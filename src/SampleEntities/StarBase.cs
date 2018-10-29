@@ -9,19 +9,21 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities {
         public string Guid { get; set; }
 
         [XmlAttribute("name")]
-        public string Name { get { return vName; } set { vName = value; OnPropertyChanged(nameof(Name)); } }
+        public string Name {
+            get => vName;
+            set { vName = value; OnPropertyChanged(nameof(Name)); } }
         private string vName;
 
         [XmlElement("CrewMember")]
         public CrewMembers Personnel {
-            get { return vPersonnel; }
+            get => vPersonnel;
             set { vPersonnel = value; OnPropertyChanged(nameof(Personnel)); }
         }
         private CrewMembers vPersonnel;
 
         [XmlElement("StarShip")]
         public StarShips DockedShips {
-            get { return vDockedShips; }
+            get => vDockedShips;
             set { vDockedShips = value; OnPropertyChanged(nameof(DockedShips)); }
         }
         private StarShips vDockedShips;

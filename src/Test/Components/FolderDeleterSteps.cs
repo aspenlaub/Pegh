@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TechTalk.SpecFlow;
@@ -13,7 +14,9 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         protected bool CanDeleteFolder, DoubleCheckOkay;
 
         public FolderDeleterSteps() {
-            Sut = new FolderDeleter();
+            Sut = new FolderDeleter {
+                IgnoreUserTempFolder = true
+            };
         }
 
         [AfterScenario("FolderDeleter")]
@@ -55,6 +58,17 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         [Given(@"the folder ends with \\obj")]
         public void GivenTheFolderEndsWithObj() {
             var newFolder = new Folder(Path.GetTempPath() + @"obj");
+            if (Directory.Exists(newFolder.FullName)) {
+                Directory.Delete(newFolder.FullName, true);
+            }
+            Directory.Move(Folder.FullName, newFolder.FullName);
+            Folder = newFolder;
+            SubFolder = Folder.SubFolder(@"\SubFolder");
+        }
+
+        [Given(@"the folder ends with \\bin")]
+        public void GivenTheFolderEndsWithBin() {
+            var newFolder = new Folder(Path.GetTempPath() + @"bin");
             if (Directory.Exists(newFolder.FullName)) {
                 Directory.Delete(newFolder.FullName, true);
             }

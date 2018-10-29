@@ -2,17 +2,21 @@
 using System.IO;
 using System.Linq;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
     public class FolderDeleter : IFolderDeleter {
-        protected readonly string Obj = @"\obj", CTemp = @"C:\Temp\", TestResults = @"\TestResults";
+        protected readonly string Obj = @"\obj", CTemp = @"C:\Temp\", TestResults = @"\TestResults", Bin = @"\bin";
         protected readonly int MinimumFolderNameLength = 20;
+        public bool IgnoreUserTempFolder { get; set; }
+        public bool IgnoreFoldersEndingWithBin { get; set; }
 
         public bool CanDeleteFolder(IFolder folder, out IFolderDeleteGates folderDeleteGates) {
             folderDeleteGates = new FolderDeleteGates {
                 FolderNameIsLongEnough = folder.FullName.Length > MinimumFolderNameLength,
                 EndsWithObj = folder.FullName.EndsWith(Obj),
+                EndsWithBin = folder.FullName.EndsWith(Bin),
                 CTemp = folder.FullName.StartsWith(CTemp, StringComparison.OrdinalIgnoreCase),
                 NotTooManyFilesInFolder = true,
                 IsGitCheckOutFolder = folder.GitSubFolder().Exists(),
@@ -22,8 +26,9 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             if (folderDeleteGates.IsGitCheckOutFolder) { return true; }
             if (!folderDeleteGates.FolderNameIsLongEnough) { return false; }
             if (folderDeleteGates.EndsWithObj) { return true; }
+            if (!IgnoreFoldersEndingWithBin && folderDeleteGates.EndsWithBin) { return true; }
             if (folderDeleteGates.CTemp) { return true; }
-            if (folderDeleteGates.UserTemp) { return true; }
+            if (!IgnoreUserTempFolder && folderDeleteGates.UserTemp) { return true; }
             if (folderDeleteGates.TestResults) { return true; }
 
             var directoryInfo = new DirectoryInfo(folder.FullName);
@@ -34,16 +39,17 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         }
 
         public bool CanDeleteFolder(IFolder folder) {
-            IFolderDeleteGates folderDeleteGates;
-            return CanDeleteFolder(folder, out folderDeleteGates);
+            return CanDeleteFolder(folder, out _);
         }
 
         public bool CanDeleteFolderDoubleCheck(IFolder folder) {
             if (folder.GitSubFolder().Exists()) { return true; }
             if (folder.FullName.Length <= MinimumFolderNameLength) { return false; }
             if (folder.FullName.EndsWith(Obj)) { return true; }
+            if (!IgnoreFoldersEndingWithBin && folder.FullName.EndsWith(Bin)) { return true; }
             if (folder.FullName.StartsWith(CTemp, StringComparison.OrdinalIgnoreCase)) { return true; }
             if (folder.FullName.StartsWith(Path.GetTempPath())) { return true; }
+            if (!IgnoreUserTempFolder && folder.FullName.StartsWith(Path.GetTempPath())) { return true; }
             if (folder.FullName.Contains(TestResults)) { return true; }
 
             var directoryInfo = new DirectoryInfo(folder.FullName);

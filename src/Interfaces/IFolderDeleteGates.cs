@@ -11,6 +11,11 @@
         bool EndsWithObj { get; set; }
 
         /// <summary>
+        /// Does the folder end with \bin, i.e. is it an output folder?
+        /// </summary>
+        bool EndsWithBin { get; set; }
+
+        /// <summary>
         /// Does the folder hold a number of files small enough to allow deletion?
         /// </summary>
         bool NotTooManyFilesInFolder { get; set; }

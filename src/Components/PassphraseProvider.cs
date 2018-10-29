@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
+[assembly: InternalsVisibleTo("Aspenlaub.Net.GitHub.CSharp.Pegh.SpecFlow.Test")]
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
     public class PassphraseProvider : IPassphraseProvider {
         internal static Dictionary<string, string> Passphrases = new Dictionary<string, string>();

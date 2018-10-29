@@ -3,8 +3,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
-using Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
@@ -92,8 +92,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
 
         [TestMethod]
         public void CanSerializeFleet() {
-            string unverifiedResultFileName, unverifiedResultFileContents, verifiedResultFileName;
-            RegenerateUnverifiedResultFile(out unverifiedResultFileName, out unverifiedResultFileContents, out verifiedResultFileName);
+            RegenerateUnverifiedResultFile(out var unverifiedResultFileName, out var unverifiedResultFileContents, out var verifiedResultFileName);
             VerifyExpected(unverifiedResultFileContents, "encoding=\"utf-8\"");
             VerifyExpected(unverifiedResultFileContents, "<StarFleets xmlns:xs");
             Assert.IsFalse(unverifiedResultFileContents.Contains("<StarFleets>"));
@@ -126,8 +125,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
 
         [TestMethod]
         public void CanDeserializeFleet() {
-            string unverifiedResultFileName, unverifiedResultFileContents, verifiedResultFileName;
-            RegenerateUnverifiedResultFile(out unverifiedResultFileName, out unverifiedResultFileContents, out verifiedResultFileName);
+            RegenerateUnverifiedResultFile(out var unverifiedResultFileName, out _, out var verifiedResultFileName);
             File.Copy(unverifiedResultFileName, verifiedResultFileName);
             var deserializer = Components.XmlDeserializer;
             var fleets = deserializer.Deserialize<ParallelUniverses>(File.ReadAllText(verifiedResultFileName, Encoding.UTF8));

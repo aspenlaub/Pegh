@@ -1,159 +1,48 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{6E932DB0-BA1D-43B7-8FE6-07EE4CB9745B}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Aspenlaub.Net.GitHub.CSharp.Pegh</RootNamespace>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Aspenlaub.Net.GitHub.CSharp.Pegh</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
+    <RootNamespace>Aspenlaub.Net.GitHub.CSharp.Pegh</RootNamespace>
+    <Deterministic>false</Deterministic>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateBuildInfoConfigFile>false</GenerateBuildInfoConfigFile>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NuspecFile>Pegh.nuspec</NuspecFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Serialization" />
-    <Reference Include="WindowsBase" />
+    <Compile Remove="SpecFlow\**" />
+    <Compile Remove="temp\**" />
+    <Compile Remove="Test\**" />
+    <EmbeddedResource Remove="SpecFlow\**" />
+    <EmbeddedResource Remove="temp\**" />
+    <EmbeddedResource Remove="Test\**" />
+    <None Remove="SpecFlow\**" />
+    <None Remove="temp\**" />
+    <None Remove="Test\**" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Components\ComponentProvider.cs" />
-    <Compile Include="Components\Disguiser.cs" />
-    <Compile Include="Components\FolderDeleter.cs" />
-    <Compile Include="Components\FolderExtensions.cs" />
-    <Compile Include="Components\FolderUpdater.cs" />
-    <Compile Include="Components\PassphraseProvider.cs" />
-    <Compile Include="Components\PeghEnvironment.cs" />
-    <Compile Include="Components\PowershellExecuter.cs" />
-    <Compile Include="Components\PrimeNumberGenerator.cs" />
-    <Compile Include="Components\SecretRepository.cs" />
-    <Compile Include="Components\StringCrypter.cs" />
-    <Compile Include="Components\XmlDeserializer.cs" />
-    <Compile Include="Components\XmlSchemer.cs" />
-    <Compile Include="Components\XmlSerializer.cs" />
-    <Compile Include="Entities\ErrorsAndInfos.cs" />
-    <Compile Include="Entities\Folder.cs" />
-    <Compile Include="Entities\FolderDeleteGates.cs" />
-    <Compile Include="Entities\LongSecretString.cs" />
-    <Compile Include="Entities\LongString.cs" />
-    <Compile Include="Entities\PowershellFunction.cs" />
-    <Compile Include="Entities\PowershellFunctionResult.cs" />
-    <Compile Include="Entities\SecretPassphraseFunction.cs" />
-    <Compile Include="Entities\SecretPassphraseFunctionArgument.cs" />
-    <Compile Include="Entities\SecretShouldDefaultSecretsBeStored.cs" />
-    <Compile Include="Entities\SecretStringDecrypterFunction.cs" />
-    <Compile Include="Entities\SecretStringEncrypterFunction.cs" />
-    <Compile Include="Entities\ShouldDefaultSecretsBeStored.cs" />
-    <Compile Include="Gui\EnterPassphrase.xaml.cs">
-      <DependentUpon>EnterPassphrase.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Interfaces\EnvironmentType.cs" />
-    <Compile Include="Interfaces\IComponentProvider.cs" />
-    <Compile Include="Interfaces\IDisguiser.cs" />
-    <Compile Include="Interfaces\IEncryptedSecret.cs" />
-    <Compile Include="Interfaces\IErrorsAndInfos.cs" />
-    <Compile Include="Interfaces\IFolder.cs" />
-    <Compile Include="Interfaces\IFolderDeleteGates.cs" />
-    <Compile Include="Interfaces\IFolderDeleter.cs" />
-    <Compile Include="Interfaces\IFolderUpdater.cs" />
-    <Compile Include="Interfaces\IGuid.cs" />
-    <Compile Include="Interfaces\IPassphraseDialog.cs" />
-    <Compile Include="Interfaces\IPassphraseProvider.cs" />
-    <Compile Include="Interfaces\IPeghEnvironment.cs" />
-    <Compile Include="Interfaces\IPowershellExecuter.cs" />
-    <Compile Include="Interfaces\IPowershellFunction.cs" />
-    <Compile Include="Interfaces\IPrimeNumberGenerator.cs" />
-    <Compile Include="Interfaces\ISecret.cs" />
-    <Compile Include="Interfaces\ISecretRepository.cs" />
-    <Compile Include="Interfaces\ISecretResult.cs" />
-    <Compile Include="Interfaces\ISetGuid.cs" />
-    <Compile Include="Interfaces\IStringCrypter.cs" />
-    <Compile Include="Interfaces\IXmlDeserializer.cs" />
-    <Compile Include="Interfaces\IXmlSchemer.cs" />
-    <Compile Include="Interfaces\IXmlSerializer.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
+    <Folder Include="Extensions\" />
+    <Folder Include="SampleEntities\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Dotnet.Script.Core" Version="0.26.1" />
+    <PackageReference Include="SharpZipLib.NETStandard" Version="1.0.7" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="SampleEntities\CrewMember.cs" />
-    <Compile Include="SampleEntities\CrewMembers.cs" />
-    <Compile Include="SampleEntities\ParallelUniverses.cs" />
-    <Compile Include="SampleEntities\StarBase.cs" />
-    <Compile Include="SampleEntities\StarBases.cs" />
-    <Compile Include="SampleEntities\StarFleet.cs" />
-    <Compile Include="SampleEntities\StarShip.cs" />
-    <Compile Include="SampleEntities\StarShips.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Gui\EnterPassphrase.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
+    <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="DotNetZip">
-      <Version>1.11.0</Version>
-    </PackageReference>
-    <PackageReference Include="System.Management.Automation.dll">
-      <Version>10.0.10586</Version>
-    </PackageReference>
-    <PackageReference Include="System.Management.Automation_PowerShell_3.0">
-      <Version>6.3.9600.17400</Version>
-    </PackageReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-  </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
