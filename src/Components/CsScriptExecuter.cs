@@ -38,7 +38,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             }
 
             if (context.Console.Error.ToString() != "") {
-                throw new Exception("An error occurred during csx script execution");
+                throw new Exception($"An error occurred during csx script execution: {context.Console.Error.ToString()}");
             }
 
             var output = ProcessOutput(context.Console.Out.ToString());
