@@ -19,6 +19,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             foreach (var argument in csScript.StringArgumentNameToDescriptions) {
                 var presetArgument = presetArguments.FirstOrDefault(p => p.Name == argument.Name);
                 string argumentValue;
+                // ReSharper disable once ConvertIfStatementToSwitchStatement
                 if (presetArgument == null) {
                     if (prompter == null) {
                         throw new NullReferenceException($"You are attempting to use a secret that requires user interaction. Please provide a {nameof(ICsScriptArgumentPrompter)}");
@@ -38,7 +39,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             }
 
             if (context.Console.Error.ToString() != "") {
-                throw new Exception($"An error occurred during csx script execution: {context.Console.Error.ToString()}");
+                throw new Exception($"An error occurred during csx script execution: {context.Console.Error}");
             }
 
             var output = ProcessOutput(context.Console.Out.ToString());

@@ -11,7 +11,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
     public class CsScriptExecuterTest {
         [TestMethod]
         public async Task CanExecuteCsScriptWithoutArguments() {
-            var sut = new CsScriptExecuter();
+            ICsScriptExecuter sut = new CsScriptExecuter();
             var presetArgument = new List<ICsScriptArgument>();
             var csScript = new CsScript(new List<CsScriptArgument>(),  "1+1");
             var result = await sut.ExecuteCsScriptAsync(csScript, presetArgument, null);
@@ -24,7 +24,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
 
         [TestMethod, ExpectedException(typeof(OperationCanceledException))]
         public async Task CannotRunInvalidCsScript() {
-            var sut = new CsScriptExecuter();
+            ICsScriptExecuter sut = new CsScriptExecuter();
             var presetArgument = new List<ICsScriptArgument>();
             var csScript = new CsScript(new List<CsScriptArgument>(), "1+1+");
             await sut.ExecuteCsScriptAsync(csScript, presetArgument, null);
@@ -32,7 +32,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
 
         [TestMethod, ExpectedException(typeof(Exception))]
         public async Task CannotRunCsScriptThatThrowsAnException() {
-            var sut = new CsScriptExecuter();
+            ICsScriptExecuter sut = new CsScriptExecuter();
             var presetArgument = new List<ICsScriptArgument>();
             var csScript = new CsScript(new List<CsScriptArgument>(), "throw new NotImplementedException();", "1+1");
             await sut.ExecuteCsScriptAsync(csScript, presetArgument, null);

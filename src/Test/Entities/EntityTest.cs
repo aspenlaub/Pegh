@@ -66,8 +66,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Entities {
         }
 
         private static void CheckEquality<TClone>(bool equalityExpected, object value, PropertyInfo property, TClone clone) {
-            var section = value as XmlCDataSection;
-            if (section != null) {
+            if (value is XmlCDataSection section) {
                 var valueProperty = typeof(XmlCDataSection).GetProperty("Value");
                 CheckEquality(equalityExpected, section.Value, valueProperty, property.GetValue(clone));
             } else if (equalityExpected) {

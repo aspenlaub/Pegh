@@ -21,6 +21,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions {
             return new Folder(folder.FullName + (subFolder.StartsWith("\\") ? subFolder : "\\" + subFolder));
         }
 
+        // ReSharper disable once UnusedMember.Global
         public static string LastWrittenFileFullName(this IFolder folder) {
             return Directory.GetFiles(folder.FullName, "*.*").OrderByDescending(f => File.GetLastWriteTime(f)).FirstOrDefault();
         }

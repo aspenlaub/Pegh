@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+// ReSharper disable UnusedMember.Global
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces {
     public interface ISecretRepository {

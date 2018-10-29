@@ -8,6 +8,7 @@
         IFolderUpdater FolderUpdater { get; }
         IPassphraseProvider PassphraseProvider { get; }
         IPeghEnvironment PeghEnvironment { get; }
+        IPlatform Platform { get; }
         IPrimeNumberGenerator PrimeNumberGenerator { get; }
         ISecretRepository SecretRepository { get; }
         IStringCrypter StringCrypter { get; }

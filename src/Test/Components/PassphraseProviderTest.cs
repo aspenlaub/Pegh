@@ -18,21 +18,21 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
 
         [TestMethod]
         public void CanProvidePassphrase() {
-            var sut = new PassphraseProvider();
+            IPassphraseProvider sut = new PassphraseProvider();
             var actualPassphrase = sut.Passphrase(PassphraseGuid, Title, Description, SuccessfulPassphraseDialog);
             Assert.AreEqual(ExpectedPassphrase, actualPassphrase);
         }
 
         [TestMethod]
         public void PassphraseIsEmptyIfDialogFails() {
-            var sut = new PassphraseProvider();
+            IPassphraseProvider sut = new PassphraseProvider();
             var actualPassphrase = sut.Passphrase(PassphraseGuid, Title, Description, FailedPassphraseDialog);
             Assert.AreEqual("", actualPassphrase);
         }
 
         [TestMethod]
         public void CachedPassphraseIsReturned() {
-            var sut = new PassphraseProvider();
+            IPassphraseProvider sut = new PassphraseProvider();
             var actualPassphrase = sut.Passphrase(PassphraseGuid, Title, Description, SuccessfulPassphraseDialog);
             Assert.AreEqual(ExpectedPassphrase, actualPassphrase);
             actualPassphrase = sut.Passphrase(PassphraseGuid, Title, Description, FailedPassphraseDialog);
@@ -41,7 +41,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
 
         [TestMethod]
         public void NoPassphraseAfterCacheIsCleared() {
-            var sut = new PassphraseProvider();
+            IPassphraseProvider sut = new PassphraseProvider();
             var actualPassphrase = sut.Passphrase(PassphraseGuid, Title, Description, SuccessfulPassphraseDialog);
             Assert.AreEqual(ExpectedPassphrase, actualPassphrase);
             PassphraseProvider.Passphrases.Clear();
@@ -51,7 +51,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
 
         [TestMethod]
         public void NoPassphraseIfDialogIsNotAvailable() {
-            var sut = new PassphraseProvider();
+            IPassphraseProvider sut = new PassphraseProvider();
             var actualPassphrase = sut.Passphrase(PassphraseGuid, Title, Description, () => null);
             Assert.AreEqual("", actualPassphrase);
         }

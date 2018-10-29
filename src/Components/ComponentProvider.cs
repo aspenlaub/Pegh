@@ -30,6 +30,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         public IFolderUpdater FolderUpdater => DefaultComponent<IFolderUpdater, FolderUpdater>();
         public IPassphraseProvider PassphraseProvider => DefaultComponent<IPassphraseProvider, PassphraseProvider>();
         public IPeghEnvironment PeghEnvironment => DefaultComponent<IPeghEnvironment, PeghEnvironment>();
+        public IPlatform Platform => DefaultComponent<IPlatform, Platform>();
         public IPrimeNumberGenerator PrimeNumberGenerator => DefaultComponent<IPrimeNumberGenerator, PrimeNumberGenerator>();
         public ISecretRepository SecretRepository { get { return DefaultComponent<ISecretRepository, SecretRepository>(() => new SecretRepository(this)); } }
         public IStringCrypter StringCrypter { get { return DefaultComponent<IStringCrypter, StringCrypter>(() => new StringCrypter(this)); } }

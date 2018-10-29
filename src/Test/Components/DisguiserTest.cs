@@ -21,7 +21,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
 
             componentProviderMock.Setup(c => c.PrimeNumberGenerator).Returns(new PrimeNumberGenerator());
 
-            var sut = new Disguiser(componentProviderMock.Object);
+            IDisguiser sut = new Disguiser(componentProviderMock.Object);
             var s = "This is a test string";
             var errorsAndInfos = new ErrorsAndInfos();
             var disguised = await sut.Disguise(s, errorsAndInfos);
