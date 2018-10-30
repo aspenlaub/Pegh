@@ -10,6 +10,12 @@ using Dotnet.Script.DependencyModel.Runtime;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
     public class CsScriptExecuter : ICsScriptExecuter {
+        private IComponentProvider vComponentProvider;
+
+        public CsScriptExecuter(IComponentProvider componentProvider) {
+            vComponentProvider = componentProvider;
+        }
+
         public async Task<string> ExecuteCsScriptAsync(ICsScript csScript, IList<ICsScriptArgument> presetArguments, ICsScriptArgumentPrompter prompter) {
             if (csScript.Script.Length == 0 || !csScript.Script.TrimEnd().EndsWith("#exit")) {
                 throw new Exception("Csx scripts must end with #exit");
@@ -30,7 +36,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
                     argumentValue = presetArgument.Value;
                 }
 
-                scriptLines.Insert(0, "var " + argument.Name + " = @\"" + argumentValue.Replace("\"", "\\\"") + "\";");
+                scriptLines.Insert(0, "var " + argument.Name + " = @\"" + vComponentProvider.CsScriptMarshaller.ToCsScript(argumentValue) + "\";");
             }
             var context = GetRunner(scriptLines.ToArray());
             var delayTask = Task.Delay(TimeSpan.FromSeconds(csScript.TimeoutInSeconds));
@@ -87,10 +93,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
                 s = s.Substring(0, s.Length - 2);
             }
 
-            if (s.StartsWith("\"") && s.EndsWith("\"")) {
-                s = s.Substring(1, s.Length - 2).Replace("\\\"", "\"").Replace("\\\\", "\\");
-            }
-
+            s = vComponentProvider.CsScriptMarshaller.FromCsScript(s);
             return s;
         }
     }

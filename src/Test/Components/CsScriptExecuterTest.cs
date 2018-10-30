@@ -5,13 +5,16 @@ using Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
     [TestClass]
     public class CsScriptExecuterTest {
         [TestMethod]
         public async Task CanExecuteCsScriptWithoutArguments() {
-            ICsScriptExecuter sut = new CsScriptExecuter();
+            var componentProviderMock = new Mock<IComponentProvider>();
+            componentProviderMock.SetupGet(c => c.CsScriptMarshaller).Returns(new CsScriptMarshaller());
+            ICsScriptExecuter sut = new CsScriptExecuter(componentProviderMock.Object);
             var presetArgument = new List<ICsScriptArgument>();
             var csScript = new CsScript(new List<CsScriptArgument>(),  "1+1");
             var result = await sut.ExecuteCsScriptAsync(csScript, presetArgument, null);
@@ -24,7 +27,9 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
 
         [TestMethod, ExpectedException(typeof(OperationCanceledException))]
         public async Task CannotRunInvalidCsScript() {
-            ICsScriptExecuter sut = new CsScriptExecuter();
+            var componentProviderMock = new Mock<IComponentProvider>();
+            componentProviderMock.SetupGet(c => c.CsScriptMarshaller).Returns(new CsScriptMarshaller());
+            ICsScriptExecuter sut = new CsScriptExecuter(componentProviderMock.Object);
             var presetArgument = new List<ICsScriptArgument>();
             var csScript = new CsScript(new List<CsScriptArgument>(), "1+1+");
             await sut.ExecuteCsScriptAsync(csScript, presetArgument, null);
@@ -32,7 +37,9 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
 
         [TestMethod, ExpectedException(typeof(Exception))]
         public async Task CannotRunCsScriptThatThrowsAnException() {
-            ICsScriptExecuter sut = new CsScriptExecuter();
+            var componentProviderMock = new Mock<IComponentProvider>();
+            componentProviderMock.SetupGet(c => c.CsScriptMarshaller).Returns(new CsScriptMarshaller());
+            ICsScriptExecuter sut = new CsScriptExecuter(componentProviderMock.Object);
             var presetArgument = new List<ICsScriptArgument>();
             var csScript = new CsScript(new List<CsScriptArgument>(), "throw new NotImplementedException();", "1+1");
             await sut.ExecuteCsScriptAsync(csScript, presetArgument, null);
