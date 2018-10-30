@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Dotnet.Script.Core;
@@ -30,7 +31,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
                     argumentValue = presetArgument.Value;
                 }
 
-                scriptLines.Insert(0, "var " + argument.Name + " = \"" + argumentValue.Replace("\"", "\\\"") + "\";");
+                scriptLines.Insert(0, "var " + argument.Name + " = \"" + Regex.Escape(argumentValue) + "\";");
             }
             var context = GetRunner(scriptLines.ToArray());
             var delayTask = Task.Delay(TimeSpan.FromSeconds(csScript.TimeoutInSeconds));
