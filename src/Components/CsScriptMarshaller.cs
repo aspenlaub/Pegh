@@ -1,4 +1,6 @@
-﻿using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
+﻿using System.Globalization;
+using System.Text.RegularExpressions;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
     public class CsScriptMarshaller : ICsScriptMarshaller {
@@ -10,6 +12,13 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             if (s.StartsWith("\"") && s.EndsWith("\"")) {
                 s = s.Substring(1, s.Length - 2).Replace("\\\"", "\"").Replace("\\\\", "\\");
             }
+
+            s = Regex.Replace(
+                s,
+                @"\\u(?<Value>[a-zA-Z0-9]{4})",
+                m => {
+                    return ((char)int.Parse(m.Groups["Value"].Value, NumberStyles.HexNumber)).ToString();
+                });
 
             return s;
         }
