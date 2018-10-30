@@ -19,7 +19,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Entities {
             var componentProvider = new ComponentProvider();
             var secretRepository = componentProvider.SecretRepository;
 
-            const string originalString = "Whatever you do not want to reveal, keep it secret!";
+            const string originalString = "Whatever you do not want to reveal, keep it secret (\\)!";
             var encryptedString = await secretRepository.ExecuteCsScriptAsync(encrypterSecret.DefaultValue, new List<ICsScriptArgument> { new CsScriptArgument { Name = "s", Value = originalString } });
             Assert.AreNotEqual(originalString, encryptedString);
             var decryptedString = await secretRepository.ExecuteCsScriptAsync(decrypterSecret.DefaultValue, new List<ICsScriptArgument> { new CsScriptArgument { Name = "s", Value = encryptedString } });
@@ -36,7 +36,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Entities {
             var componentProvider = new ComponentProvider();
             var secretRepository = componentProvider.SecretRepository;
 
-            const string originalString = "Whatever you do not want to reveal, keep it secret!";
+            const string originalString = "Whatever you do not want to reveal, keep it secret (\\)!";
 
             var errorsAndInfos = new ErrorsAndInfos();
             var realEncrypterSecret = await secretRepository.GetAsync(encrypterSecret, errorsAndInfos);
