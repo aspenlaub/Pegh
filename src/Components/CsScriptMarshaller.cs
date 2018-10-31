@@ -5,7 +5,7 @@ using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
     public class CsScriptMarshaller : ICsScriptMarshaller {
         public string ToCsScript(string s) {
-            return s.Replace("\"", "\\\"");
+            return s.Replace("\"", "\"\"");
         }
 
         public string FromCsScript(string s) {
