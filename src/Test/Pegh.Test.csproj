@@ -50,4 +50,7 @@
       <LastGenOutput>FolderUpdater.feature.cs</LastGenOutput>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Helpers\" />
+  </ItemGroup>
 </Project>
