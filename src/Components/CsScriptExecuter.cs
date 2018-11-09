@@ -78,7 +78,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             var console = new ScriptConsole(writer, reader, error);
 
             var logFactory = CreateLogFactory();
-            var runtimeDependencyResolver = new RuntimeDependencyResolver(logFactory);
+            var runtimeDependencyResolver = new RuntimeDependencyResolver(logFactory, false);
 
             var compiler = new ScriptCompiler(logFactory, runtimeDependencyResolver);
             var runner = new InteractiveRunner(compiler, logFactory, console, Array.Empty<string>());

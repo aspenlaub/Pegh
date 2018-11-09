@@ -30,7 +30,8 @@
     <Folder Include="SampleEntities\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Dotnet.Script.Core" Version="0.26.1" />
+    <PackageReference Include="Dotnet.Script.Core" Version="0.27.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="2.9.0" />
     <PackageReference Include="SharpZipLib.NETStandard" Version="1.0.7" />
   </ItemGroup>
   <ItemGroup>

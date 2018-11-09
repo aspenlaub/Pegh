@@ -1,18 +1,17 @@
-﻿using System.Collections.Generic;
-using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
+﻿using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities {
-    public class SecretStringEncrypterFunction : ISecret<CsScript> {
-        private static CsScript vDefaultCsScript;
-        public CsScript DefaultValue => vDefaultCsScript ?? (vDefaultCsScript = CreateDefaultCsScript());
+    public class SecretStringEncrypterFunction : ISecret<CsLambda> {
+        private static CsLambda vDefaultCsScript;
+        public CsLambda DefaultValue => vDefaultCsScript ?? (vDefaultCsScript = CreateDefaultCsLambda());
 
-        private static CsScript CreateDefaultCsScript() {
-            var script = new CsScript(new List<CsScriptArgument> { new CsScriptArgument { Name = "s", Value = "The string which the script shall encrypt" } },
-                "s + \" - but do not tell anyone\""
-            );
-            return script;
+        private static CsLambda CreateDefaultCsLambda() {
+            var lambda = new CsLambda {
+                LambdaExpression = "s => s + \" - but do not tell anyone\""
+            };
+            return lambda;
         }
 
-        public string Guid => "8EA6005C-EF9C-4FF4-9CDC-179C3CA9D9E9";
+        public string Guid => "179C3CA5C-EF9C-4FF48EA600-9CDC-9D9E9";
     }
 }
