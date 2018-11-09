@@ -1,5 +1,5 @@
 ﻿namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces {
-    public interface ICsScriptArgumentPrompter {
+    public interface ICsArgumentPrompter {
         string PromptForArgument(string name, string description);
     }
 }

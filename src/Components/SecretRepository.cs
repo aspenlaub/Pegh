@@ -20,7 +20,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         internal readonly Dictionary<string, object> Values;
         internal SecretShouldDefaultSecretsBeStored SecretShouldDefaultSecretsBeStored;
 
-        public ICsScriptArgumentPrompter CsScriptArgumentPrompter { get; set; }
+        public ICsArgumentPrompter CsArgumentPrompter { get; set; }
 
         public SecretRepository(IComponentProvider componentProvider) {
             ComponentProvider = componentProvider;
@@ -113,10 +113,6 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             }
 
             return false;
-        }
-
-        public async Task<string> ExecuteCsScriptAsync(ICsScript csScript, IList<ICsScriptArgument> presetArguments) {
-            return await ComponentProvider.CsScriptExecuter.ExecuteCsScriptAsync(csScript, presetArguments, CsScriptArgumentPrompter);
         }
 
         public Assembly Type2Assembly(string type) {
@@ -245,11 +241,11 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         }
 
         private async Task<string> GetDisguisedPassphraseAsync(IErrorsAndInfos errorsAndInfos) {
-            if (CsScriptArgumentPrompter == null) {
-                throw new NullReferenceException( $"You are attempting to use a secret that requires user interaction. Please provide a {nameof(ICsScriptArgumentPrompter)}");
+            if (CsArgumentPrompter == null) {
+                throw new NullReferenceException( $"You are attempting to use a secret that requires user interaction. Please provide a {nameof(ICsArgumentPrompter)}");
             }
 
-            var passphrase = CsScriptArgumentPrompter.PromptForArgument("passPhrase", "Please enter the required passphrase");
+            var passphrase = CsArgumentPrompter.PromptForArgument("passPhrase", "Please enter the required passphrase");
             return string.IsNullOrEmpty(passphrase) ? "" : await ComponentProvider.Disguiser.Disguise(passphrase, errorsAndInfos);
         }
     }

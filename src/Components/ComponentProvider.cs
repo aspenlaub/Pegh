@@ -24,8 +24,6 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             return (T)DefaultComponents[typeof(T)];
         }
 
-        public ICsScriptExecuter CsScriptExecuter => DefaultComponent<ICsScriptExecuter, CsScriptExecuter>(() => new CsScriptExecuter(this));
-        public ICsScriptMarshaller CsScriptMarshaller => DefaultComponent<ICsScriptMarshaller, CsScriptMarshaller>();
         public IDisguiser Disguiser { get { return DefaultComponent<IDisguiser, Disguiser>(() => new Disguiser(this)); } }
         public IFolderDeleter FolderDeleter => DefaultComponent<IFolderDeleter, FolderDeleter>();
         public IFolderUpdater FolderUpdater => DefaultComponent<IFolderUpdater, FolderUpdater>();

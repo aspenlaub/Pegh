@@ -2,8 +2,6 @@
     public interface IComponentProvider {
         void SetAppDataSpecialFolder(IFolder folder);
 
-        ICsScriptExecuter CsScriptExecuter { get; }
-        ICsScriptMarshaller CsScriptMarshaller { get; }
         IDisguiser Disguiser { get; }
         IFolderDeleter FolderDeleter { get; }
         IFolderUpdater FolderUpdater { get; }

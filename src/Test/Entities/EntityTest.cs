@@ -21,7 +21,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Entities {
             CanUseEntity<CrewMember>();
             CanUseEntity<ShouldDefaultSecretsBeStored>();
             CanUseEntity<LongString>();
-            CanUseEntity<CsScript>();
+            CanUseEntity<CsLambda>();
         }
 
         protected void CanUseEntity<T>() where T : class, new() {
@@ -69,12 +69,22 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Entities {
             if (value is XmlCDataSection section) {
                 var valueProperty = typeof(XmlCDataSection).GetProperty("Value");
                 CheckEquality(equalityExpected, section.Value, valueProperty, property.GetValue(clone));
+            } else if (DoListsMatch<string, TClone>(value, property, clone)) {
             } else if (equalityExpected) {
                 Assert.AreEqual(value, property.GetValue(clone));
-            }
-            else {
+            } else {
                 Assert.AreNotEqual(value, property.GetValue(clone));
             }
+        }
+
+        private static bool DoListsMatch<T, TClone>(object value, PropertyInfo property, TClone clone) {
+            if (!(value is List<T> valueAsList)) { return false; }
+
+            var clonedValueAsList = property.GetValue(clone) as List<T>;
+            if (clonedValueAsList == null) { return false; }
+            if (valueAsList.Count != clonedValueAsList.Count) { return false; }
+
+            return !valueAsList.Where((t, i) => !t.Equals(clonedValueAsList[i])).Any();
         }
 
         private void NotifyPropertyChanged_PropertyChanged(object sender, PropertyChangedEventArgs e) {

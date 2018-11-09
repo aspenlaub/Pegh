@@ -2,8 +2,8 @@
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities {
     public class SecretStringEncrypterFunction : ISecret<CsLambda> {
-        private static CsLambda vDefaultCsScript;
-        public CsLambda DefaultValue => vDefaultCsScript ?? (vDefaultCsScript = CreateDefaultCsLambda());
+        private static CsLambda vDefaultCsLambda;
+        public CsLambda DefaultValue => vDefaultCsLambda ?? (vDefaultCsLambda = CreateDefaultCsLambda());
 
         private static CsLambda CreateDefaultCsLambda() {
             var lambda = new CsLambda {

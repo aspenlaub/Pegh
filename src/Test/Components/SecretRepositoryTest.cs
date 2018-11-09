@@ -22,7 +22,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         protected SecretRepository AlternativeSut { get; set; }
         protected const string SomeFirstName = "Some First Name", SomeSurName = "Some Surname", SomeRank = "Some Rank";
         protected const string Passphrase = "DbDy38Dk973-5DeC9-4A.10-A7$45-DB§66C15!!05B80";
-        protected Mock<ICsScriptArgumentPrompter> CsScriptArgumentPrompterMock, AlternatievCsScriptArgumentPrompterMock;
+        protected Mock<ICsArgumentPrompter> CsArgumentPrompterMock, AlternativeCsArgumentPrompterMock;
 
         [TestInitialize]
         public void Initialize() {
@@ -43,15 +43,15 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
 
             Sut = ComponentProvider.SecretRepository as SecretRepository;
             Assert.IsNotNull(Sut);
-            CsScriptArgumentPrompterMock = new Mock<ICsScriptArgumentPrompter>();
-            CsScriptArgumentPrompterMock.Setup(p => p.PromptForArgument(It.IsAny<string>(), It.IsAny<string>())).Returns(Passphrase);
-            Sut.CsScriptArgumentPrompter = CsScriptArgumentPrompterMock.Object;
+            CsArgumentPrompterMock = new Mock<ICsArgumentPrompter>();
+            CsArgumentPrompterMock.Setup(p => p.PromptForArgument(It.IsAny<string>(), It.IsAny<string>())).Returns(Passphrase);
+            Sut.CsArgumentPrompter = CsArgumentPrompterMock.Object;
 
             AlternativeSut = AlternativeComponentProvider.SecretRepository as SecretRepository;
             Assert.IsNotNull(AlternativeSut);
-            AlternatievCsScriptArgumentPrompterMock = new Mock<ICsScriptArgumentPrompter>();
-            AlternatievCsScriptArgumentPrompterMock.Setup(p => p.PromptForArgument(It.IsAny<string>(), It.IsAny<string>())).Returns(Passphrase);
-            AlternativeSut.CsScriptArgumentPrompter = AlternatievCsScriptArgumentPrompterMock.Object;
+            AlternativeCsArgumentPrompterMock = new Mock<ICsArgumentPrompter>();
+            AlternativeCsArgumentPrompterMock.Setup(p => p.PromptForArgument(It.IsAny<string>(), It.IsAny<string>())).Returns(Passphrase);
+            AlternativeSut.CsArgumentPrompter = AlternativeCsArgumentPrompterMock.Object;
         }
 
         [ClassCleanup]
@@ -145,37 +145,17 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             await SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
 
-            var secret = new SecretStringListFunction();
+            var secret = new SecretStringFunction();
             Sut.Reset(secret, false);
             const string s = "This is not a string";
-            var r = await Sut.ExecuteCsScriptAsync(await Sut.GetAsync(secret, errorsAndInfos), new List<ICsScriptArgument> { new CsScriptArgument { Name = "s", Value = s } });
+            var r = (await Sut.CompileCsLambdaAsync<string, string>(await Sut.GetAsync(secret, errorsAndInfos)))(s);
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsTrue(r.StartsWith(s));
             Assert.IsTrue(r.Contains("with greetings from a csx"));
         }
 
-        [TestMethod]
-        public async Task CannotGetScriptSecretIfScriptCannotBeRunWithoutErrors() {
-            var errorsAndInfos = new ErrorsAndInfos();
-            await SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
-
-            var secret = new FailingSecretStringFunction();
-            Sut.Reset(secret, false);
-            const string s = "This is not a string";
-            try {
-                await Sut.ExecuteCsScriptAsync(await Sut.GetAsync(secret, errorsAndInfos),
-                new List<ICsScriptArgument> {new CsScriptArgument {Name = "s", Value = s}});
-                throw new Exception("Exception expected");
-            } catch (Exception e) {
-                Assert.IsTrue(e.Message.Contains("during csx script execution"));
-            }
-
-            CleanUpSecretRepository(false);
-        }
-
         private void CleanUpSecretRepository(bool alternative) {
-            var secrets = new List<IGuid> { new SecretCrewMember(), new SecretStringListFunction(), new FailingSecretStringFunction(), new EncryptedSecretCrewMember(), new SecretListOfElements() };
+            var secrets = new List<IGuid> { new SecretCrewMember(), new SecretStringFunction(), new EncryptedSecretCrewMember(), new SecretListOfElements() };
             foreach (var files in new[] { false, true }.Select(sample => SecretRepositoryFolder(sample, alternative)).SelectMany(folder => secrets.Select(secret => Directory.GetFiles(folder, secret.Guid + "*.*").ToList()))) {
                 Assert.IsTrue(files.Count < 3);
                 files.ForEach(f => File.Delete(f));
@@ -269,7 +249,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             await SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
 
-            var secret = new SecretStringListFunction();
+            var secret = new SecretStringFunction();
             Sut.Reset(secret, false);
             await Sut.GetAsync(secret, errorsAndInfos);
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
@@ -283,7 +263,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             await SetShouldDefaultSecretsBeStored(false, errorsAndInfos);
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
 
-            var secret = new SecretStringListFunction();
+            var secret = new SecretStringFunction();
             Sut.Reset(secret, false);
             await Sut.GetAsync(secret, errorsAndInfos);
             Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), string.Join("\r\n", errorsAndInfos.Errors));
@@ -297,7 +277,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             await SetShouldDefaultSecretsBeStored(false, errorsAndInfos);
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
 
-            var secret = new SecretStringListFunction();
+            var secret = new SecretStringFunction();
             Sut.Reset(secret, false);
             Assert.IsNull(await Sut.GetAsync(secret, errorsAndInfos));
             Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), string.Join("\r\n", errorsAndInfos.Errors));
@@ -310,7 +290,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             await SetShouldDefaultSecretsBeStored(false, errorsAndInfos);
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
 
-            var secret = new SecretStringListFunction();
+            var secret = new SecretStringFunction();
             Sut.Reset(secret, false);
             await Sut.GetAsync(secret, errorsAndInfos);
             Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), string.Join("\r\n", errorsAndInfos.Errors));
@@ -324,20 +304,20 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             await SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
 
-            var secret = new SecretStringListFunction();
+            var secret = new SecretStringFunction();
             Sut.Reset(secret, false);
             var script = await Sut.GetAsync(secret, errorsAndInfos);
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             const string addedString = "/* This script has been altered */";
-            Assert.IsFalse(script.Script.Contains(addedString));
-            script.Script = addedString + "\r\n" + script.Script;
+            Assert.IsFalse(script.LambdaExpression.Contains(addedString));
+            script.LambdaExpression = addedString + "\r\n" + script.LambdaExpression;
             await Sut.SetAsync(secret, errorsAndInfos);
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Sut.Values.Clear();
             await Sut.ValueOrDefaultAsync(secret, errorsAndInfos);
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
-            script = (CsScript)Sut.Values[secret.Guid];
-            Assert.IsTrue(script.Script.StartsWith(addedString));
+            script = (CsLambda)Sut.Values[secret.Guid];
+            Assert.IsTrue(script.LambdaExpression.StartsWith(addedString));
             CleanUpSecretRepository(false);
         }
 
@@ -436,7 +416,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             Sut.Reset(secret, true);
             Assert.IsNull(GetSecretCrewMember(secret));
             Assert.IsFalse(Sut.Exists(secret, true));
-            CsScriptArgumentPrompterMock.Setup(p => p.PromptForArgument(It.IsAny<string>(), It.IsAny<string>())).Returns("");
+            CsArgumentPrompterMock.Setup(p => p.PromptForArgument(It.IsAny<string>(), It.IsAny<string>())).Returns("");
             var crewMember = await Sut.GetAsync(secret, errorsAndInfos);
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
             Assert.IsFalse(Sut.Exists(secret, true));
@@ -462,7 +442,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             disguiserMock.Setup(d => d.Disguise(It.IsAny<string>(), It.IsAny<IErrorsAndInfos>())).Returns(Task.FromResult(""));
             componentProviderMock.Setup(c => c.Disguiser).Returns(disguiserMock.Object);
             Sut = new SecretRepository(componentProviderMock.Object) {
-                CsScriptArgumentPrompter = CsScriptArgumentPrompterMock.Object
+                CsArgumentPrompter = CsArgumentPrompterMock.Object
             };
             Assert.IsNull(GetSecretCrewMember(secret));
             await Sut.GetAsync(secret, errorsAndInfos);
@@ -479,9 +459,9 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             var errorsAndInfos = new ErrorsAndInfos();
             await Sut.SetAsync(secret, errorsAndInfos);
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
-            CsScriptArgumentPrompterMock.Setup(p => p.PromptForArgument(It.IsAny<string>(), It.IsAny<string>())).Returns("Wrong-Password");
+            CsArgumentPrompterMock.Setup(p => p.PromptForArgument(It.IsAny<string>(), It.IsAny<string>())).Returns("Wrong-Password");
             Sut = new SecretRepository(ComponentProvider) {
-                CsScriptArgumentPrompter = CsScriptArgumentPrompterMock.Object
+                CsArgumentPrompter = CsArgumentPrompterMock.Object
             };
             Assert.IsNull(GetSecretCrewMember(secret));
             try {
@@ -518,9 +498,9 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             var errorsAndInfos = new ErrorsAndInfos();
             await Sut.SetAsync(secret, errorsAndInfos);
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
-            CsScriptArgumentPrompterMock.Setup(p => p.PromptForArgument(It.IsAny<string>(), It.IsAny<string>())).Returns(Passphrase + Passphrase);
+            CsArgumentPrompterMock.Setup(p => p.PromptForArgument(It.IsAny<string>(), It.IsAny<string>())).Returns(Passphrase + Passphrase);
             Sut = new SecretRepository(ComponentProvider) {
-                CsScriptArgumentPrompter = CsScriptArgumentPrompterMock.Object
+                CsArgumentPrompter = CsArgumentPrompterMock.Object
             };
             await Sut.GetAsync(secret, errorsAndInfos);
             Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
