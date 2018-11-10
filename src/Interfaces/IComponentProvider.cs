@@ -2,6 +2,7 @@
     public interface IComponentProvider {
         void SetAppDataSpecialFolder(IFolder folder);
 
+        ICsLambdaCompiler CsLambdaCompiler { get; }
         IDisguiser Disguiser { get; }
         IFolderDeleter FolderDeleter { get; }
         IFolderUpdater FolderUpdater { get; }
