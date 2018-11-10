@@ -13,7 +13,6 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             Assert.IsNotNull(sut.FolderUpdater);
             Assert.IsNotNull(sut.PassphraseProvider);
             Assert.IsNotNull(sut.PeghEnvironment);
-            Assert.IsNotNull(sut.Platform);
             Assert.IsNotNull(sut.PrimeNumberGenerator);
             Assert.IsNotNull(sut.SecretRepository);
             Assert.IsNotNull(sut.StringCrypter);
