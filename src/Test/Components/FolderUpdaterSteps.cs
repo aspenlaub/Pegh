@@ -10,6 +10,7 @@ using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TechTalk.SpecFlow;
 // ReSharper disable UnusedMember.Global
+// ReSharper disable StringLiteralTypo
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
     [Binding]

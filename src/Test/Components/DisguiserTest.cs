@@ -5,6 +5,7 @@ using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+// ReSharper disable StringLiteralTypo
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
     [TestClass]
