@@ -5,6 +5,7 @@
         ICsLambdaCompiler CsLambdaCompiler { get; }
         IDisguiser Disguiser { get; }
         IFolderDeleter FolderDeleter { get; }
+        IFolderResolver FolderResolver { get; }
         IFolderUpdater FolderUpdater { get; }
         IPassphraseProvider PassphraseProvider { get; }
         IPeghEnvironment PeghEnvironment { get; }

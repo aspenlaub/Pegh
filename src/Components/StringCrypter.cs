@@ -1,5 +1,6 @@
 using System;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
@@ -22,7 +23,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
 
             if (!errorsAndInfos.AnyErrors()) { return; }
 
-            throw new Exception(string.Join("\r\n", errorsAndInfos.Errors));
+            throw new Exception(errorsAndInfos.ErrorsToString());
         }
 
         public string Encrypt(string s) {

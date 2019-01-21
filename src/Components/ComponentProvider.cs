@@ -27,6 +27,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         public ICsLambdaCompiler CsLambdaCompiler => DefaultComponent<ICsLambdaCompiler, CsLambdaCompiler>();
         public IDisguiser Disguiser => DefaultComponent<IDisguiser, Disguiser>(() => new Disguiser(this));
         public IFolderDeleter FolderDeleter => DefaultComponent<IFolderDeleter, FolderDeleter>();
+        public IFolderResolver FolderResolver => DefaultComponent<IFolderResolver, FolderResolver>(() => new FolderResolver(this));
         public IFolderUpdater FolderUpdater => DefaultComponent<IFolderUpdater, FolderUpdater>();
         public IPassphraseProvider PassphraseProvider => DefaultComponent<IPassphraseProvider, PassphraseProvider>();
         public IPeghEnvironment PeghEnvironment => DefaultComponent<IPeghEnvironment, PeghEnvironment>();

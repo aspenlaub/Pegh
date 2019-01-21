@@ -1,5 +1,6 @@
 ﻿using Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Entities {
@@ -34,13 +35,13 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Entities {
             Assert.IsFalse(string.IsNullOrEmpty(encrypterSecret.Guid));
             var errorsAndInfos = new ErrorsAndInfos();
             var csLambda = secretRepository.GetAsync(encrypterSecret, errorsAndInfos).Result;
-            Assert.IsFalse(errorsAndInfos.AnyErrors(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
             var secretEncrypterFunction = secretRepository.CompileCsLambdaAsync<string, string>(csLambda).Result;
 
             var decrypterSecret = new SecretStringDecrypterFunction();
             Assert.IsFalse(string.IsNullOrEmpty(decrypterSecret.Guid));
             csLambda = secretRepository.GetAsync(decrypterSecret, errorsAndInfos).Result;
-            Assert.IsFalse(errorsAndInfos.AnyErrors(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
             var secretDecrypterFunction = secretRepository.CompileCsLambdaAsync<string, string>(csLambda).Result;
 
             const string originalString = "Whatever you do not want to reveal, keep it secret (\\, € ✂ and ❤)!";

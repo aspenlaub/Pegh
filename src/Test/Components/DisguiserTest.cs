@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -26,14 +27,14 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             var s = "This is a test string";
             var errorsAndInfos = new ErrorsAndInfos();
             var disguised = await sut.Disguise(s, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             Assert.IsTrue(disguised.Length >= 3 * s.Length);
             Assert.IsFalse(disguised.Contains(s));
             Assert.AreEqual("./*56.D34CD3456/*E./*56.456./*FG7BCD78HBCD456*EF345BCDD342BC/*E", disguised);
 
             s = "Short string";
             disguised = await sut.Disguise(s, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             Assert.IsTrue(disguised.Length >= 3 * s.Length);
             Assert.IsFalse(disguised.Contains(s));
         }

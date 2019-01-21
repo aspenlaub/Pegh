@@ -192,7 +192,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
 
         [Then(@"no errors occurred during the folder update")]
         public void ThenNoErrorsOccurredDuringTheFolderUpdate() {
-            Assert.IsFalse(UpdateFolderErrorsAndInfos.Errors.Any(), string.Join("\r\n", UpdateFolderErrorsAndInfos.Errors));
+            Assert.IsFalse(UpdateFolderErrorsAndInfos.Errors.Any(), UpdateFolderErrorsAndInfos.ErrorsToString());
         }
 
         [Then(@"folder update failed because the (.*) kilobyte destination file could not be renamed")]

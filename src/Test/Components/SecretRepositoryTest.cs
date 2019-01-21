@@ -96,14 +96,14 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         public async Task CanGetDefault() {
             var errorsAndInfos = new ErrorsAndInfos();
             await SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
             var secret = new SecretCrewMember();
             Sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName };
             Sut.Reset(secret, false);
             Assert.IsNull(GetSecretCrewMember(secret));
             var crewMember = await Sut.GetAsync(secret, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             Assert.AreEqual(SecretCrewMember.DefaultFirstName, crewMember.FirstName);
             CleanUpSecretRepository(false);
         }
@@ -114,7 +114,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             Sut.Reset(secret, false);
             var errorsAndInfos = new ErrorsAndInfos();
             await Sut.SetAsync(secret, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             Assert.IsTrue(Sut.Exists(secret, false));
             Sut.Reset(secret, false);
             Assert.IsFalse(Sut.Exists(secret, false));
@@ -128,11 +128,11 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             Sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName, SurName = SomeSurName, Rank = SomeRank };
             var errorsAndInfos = new ErrorsAndInfos();
             await Sut.SetAsync(secret, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             Sut.Values.Remove(secret.Guid);
             Assert.IsNull(GetSecretCrewMember(secret));
             await Sut.GetAsync(secret, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             Assert.AreEqual(SomeFirstName, GetSecretCrewMember(secret).FirstName);
             Assert.AreEqual(SomeSurName, GetSecretCrewMember(secret).SurName);
             Assert.AreEqual(SomeRank, GetSecretCrewMember(secret).Rank);
@@ -143,13 +143,13 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         public async Task CanGetScriptSecret() {
             var errorsAndInfos = new ErrorsAndInfos();
             await SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
             var secret = new SecretStringFunction();
             Sut.Reset(secret, false);
             const string s = "This is not a string";
             var r = (await Sut.CompileCsLambdaAsync<string, string>(await Sut.GetAsync(secret, errorsAndInfos)))(s);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             Assert.IsTrue(r.StartsWith(s));
             Assert.IsTrue(r.Contains("with greetings from a csx"));
         }
@@ -174,12 +174,12 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         public async Task DefaultSecretIsSavedIfSecretSaysSo() {
             var errorsAndInfos = new ErrorsAndInfos();
             await SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
             var secret = new SecretCrewMember();
             Sut.Reset(secret, false);
             await Sut.GetAsync(secret, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             Assert.IsTrue(Sut.Exists(secret, false));
             CleanUpSecretRepository(false);
         }
@@ -188,12 +188,12 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         public async Task DefaultSecretIsNotSavedIfSecretSaysNo() {
             var errorsAndInfos = new ErrorsAndInfos();
             await SetShouldDefaultSecretsBeStored(false, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
             var secret = new SecretCrewMember();
             Sut.Reset(secret, false);
             await Sut.GetAsync(secret, errorsAndInfos);
-            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), errorsAndInfos.ErrorsToString());
             Assert.IsFalse(Sut.Exists(secret, false));
             CleanUpSecretRepository(false);
         }
@@ -202,12 +202,12 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         public async Task DefaultSecretIsNotReturnedIfSecretSaysItShouldNotBeSaved() {
             var errorsAndInfos = new ErrorsAndInfos();
             await SetShouldDefaultSecretsBeStored(false, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
             var secret = new SecretCrewMember();
             Sut.Reset(secret, false);
             Assert.IsNull(await Sut.GetAsync(secret, errorsAndInfos));
-            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), errorsAndInfos.ErrorsToString());
             CleanUpSecretRepository(false);
         }
 
@@ -215,12 +215,12 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         public async Task DefaultSecretIsNotCachedIfSecretSaysItShouldNotBeSaved() {
             var errorsAndInfos = new ErrorsAndInfos();
             await SetShouldDefaultSecretsBeStored(false, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
             var secret = new SecretCrewMember();
             Sut.Reset(secret, false);
             await Sut.GetAsync(secret, errorsAndInfos);
-            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), errorsAndInfos.ErrorsToString());
             Assert.IsFalse(Sut.Values.ContainsKey(secret.Guid));
             CleanUpSecretRepository(false);
         }
@@ -247,12 +247,12 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         public async Task DefaultScriptSecretIsSavedIfSecretSaysSo() {
             var errorsAndInfos = new ErrorsAndInfos();
             await SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
             var secret = new SecretStringFunction();
             Sut.Reset(secret, false);
             await Sut.GetAsync(secret, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             Assert.IsTrue(Sut.Exists(secret, false));
             CleanUpSecretRepository(false);
         }
@@ -261,12 +261,12 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         public async Task DefaultScriptSecretIsNotSavedIfSecretSaysNo() {
             var errorsAndInfos = new ErrorsAndInfos();
             await SetShouldDefaultSecretsBeStored(false, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
             var secret = new SecretStringFunction();
             Sut.Reset(secret, false);
             await Sut.GetAsync(secret, errorsAndInfos);
-            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), errorsAndInfos.ErrorsToString());
             Assert.IsFalse(Sut.Exists(secret, false));
             CleanUpSecretRepository(false);
         }
@@ -275,12 +275,12 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         public async Task DefaultScriptSecretIsNotReturnedIfSecretSaysItShouldNotBeSaved() {
             var errorsAndInfos = new ErrorsAndInfos();
             await SetShouldDefaultSecretsBeStored(false, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
             var secret = new SecretStringFunction();
             Sut.Reset(secret, false);
             Assert.IsNull(await Sut.GetAsync(secret, errorsAndInfos));
-            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), errorsAndInfos.ErrorsToString());
             CleanUpSecretRepository(false);
         }
 
@@ -288,12 +288,12 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         public async Task DefaultScriptSecretIsNotCachedIfSecretSaysItShouldNotBeSaved() {
             var errorsAndInfos = new ErrorsAndInfos();
             await SetShouldDefaultSecretsBeStored(false, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
             var secret = new SecretStringFunction();
             Sut.Reset(secret, false);
             await Sut.GetAsync(secret, errorsAndInfos);
-            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), errorsAndInfos.ErrorsToString());
             Assert.IsFalse(Sut.Values.ContainsKey(secret.Guid));
             CleanUpSecretRepository(false);
         }
@@ -302,20 +302,20 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         public async Task SavedScriptSecretIsUsedDuringExecution() {
             var errorsAndInfos = new ErrorsAndInfos();
             await SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
             var secret = new SecretStringFunction();
             Sut.Reset(secret, false);
             var script = await Sut.GetAsync(secret, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             const string addedString = "/* This script has been altered */";
             Assert.IsFalse(script.LambdaExpression.Contains(addedString));
             script.LambdaExpression = addedString + "\r\n" + script.LambdaExpression;
             await Sut.SetAsync(secret, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             Sut.Values.Clear();
             await Sut.ValueOrDefaultAsync(secret, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             script = (CsLambda)Sut.Values[secret.Guid];
             Assert.IsTrue(script.LambdaExpression.StartsWith(addedString));
             CleanUpSecretRepository(false);
@@ -325,7 +325,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         public async Task DefaultSecretSampleIsSavedIfSecretSaysSo() {
             var errorsAndInfos = new ErrorsAndInfos();
             await SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             CleanUpSecretRepository(false);
 
             var secret = new SecretCrewMember();
@@ -341,7 +341,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         public async Task DefaultSecretSampleIsSavedEvenIfSecretSaysNo() {
             var errorsAndInfos = new ErrorsAndInfos();
             await SetShouldDefaultSecretsBeStored(false, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             CleanUpSecretRepository(false);
 
             var secret = new SecretCrewMember();
@@ -357,11 +357,11 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         public async Task CanGetLongSecretString() {
             var errorsAndInfos = new ErrorsAndInfos();
             await SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
             var secret = new LongSecretString();
             var longSecretString = await Sut.GetAsync(secret, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             Assert.AreEqual(128, longSecretString.TheLongString.Length);
 
             secret = new LongSecretString();
@@ -373,7 +373,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         public async Task CanGetDefaultForEncryptedSecret() {
             var errorsAndInfos = new ErrorsAndInfos();
             await SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
             var secret = new EncryptedSecretCrewMember();
             Sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName };
@@ -381,7 +381,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             Assert.IsNull(GetSecretCrewMember(secret));
             Assert.IsFalse(Sut.Exists(secret, true));
             var crewMember = await Sut.GetAsync(secret, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             Assert.IsTrue(Sut.Exists(secret, true));
             Assert.AreEqual(EncryptedSecretCrewMember.DefaultFirstName, crewMember.FirstName);
             CleanUpSecretRepository(false);
@@ -394,11 +394,11 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             Sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName, SurName = SomeSurName, Rank = SomeRank };
             var errorsAndInfos = new ErrorsAndInfos();
             await Sut.SetAsync(secret, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             Sut.Values.Remove(secret.Guid);
             Assert.IsNull(GetSecretCrewMember(secret));
             await Sut.GetAsync(secret, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             Assert.AreEqual(SomeFirstName, GetSecretCrewMember(secret).FirstName);
             Assert.AreEqual(SomeSurName, GetSecretCrewMember(secret).SurName);
             Assert.AreEqual(SomeRank, GetSecretCrewMember(secret).Rank);
@@ -409,7 +409,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         public async Task CanGetDefaultForEncryptedSecretWithEmptyPassphraseButItIsNotSaved() {
             var errorsAndInfos = new ErrorsAndInfos();
             await SetShouldDefaultSecretsBeStored(true, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
             var secret = new EncryptedSecretCrewMember();
             Sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName };
@@ -418,7 +418,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             Assert.IsFalse(Sut.Exists(secret, true));
             CsArgumentPrompterMock.Setup(p => p.PromptForArgument(It.IsAny<string>(), It.IsAny<string>())).Returns("");
             var crewMember = await Sut.GetAsync(secret, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             Assert.IsFalse(Sut.Exists(secret, true));
             Assert.AreEqual(EncryptedSecretCrewMember.DefaultFirstName, crewMember.FirstName);
             CleanUpSecretRepository(false);
@@ -431,7 +431,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             Sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName, SurName = SomeSurName, Rank = SomeRank };
             var errorsAndInfos = new ErrorsAndInfos();
             await Sut.SetAsync(secret, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
             var componentProviderMock = new Mock<IComponentProvider>();
             componentProviderMock.Setup(c => c.PeghEnvironment).Returns(ComponentProvider.PeghEnvironment);
@@ -446,7 +446,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             };
             Assert.IsNull(GetSecretCrewMember(secret));
             await Sut.GetAsync(secret, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             Assert.IsNull(GetSecretCrewMember(secret));
             CleanUpSecretRepository(false);
         }
@@ -458,7 +458,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             Sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName, SurName = SomeSurName, Rank = SomeRank };
             var errorsAndInfos = new ErrorsAndInfos();
             await Sut.SetAsync(secret, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             CsArgumentPrompterMock.Setup(p => p.PromptForArgument(It.IsAny<string>(), It.IsAny<string>())).Returns("Wrong-Password");
             Sut = new SecretRepository(ComponentProvider) {
                 CsArgumentPrompter = CsArgumentPrompterMock.Object
@@ -471,7 +471,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
                 Assert.IsTrue(e.Message.Contains("nvalid password"));
             }
 
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             Assert.IsNull(GetSecretCrewMember(secret));
             CleanUpSecretRepository(false);
         }
@@ -484,7 +484,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             var xml = ComponentProvider.XmlSerializer.Serialize(valueOrDefault).Replace("Crew", "Curfew");
             var errorsAndInfos = new ErrorsAndInfos();
             await Sut.WriteToFileAsync(secret, xml, false, false, errorsAndInfos);
-            Assert.IsTrue(errorsAndInfos.Errors.All(e => e.Contains("The \'http://www.aspenlaub.net:CurfewMember\' element is not declared")), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsTrue(errorsAndInfos.Errors.All(e => e.Contains("The \'http://www.aspenlaub.net:CurfewMember\' element is not declared")), errorsAndInfos.ErrorsToString());
             Assert.IsFalse(Sut.Exists(secret, false));
             CleanUpSecretRepository(false);
         }
@@ -497,13 +497,13 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             Sut.Values[secret.Guid] = listOfElements;
             var errorsAndInfos = new ErrorsAndInfos();
             await Sut.SetAsync(secret, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             CsArgumentPrompterMock.Setup(p => p.PromptForArgument(It.IsAny<string>(), It.IsAny<string>())).Returns(Passphrase + Passphrase);
             Sut = new SecretRepository(ComponentProvider) {
                 CsArgumentPrompter = CsArgumentPrompterMock.Object
             };
             await Sut.GetAsync(secret, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             listOfElements = GetSecretListOfElements(secret);
             Assert.AreEqual(2, listOfElements.Count);
             Assert.AreEqual("Two", listOfElements[1].Value);
@@ -517,24 +517,24 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             Sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName, SurName = SomeSurName, Rank = SomeRank };
             var errorsAndInfos = new ErrorsAndInfos();
             await Sut.SetAsync(secret, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
             secret = new SecretCrewMember();
             AlternativeSut.Reset(secret, false);
             AlternativeSut.Values[secret.Guid] = new CrewMember { FirstName = "ALT " + SomeFirstName, SurName = "ALT" + SomeSurName, Rank = "ALT" + SomeRank };
             errorsAndInfos = new ErrorsAndInfos();
             await AlternativeSut.SetAsync(secret, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
             Sut.Values.Remove(secret.Guid);
             AlternativeSut.Values.Remove(secret.Guid);
 
             await AlternativeSut.GetAsync(secret, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             Assert.AreEqual("ALT " + SomeFirstName, GetAlternativeSecretCrewMember(secret).FirstName);
 
             await Sut.GetAsync(secret, errorsAndInfos);
-            Assert.IsFalse(errorsAndInfos.Errors.Any(), string.Join("\r\n", errorsAndInfos.Errors));
+            Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
             Assert.AreEqual(SomeFirstName, GetSecretCrewMember(secret).FirstName);
 
             CleanUpSecretRepository(false);
