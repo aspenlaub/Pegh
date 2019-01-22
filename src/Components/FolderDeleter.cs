@@ -60,10 +60,10 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
 
         public void DeleteFolder(IFolder folder) {
             if (!CanDeleteFolder(folder)) {
-                throw new ArgumentException("This folder cannot be deleted, use CanDeleteDirectoy to find out why");
+                throw new ArgumentException("This folder cannot be deleted, use CanDeleteDirectory to find out why");
             }
             if (!CanDeleteFolderDoubleCheck(folder)) {
-                throw new ArgumentException("Double check on CanDeleteDirectoy FAILED");
+                throw new ArgumentException("Double check on CanDeleteDirectory FAILED");
             }
 
             MakeFilesDeletable(folder);

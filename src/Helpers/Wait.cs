@@ -5,26 +5,26 @@ using System.Threading.Tasks;
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Helpers {
     public class Wait {
         public static void Until(Func<bool> condition, TimeSpan timeSpan) {
-            var miliSeconds = timeSpan.Milliseconds + 1000 * timeSpan.TotalSeconds;
-            var internalMiliSeconds = (int)Math.Ceiling(1 + miliSeconds / 20);
+            var milliseconds = timeSpan.Milliseconds + 1000 * timeSpan.TotalSeconds;
+            var internalMilliseconds = (int)Math.Ceiling(1 + milliseconds / 20);
             do {
                 if (condition()) { return; }
 
-                Thread.Sleep(internalMiliSeconds); // Do not use await Task.Delay here
-                miliSeconds = miliSeconds - internalMiliSeconds;
-            } while (miliSeconds >= 0);
+                Thread.Sleep(internalMilliseconds); // Do not use await Task.Delay here
+                milliseconds = milliseconds - internalMilliseconds;
+            } while (milliseconds >= 0);
 
         }
 
         public static async Task UntilAsync(Func<Task<bool>> condition, TimeSpan timeSpan) {
-            var miliSeconds = timeSpan.Milliseconds + 1000 * timeSpan.TotalSeconds;
-            var internalMiliSeconds = (int)Math.Ceiling(1 + miliSeconds / 20);
+            var milliseconds = timeSpan.Milliseconds + 1000 * timeSpan.TotalSeconds;
+            var internalMilliseconds = (int)Math.Ceiling(1 + milliseconds / 20);
             do {
                 if (await condition()) { return; }
 
-                Thread.Sleep(internalMiliSeconds); // Do not use await Task.Delay here
-                miliSeconds = miliSeconds - internalMiliSeconds;
-            } while (miliSeconds >= 0);
+                Thread.Sleep(internalMilliseconds); // Do not use await Task.Delay here
+                milliseconds = milliseconds - internalMilliseconds;
+            } while (milliseconds >= 0);
 
         }
     }

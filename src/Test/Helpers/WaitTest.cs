@@ -10,36 +10,36 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Helpers {
         public void CanWait() {
             var now = DateTime.Now;
             Wait.Until(() => true, TimeSpan.FromSeconds(1));
-            var elapsedMilliSeconds = (int)DateTime.Now.Subtract(now).TotalMilliseconds;
-            Assert.IsTrue(elapsedMilliSeconds < 100, $"Expected less than 100 millseconds elapsed time, it were {elapsedMilliSeconds} millseconds");
+            var elapsedMilliseconds = (int)DateTime.Now.Subtract(now).TotalMilliseconds;
+            Assert.IsTrue(elapsedMilliseconds < 100, $"Expected less than 100 milliseconds elapsed time, it were {elapsedMilliseconds} milliseconds");
 
             var now2 = DateTime.Now;
             Wait.Until(() => DateTime.Now.Subtract(now2).TotalMilliseconds > 500, TimeSpan.FromSeconds(1));
-            elapsedMilliSeconds = (int)DateTime.Now.Subtract(now2).TotalMilliseconds;
-            Assert.IsTrue(elapsedMilliSeconds < 600, $"Expected less than 600 millseconds elapsed time, it were {elapsedMilliSeconds} millseconds");
+            elapsedMilliseconds = (int)DateTime.Now.Subtract(now2).TotalMilliseconds;
+            Assert.IsTrue(elapsedMilliseconds < 600, $"Expected less than 600 milliseconds elapsed time, it were {elapsedMilliseconds} milliseconds");
 
             var now3 = DateTime.Now;
             Wait.Until(() => DateTime.Now.Subtract(now3).TotalMilliseconds > 2000, TimeSpan.FromSeconds(1));
-            elapsedMilliSeconds = (int)DateTime.Now.Subtract(now3).TotalMilliseconds;
-            Assert.IsTrue(elapsedMilliSeconds < 1500, $"Expected less than 1500 millseconds elapsed time, it were {elapsedMilliSeconds} millseconds");
+            elapsedMilliseconds = (int)DateTime.Now.Subtract(now3).TotalMilliseconds;
+            Assert.IsTrue(elapsedMilliseconds < 1500, $"Expected less than 1500 milliseconds elapsed time, it were {elapsedMilliseconds} milliseconds");
         }
 
         [TestMethod]
         public async Task CanWaitAsync() {
             var now = DateTime.Now;
             await Wait.UntilAsync(async () => await Task.FromResult(true), TimeSpan.FromSeconds(1));
-            var elapsedMilliSeconds = (int)DateTime.Now.Subtract(now).TotalMilliseconds;
-            Assert.IsTrue(elapsedMilliSeconds < 100, $"Expected less than 100 millseconds elapsed time, it were {elapsedMilliSeconds} millseconds");
+            var elapsedMilliseconds = (int)DateTime.Now.Subtract(now).TotalMilliseconds;
+            Assert.IsTrue(elapsedMilliseconds < 100, $"Expected less than 100 milliseconds elapsed time, it were {elapsedMilliseconds} milliseconds");
 
             var now2 = DateTime.Now;
             await Wait.UntilAsync(async () => await Task.FromResult(DateTime.Now.Subtract(now2).TotalMilliseconds > 500), TimeSpan.FromSeconds(1));
-            elapsedMilliSeconds = (int)DateTime.Now.Subtract(now2).TotalMilliseconds;
-            Assert.IsTrue(elapsedMilliSeconds < 600, $"Expected less than 600 millseconds elapsed time, it were {elapsedMilliSeconds} millseconds");
+            elapsedMilliseconds = (int)DateTime.Now.Subtract(now2).TotalMilliseconds;
+            Assert.IsTrue(elapsedMilliseconds < 600, $"Expected less than 600 milliseconds elapsed time, it were {elapsedMilliseconds} milliseconds");
 
             var now3 = DateTime.Now;
             await Wait.UntilAsync(async () => await Task.FromResult(DateTime.Now.Subtract(now3).TotalMilliseconds > 2000), TimeSpan.FromSeconds(1));
-            elapsedMilliSeconds = (int)DateTime.Now.Subtract(now3).TotalMilliseconds;
-            Assert.IsTrue(elapsedMilliSeconds < 1500, $"Expected less than 1500 millseconds elapsed time, it were {elapsedMilliSeconds} millseconds");
+            elapsedMilliseconds = (int)DateTime.Now.Subtract(now3).TotalMilliseconds;
+            Assert.IsTrue(elapsedMilliseconds < 1500, $"Expected less than 1500 milliseconds elapsed time, it were {elapsedMilliseconds} milliseconds");
         }
     }
 }

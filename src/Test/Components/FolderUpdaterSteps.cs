@@ -90,7 +90,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         }
 
         [Given(@"I place a (.*) kilobyte file with (.*) differences into the destination folder")]
-        public void GivenIPlaceAKilobyteFileWithDifferencesIntoTheDestintionFolder(int p0, int p1) {
+        public void GivenIPlaceAKilobyteFileWithDifferencesIntoTheDestinationFolder(int p0, int p1) {
             var bytes = new List<byte>();
             byte b = 0;
             for (var i = 0; i < p0 * 1000; i++) {

@@ -193,7 +193,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             var secret = new SecretCrewMember();
             Sut.Reset(secret, false);
             await Sut.GetAsync(secret, errorsAndInfos);
-            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), errorsAndInfos.ErrorsToString());
+            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase)), errorsAndInfos.ErrorsToString());
             Assert.IsFalse(Sut.Exists(secret, false));
             CleanUpSecretRepository(false);
         }
@@ -207,7 +207,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             var secret = new SecretCrewMember();
             Sut.Reset(secret, false);
             Assert.IsNull(await Sut.GetAsync(secret, errorsAndInfos));
-            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), errorsAndInfos.ErrorsToString());
+            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase)), errorsAndInfos.ErrorsToString());
             CleanUpSecretRepository(false);
         }
 
@@ -220,7 +220,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             var secret = new SecretCrewMember();
             Sut.Reset(secret, false);
             await Sut.GetAsync(secret, errorsAndInfos);
-            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), errorsAndInfos.ErrorsToString());
+            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase)), errorsAndInfos.ErrorsToString());
             Assert.IsFalse(Sut.Values.ContainsKey(secret.Guid));
             CleanUpSecretRepository(false);
         }
@@ -266,7 +266,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             var secret = new SecretStringFunction();
             Sut.Reset(secret, false);
             await Sut.GetAsync(secret, errorsAndInfos);
-            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), errorsAndInfos.ErrorsToString());
+            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase)), errorsAndInfos.ErrorsToString());
             Assert.IsFalse(Sut.Exists(secret, false));
             CleanUpSecretRepository(false);
         }
@@ -280,7 +280,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             var secret = new SecretStringFunction();
             Sut.Reset(secret, false);
             Assert.IsNull(await Sut.GetAsync(secret, errorsAndInfos));
-            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), errorsAndInfos.ErrorsToString());
+            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase)), errorsAndInfos.ErrorsToString());
             CleanUpSecretRepository(false);
         }
 
@@ -293,7 +293,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             var secret = new SecretStringFunction();
             Sut.Reset(secret, false);
             await Sut.GetAsync(secret, errorsAndInfos);
-            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("ecret has not been defined")), errorsAndInfos.ErrorsToString());
+            Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase)), errorsAndInfos.ErrorsToString());
             Assert.IsFalse(Sut.Values.ContainsKey(secret.Guid));
             CleanUpSecretRepository(false);
         }
@@ -468,7 +468,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
                 await Sut.GetAsync(secret, errorsAndInfos);
                 throw new Exception("ZipException expected");
             } catch (ZipException e) {
-                Assert.IsTrue(e.Message.Contains("nvalid password"));
+                Assert.IsTrue(e.Message.Contains("Invalid password", StringComparison.InvariantCultureIgnoreCase));
             }
 
             Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());

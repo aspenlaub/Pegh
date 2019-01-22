@@ -16,7 +16,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         protected StarFleet Fleet;
         protected ParallelUniverses Universes;
         protected CrewMember[] CrewMemberArray;
-        protected int FleetPropertyChangedDuringInitialisation;
+        protected int FleetPropertyChangedDuringInitialization;
 
         protected IComponentProvider Components;
 
@@ -26,7 +26,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         [TestInitialize]
         public void Initialize() {
             Components = new ComponentProvider();
-            FleetPropertyChangedDuringInitialisation = 0;
+            FleetPropertyChangedDuringInitialization = 0;
             Fleet = new StarFleet();
             ((INotifyPropertyChanged)Fleet.StarShips).PropertyChanged += FleetPropertyChanged;
             Assert.AreEqual(0, Fleet.StarShips.Count);
@@ -66,7 +66,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         }
 
         private void FleetPropertyChanged(object sender, PropertyChangedEventArgs e) {
-            FleetPropertyChangedDuringInitialisation ++;
+            FleetPropertyChangedDuringInitialization ++;
         }
 
         [TestMethod]
@@ -87,7 +87,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             Assert.AreEqual("Captain", Castillo.Rank);
             Assert.IsNull(CrewMemberArray[0]);
             Assert.AreSame(Picard, CrewMemberArray[1]);
-            Assert.AreEqual(4, FleetPropertyChangedDuringInitialisation);
+            Assert.AreEqual(4, FleetPropertyChangedDuringInitialization);
         }
 
         [TestMethod]
