@@ -88,6 +88,24 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Folder placeholder {0} is not defined. Either define it as a machine drive in secret &quot;{1}&quot; or as a logical folder in secret &quot;{2}&quot;.
+        /// </summary>
+        internal static string FolderPlaceholderNotFound {
+            get {
+                return ResourceManager.GetString("FolderPlaceholderNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Folder placeholders {0} are not defined. Either define them as machine drives in secret &quot;{1}&quot; or as logical folders in secret &quot;{2}&quot;.
+        /// </summary>
+        internal static string FolderPlaceholdersNotFound {
+            get {
+                return ResourceManager.GetString("FolderPlaceholdersNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Schema &quot;{0}&quot; is invalid.
         /// </summary>
         internal static string InvalidSchema {

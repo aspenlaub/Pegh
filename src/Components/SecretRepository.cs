@@ -218,7 +218,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         }
 
 
-        private string FileName(IGuid secret, bool sample, bool encrypted) {
+        public string FileName(IGuid secret, bool sample, bool encrypted) {
             return ComponentProvider.PeghEnvironment.RootWorkFolder + (sample ? @"\SecretSamples\" : @"\SecretRepository\") + secret.Guid + (encrypted ? @".7zip" : @".xml");
         }
 

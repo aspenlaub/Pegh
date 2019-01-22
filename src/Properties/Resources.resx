@@ -126,6 +126,12 @@
   <data name="FailedToRename" xml:space="preserve">
     <value>Failed to rename "{0}" into "{1}"</value>
   </data>
+  <data name="FolderPlaceholderNotFound" xml:space="preserve">
+    <value>Folder placeholder {0} is not defined. Either define it as a machine drive in secret "{1}" or as a logical folder in secret "{2}"</value>
+  </data>
+  <data name="FolderPlaceholdersNotFound" xml:space="preserve">
+    <value>Folder placeholders {0} are not defined. Either define them as machine drives in secret "{1}" or as logical folders in secret "{2}"</value>
+  </data>
   <data name="InvalidSchema" xml:space="preserve">
     <value>Schema "{0}" is invalid</value>
   </data>
