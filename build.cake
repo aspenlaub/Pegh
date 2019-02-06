@@ -1,16 +1,6 @@
 #load "solution.cake"
-#addin nuget:?package=Newtonsoft.Json
 #addin nuget:?package=Cake.Git
-#addin nuget:?package=Nuget.Client&loaddependencies=true
-#addin nuget:?package=Nuget.Protocol.Core.v3&loaddependencies=true
-#addin nuget:?package=Microsoft.Win32.Registry
-#addin nuget:?package=Autofac&loaddependencies=true
-#addin nuget:?package=Microsoft.Extensions.DependencyInjection.Abstractions
-#addin nuget:?package=SharpZipLib.NETStandard
-#addin nuget:https://www.aspenlaub.net/nuget/?package=Aspenlaub.Net.GitHub.CSharp.Pegh
-#addin nuget:https://www.aspenlaub.net/nuget/?package=Aspenlaub.Net.GitHub.CSharp.Gitty
-#addin nuget:https://www.aspenlaub.net/nuget/?package=Aspenlaub.Net.GitHub.CSharp.Protch
-#addin nuget:https://www.aspenlaub.net/nuget/?package=Aspenlaub.Net.GitHub.CSharp.Nuclide
+#addin nuget:https://www.aspenlaub.net/nuget/?package=Aspenlaub.Net.GitHub.CSharp.Nuclide&loaddependencies=true
 
 using Regex = System.Text.RegularExpressions.Regex;
 using Microsoft.Extensions.DependencyInjection;
