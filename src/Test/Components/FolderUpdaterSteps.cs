@@ -25,8 +25,8 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         protected ErrorsAndInfos UpdateFolderErrorsAndInfos;
 
         public FolderUpdaterSteps() {
-            SourceFolder = new Folder(Path.GetTempPath() + nameof(FolderUpdaterSteps) + @"\Source");
-            DestinationFolder = new Folder(Path.GetTempPath() + nameof(FolderUpdaterSteps) + @"\Destination");
+            SourceFolder = new Folder(Path.GetTempPath()).SubFolder("AspenlaubTemp").SubFolder(nameof(FolderUpdaterSteps)).SubFolder("Source");
+            DestinationFolder = new Folder(Path.GetTempPath()).SubFolder("AspenlaubTemp").SubFolder(nameof(FolderUpdaterSteps)).SubFolder("Destination");
             EmptySourceFileFullName = SourceFolder.FullName + @"\empty.txt";
             EmptyDestinationFileFullName = DestinationFolder.FullName + @"\empty.txt";
             SourceSubFolder = SourceFolder.SubFolder("Subb");

@@ -29,7 +29,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
 
         [Given(@"I have a folder beneath the user's temp folder but not immediately recognizable as such")]
         public void GivenIHaveAFolderBeneathTheUserSTempFolder() {
-            Folder = new Folder(Path.GetTempPath().Replace(@"\", @"\.\") + nameof(FolderDeleterSteps));
+            Folder = new Folder(Path.GetTempPath().Replace(@"\", @"\.\")).SubFolder("AspenlaubTemp").SubFolder(nameof(FolderDeleterSteps));
             if (Directory.Exists(Folder.FullName)) {
                 Directory.Delete(Folder.FullName, true);
             }
@@ -58,7 +58,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
 
         [Given(@"the folder ends with \\obj")]
         public void GivenTheFolderEndsWithObj() {
-            var newFolder = new Folder(Path.GetTempPath() + @"obj");
+            var newFolder = new Folder(Path.GetTempPath()).SubFolder("AspenlaubTemp").SubFolder("obj");
             if (Directory.Exists(newFolder.FullName)) {
                 Directory.Delete(newFolder.FullName, true);
             }
@@ -69,7 +69,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
 
         [Given(@"the folder ends with \\bin")]
         public void GivenTheFolderEndsWithBin() {
-            var newFolder = new Folder(Path.GetTempPath() + @"bin");
+            var newFolder = new Folder(Path.GetTempPath()).SubFolder("AspenlaubTemp").SubFolder("bin");
             if (Directory.Exists(newFolder.FullName)) {
                 Directory.Delete(newFolder.FullName, true);
             }

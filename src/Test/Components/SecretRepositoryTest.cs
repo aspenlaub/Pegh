@@ -28,7 +28,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         public void Initialize() {
             ComponentProvider = new ComponentProvider();
             AlternativeComponentProvider = new ComponentProvider();
-            AppDataSpecialFolder = new Folder(Path.GetTempPath() + @"NoSecrets");
+            AppDataSpecialFolder = new Folder(Path.GetTempPath()).SubFolder("AspenlaubTemp").SubFolder("NoSecrets");
             if (AppDataSpecialFolder.Exists()) {
                 var deleter = new FolderDeleter();
                 deleter.DeleteFolder(AppDataSpecialFolder);
@@ -56,7 +56,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
 
         [ClassCleanup]
         public static void ClassCleanup() {
-            var folder = new Folder(Path.GetTempPath() + @"NoSecrets");
+            var folder = new Folder(Path.GetTempPath()).SubFolder("AspenlaubTemp").SubFolder("NoSecrets");
             if (!folder.Exists()) { return; }
 
 

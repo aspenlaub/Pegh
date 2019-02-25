@@ -16,7 +16,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Entities {
 
         [TestMethod]
         public void CanCheckIfSubFolderExists() {
-            var sut = new Folder(Path.GetTempPath());
+            var sut = new Folder(Path.GetTempPath()).SubFolder("AspenlaubTemp");
             const string subFolder = @"\FolderExtensionsTest";
             if (Directory.Exists(sut.FullName + subFolder)) {
                 Directory.Delete(sut.FullName + subFolder);
@@ -40,7 +40,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Entities {
 
         [TestMethod]
         public void FolderIsCreatedIfNecessary() {
-            var folder = new Folder(Path.GetTempPath() + @"\Folder\Helper\Test");
+            var folder = new Folder(Path.GetTempPath()).SubFolder("AspenlaubTemp").SubFolder("Folder").SubFolder("Helper").SubFolder("Test");
             Assert.IsTrue(folder.FullName.Contains("Temp"));
             if (folder.Exists()) {
                 Directory.Delete(folder.FullName, true);
