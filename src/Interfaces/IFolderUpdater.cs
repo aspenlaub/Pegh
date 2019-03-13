@@ -4,6 +4,6 @@
     }
 
     public enum FolderUpdateMethod {
-        Assemblies = 1
+        AssembliesButNotIfOnlySlightlyChanged = 1, AssembliesEvenIfOnlySlightlyChanged = 2
     }
 }

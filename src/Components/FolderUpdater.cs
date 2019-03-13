@@ -9,7 +9,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         private const int MinimumBinaryFileSizeInBytes = 4000;
 
         public void UpdateFolder(IFolder sourceFolder, IFolder destinationFolder, FolderUpdateMethod folderUpdateMethod, IErrorsAndInfos errorsAndInfos) {
-            if (folderUpdateMethod != FolderUpdateMethod.Assemblies) {
+            if (folderUpdateMethod != FolderUpdateMethod.AssembliesButNotIfOnlySlightlyChanged && folderUpdateMethod != FolderUpdateMethod.AssembliesEvenIfOnlySlightlyChanged) {
                 throw new NotImplementedException("Update method is not implemented");
             }
 
@@ -29,7 +29,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
                             if (differences == 0) {
                                 continue;
                             }
-                            if (IsBinary(sourceFileInfo.Name) && differences < 50 && sourceFileInfo.Length >= MinimumBinaryFileSizeInBytes) {
+                            if (folderUpdateMethod == FolderUpdateMethod.AssembliesButNotIfOnlySlightlyChanged && IsBinary(sourceFileInfo.Name) && differences < 50 && sourceFileInfo.Length >= MinimumBinaryFileSizeInBytes) {
                                 continue;
                             }
                         }

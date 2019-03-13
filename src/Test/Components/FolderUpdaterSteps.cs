@@ -128,7 +128,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
                 }
             }
 
-            Sut.UpdateFolder(SourceFolder, DestinationFolder, FolderUpdateMethod.Assemblies, UpdateFolderErrorsAndInfos);
+            Sut.UpdateFolder(SourceFolder, DestinationFolder, FolderUpdateMethod.AssembliesButNotIfOnlySlightlyChanged, UpdateFolderErrorsAndInfos);
         }
 
         [When(@"I overwrite the empty file in the source folder")]
