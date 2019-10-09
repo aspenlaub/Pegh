@@ -1,13 +1,20 @@
-﻿using Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
+﻿using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
+using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
     [TestClass]
     public class StringCrypterTest {
+        private static IContainer Container { get; set; }
+
+        public StringCrypterTest() {
+            var builder = new ContainerBuilder().RegisterForPeghTest();
+            Container = builder.Build();
+        }
+
         [TestMethod]
         public void CanEncryptStringWithoutEscapingUnicodeCharacters() {
-            var componentProvider = new ComponentProvider();
-            var sut = componentProvider.StringCrypter;
+            var sut = Container.Resolve<IStringCrypter>();
             var encrypted = sut.Encrypt("2018-10-3076MuWwlgbBtCHxwW");
             Assert.IsFalse(encrypted.Contains("\\u"));
         }

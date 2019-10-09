@@ -1,17 +1,25 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components;
+using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Entities {
     [TestClass]
     public class MachineDrivesTest {
+        private static IContainer Container { get; set; }
+
+        public MachineDrivesTest() {
+            var builder = new ContainerBuilder().RegisterForPeghTest();
+            Container = builder.Build();
+        }
+
         [TestMethod]
         public async Task CanGetMachineDrives() {
-            var componentProvider = new ComponentProvider();
-            var secretRepository = componentProvider.SecretRepository;
+            var secretRepository = Container.Resolve<ISecretRepository>();
             var machineDrivesSecret = new MachineDrivesSecret();
             var errorsAndInfos = new ErrorsAndInfos();
             var machineDrives = await secretRepository.GetAsync(machineDrivesSecret, errorsAndInfos);

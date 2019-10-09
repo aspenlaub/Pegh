@@ -13,20 +13,32 @@ using ICSharpCode.SharpZipLib.Zip;
 [assembly: InternalsVisibleTo("Aspenlaub.Net.GitHub.CSharp.Pegh.Test")]
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
     public class SecretRepository : ISecretRepository {
-        protected readonly IComponentProvider ComponentProvider;
         internal readonly Dictionary<string, object> Values;
         internal SecretShouldDefaultSecretsBeStored SecretShouldDefaultSecretsBeStored;
 
         public ICsArgumentPrompter CsArgumentPrompter { get; set; }
 
-        public SecretRepository(IComponentProvider componentProvider) {
-            ComponentProvider = componentProvider;
+        protected readonly ICsLambdaCompiler CsLambdaCompiler;
+        protected readonly IDisguiser Disguiser;
+        protected readonly IPeghEnvironment PeghEnvironment;
+        protected readonly IXmlDeserializer XmlDeserializer;
+        protected readonly IXmlSchemer XmlSchemer;
+        protected readonly IXmlSerializer XmlSerializer;
+
+        public SecretRepository(ICsArgumentPrompter csArgumentPrompter, ICsLambdaCompiler csLambdaCompiler, IDisguiser disguiser, IPeghEnvironment peghEnvironment, IXmlDeserializer xmlDeserializer, IXmlSerializer xmlSerializer, IXmlSchemer xmlSchemer) {
+            CsArgumentPrompter = csArgumentPrompter;
+            CsLambdaCompiler = csLambdaCompiler;
+            Disguiser = disguiser;
+            PeghEnvironment = peghEnvironment;
+            XmlDeserializer = xmlDeserializer;
+            XmlSchemer = xmlSchemer;
+            XmlSerializer = xmlSerializer;
             Values = new Dictionary<string, object>();
-            var folder = ComponentProvider.PeghEnvironment.RootWorkFolder + @"\SecretSamples\";
+            var folder = PeghEnvironment.RootWorkFolder + @"\SecretSamples\";
             if (!Directory.Exists(folder)) {
                 Directory.CreateDirectory(folder);
             }
-            folder = ComponentProvider.PeghEnvironment.RootWorkFolder + @"\SecretRepository\";
+            folder = PeghEnvironment.RootWorkFolder + @"\SecretRepository\";
             if (!Directory.Exists(folder)) {
                 Directory.CreateDirectory(folder);
             }
@@ -34,7 +46,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
 
         public async Task SetAsync<TResult>(ISecret<TResult> secret, IErrorsAndInfos errorsAndInfos) where TResult : class, ISecretResult<TResult>, new() {
             var valueOrDefault = await ValueOrDefaultAsync(secret, errorsAndInfos);
-            var xml = ComponentProvider.XmlSerializer.Serialize(valueOrDefault);
+            var xml = XmlSerializer.Serialize(valueOrDefault);
             var encrypted = secret is IEncryptedSecret<TResult>;
             await WriteToFileAsync(secret, xml, false, encrypted, errorsAndInfos);
             Values[secret.Guid] = valueOrDefault;
@@ -48,7 +60,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             var encrypted = secret is IEncryptedSecret<TResult>;
             if (File.Exists(FileName(secret, false, encrypted))) {
                 var xml = await ReadFromFileAsync(secret, false, encrypted, errorsAndInfos);
-                Values[secret.Guid] = ComponentProvider.XmlDeserializer.Deserialize<TResult>(xml);
+                Values[secret.Guid] = XmlDeserializer.Deserialize<TResult>(xml);
                 return (TResult) Values[secret.Guid];
             }
 
@@ -89,7 +101,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             var xml = await ReadFromFileAsync(secret, false, encrypted, errorsAndInfos);
             if (string.IsNullOrEmpty(xml)) { return null; }
 
-            valueOrDefault = ComponentProvider.XmlDeserializer.Deserialize<TResult>(xml);
+            valueOrDefault = XmlDeserializer.Deserialize<TResult>(xml);
             if (!IsGenericType(valueOrDefault.GetType())) {
                 foreach (var property in valueOrDefault.GetType().GetProperties().Where(p => p.GetValue(valueOrDefault) == null)) {
                     SaveSample(secret, true);
@@ -113,7 +125,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         }
 
         public async Task<Func<TArgument, TResult>> CompileCsLambdaAsync<TArgument, TResult>(ICsLambda csLambda) {
-            return await ComponentProvider.CsLambdaCompiler.CompileCsLambdaAsync<TArgument, TResult>(csLambda);
+            return await CsLambdaCompiler.CompileCsLambdaAsync<TArgument, TResult>(csLambda);
         }
 
         internal void Reset(IGuid secret, bool encrypted) {
@@ -136,21 +148,21 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             var fileName = FileName(secret, true, encrypted);
             if (File.Exists(fileName) && !update) { return; }
 
-            var xml = ComponentProvider.XmlSerializer.Serialize(secret.DefaultValue);
+            var xml = XmlSerializer.Serialize(secret.DefaultValue);
             if (File.Exists(fileName) && File.ReadAllText(fileName) == xml) { return; }
 
             File.WriteAllText(fileName, xml);
-            File.WriteAllText(fileName.Replace(".xml", ".xsd"), ComponentProvider.XmlSchemer.Create(typeof(TResult)));
+            File.WriteAllText(fileName.Replace(".xml", ".xsd"), XmlSchemer.Create(typeof(TResult)));
         }
 
         // ReSharper disable once SuggestBaseTypeForParameter
         internal async Task WriteToFileAsync<TResult>(ISecret<TResult> secret, string xml, bool sample, bool encrypted, IErrorsAndInfos errorsAndInfos) where TResult : class, ISecretResult<TResult>, new() {
-            if (!ComponentProvider.XmlSchemer.Valid(secret.Guid, xml, typeof(TResult), errorsAndInfos)) { return; }
+            if (!XmlSchemer.Valid(secret.Guid, xml, typeof(TResult), errorsAndInfos)) { return; }
 
             var fileName = FileName(secret, sample, encrypted);
             if (!encrypted) {
                 File.WriteAllText(fileName, xml);
-                File.WriteAllText(fileName.Replace(".xml", ".xsd"), ComponentProvider.XmlSchemer.Create(typeof(TResult)));
+                File.WriteAllText(fileName.Replace(".xml", ".xsd"), XmlSchemer.Create(typeof(TResult)));
                 return;
             }
 
@@ -187,7 +199,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             var fileName = FileName(secret, sample, encrypted);
             if (!encrypted) {
                 xml = File.ReadAllText(fileName);
-                return ComponentProvider.XmlSchemer.Valid(secret.Guid, xml, typeof(TResult), errorsAndInfos) ? xml : "";
+                return XmlSchemer.Valid(secret.Guid, xml, typeof(TResult), errorsAndInfos) ? xml : "";
             }
 
             var disguisedPassphrase = await GetDisguisedPassphraseAsync(errorsAndInfos);
@@ -214,12 +226,12 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
                 }
             }
 
-            return ComponentProvider.XmlSchemer.Valid(secret.Guid, xml, typeof(TResult), errorsAndInfos) ? xml : "";
+            return XmlSchemer.Valid(secret.Guid, xml, typeof(TResult), errorsAndInfos) ? xml : "";
         }
 
 
         public string FileName(IGuid secret, bool sample, bool encrypted) {
-            return ComponentProvider.PeghEnvironment.RootWorkFolder + (sample ? @"\SecretSamples\" : @"\SecretRepository\") + secret.Guid + (encrypted ? @".7zip" : @".xml");
+            return PeghEnvironment.RootWorkFolder + (sample ? @"\SecretSamples\" : @"\SecretRepository\") + secret.Guid + (encrypted ? @".7zip" : @".xml");
         }
 
         private async Task<string> GetDisguisedPassphraseAsync(IErrorsAndInfos errorsAndInfos) {
@@ -228,7 +240,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             }
 
             var passphrase = CsArgumentPrompter.PromptForArgument("passPhrase", "Please enter the required passphrase");
-            return string.IsNullOrEmpty(passphrase) ? "" : await ComponentProvider.Disguiser.Disguise(passphrase, errorsAndInfos);
+            return string.IsNullOrEmpty(passphrase) ? "" : await Disguiser.Disguise(this, passphrase, errorsAndInfos);
         }
     }
 }

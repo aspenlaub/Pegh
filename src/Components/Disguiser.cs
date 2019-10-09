@@ -7,29 +7,21 @@ using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
     public class Disguiser : IDisguiser {
-        protected IComponentProvider ComponentProvider;
-        protected ISecretRepository SecretRepository;
         protected IPrimeNumberGenerator PrimeNumberGenerator;
         protected IList<int> PrimeNumbers;
 
-        public Disguiser(IComponentProvider componentProvider) {
-            ComponentProvider = componentProvider;
-            SecretRepository = componentProvider.SecretRepository;
-            PrimeNumberGenerator = ComponentProvider.PrimeNumberGenerator;
+        public Disguiser(IPrimeNumberGenerator primeNumberGenerator) {
+            PrimeNumberGenerator = primeNumberGenerator;
         }
 
-        protected async Task<string> LongString(IErrorsAndInfos errorsAndInfos) {
-            var secretLongString = await SecretRepository.GetAsync(new LongSecretString(), errorsAndInfos);
-            return secretLongString.TheLongString;
-        }
-
-        public async Task<string> Disguise(string s, IErrorsAndInfos errorsAndInfos) {
+        public async Task<string> Disguise(ISecretRepository secretRepository, string s, IErrorsAndInfos errorsAndInfos) {
             var bytes = Encoding.UTF8.GetBytes(s);
             EnsurePrimeNumbers(bytes);
             long pos = bytes.Length;
             var primePos = bytes.Length;
             var disguised = "";
-            var longString = await LongString(errorsAndInfos);
+            var secretLongString = await secretRepository.GetAsync(new LongSecretString(), errorsAndInfos);
+            var longString = secretLongString.TheLongString;
             foreach (var aByte in bytes) {
                 pos = pos + aByte * PrimeNumbers[primePos];
                 primePos = primePos + aByte;

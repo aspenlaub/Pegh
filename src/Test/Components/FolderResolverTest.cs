@@ -5,16 +5,19 @@ using Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
+using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
     [TestClass]
     public class FolderResolverTest {
-        private IFolderResolver vSut;
+        private readonly IFolderResolver vSut;
 
-        [TestInitialize]
-        public void Initialize() {
+        private static IContainer Container { get; set; }
+        private static IContainer ProductionContainer { get; set; }
+
+        public FolderResolverTest() {
             var machineDrives = new MachineDrives {
                 new MachineDrive { Machine = Environment.MachineName, Name = "SomeDrive", Drive = "e" }
             };
@@ -22,18 +25,24 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
                 new LogicalFolder { Name = "SomeLogicalFolder", Folder = @"$(SomeDrive)\Logical\Folder" },
                 new LogicalFolder { Name = "SomeOtherLogicalFolder", Folder = @"$(SomeLogicalFolder)\Other" }
             };
-            var componentProviderMock = new Mock<IComponentProvider>();
+
             var secretRepositoryMock = new Mock<ISecretRepository>();
             secretRepositoryMock.Setup(s => s.GetAsync(It.IsAny<MachineDrivesSecret>(), It.IsAny<IErrorsAndInfos>())).Returns(Task.FromResult(machineDrives));
             secretRepositoryMock.Setup(s => s.GetAsync(It.IsAny<LogicalFoldersSecret>(), It.IsAny<IErrorsAndInfos>())).Returns(Task.FromResult(logicalFolders));
-            componentProviderMock.SetupGet(c => c.SecretRepository).Returns(secretRepositoryMock.Object);
 
-            vSut = new FolderResolver(componentProviderMock.Object);
+            var builder = new ContainerBuilder().RegisterForPeghTest(secretRepositoryMock.Object);
+            Container = builder.Build();
+
+            var csArgumentPrompterMock = new Mock<ICsArgumentPrompter>();
+            builder = new ContainerBuilder().RegisterForPegh(csArgumentPrompterMock.Object);
+            ProductionContainer = builder.Build();
+
+            vSut = Container.Resolve<IFolderResolver>();
         }
 
         [TestMethod]
         public void DriveResolvesToActualDrive() {
-            var errorsAndInfos = new ErrorsAndInfos();
+            IErrorsAndInfos errorsAndInfos = new ErrorsAndInfos();
             Assert.AreEqual(@"E:", vSut.Resolve(@"$(SomeDrive)", errorsAndInfos).FullName);
             Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
             Assert.AreEqual(@"E:", vSut.Resolve(@"$(SomeDrive)\", errorsAndInfos).FullName);
@@ -51,8 +60,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
 
         [TestMethod]
         public void CanUseRealResolver() {
-            IComponentProvider componentProvider = new ComponentProvider();
-            var sut = componentProvider.FolderResolver;
+            var sut = ProductionContainer.Resolve<IFolderResolver>();
             var errorsAndInfos = new ErrorsAndInfos();
             var folder = sut.Resolve("$(MainUserFolder)", errorsAndInfos);
             Assert.IsTrue(folder.SubFolder("CSharp").Exists());
@@ -63,8 +71,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
 
         [TestMethod]
         public void ProperErrorMessagesAreReturnedIfPlaceholderIsNotDefined() {
-            IComponentProvider componentProvider = new ComponentProvider();
-            var sut = componentProvider.FolderResolver;
+            var sut = ProductionContainer.Resolve<IFolderResolver>();
             var errorsAndInfos = new ErrorsAndInfos();
             sut.Resolve("$(CSharpDrive)/$(OopsNotExisting)/$(OopsNotExistingEither)", errorsAndInfos);
             Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("$(OopsNotExisting)")));

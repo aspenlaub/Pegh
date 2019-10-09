@@ -7,24 +7,25 @@ using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
     public class FolderResolver : IFolderResolver {
-        protected IComponentProvider ComponentProvider;
         protected IDictionary<string, string> Replacements;
 
-        public FolderResolver(IComponentProvider componentProvider) {
-            ComponentProvider = componentProvider;
+        protected readonly ISecretRepository SecretRepository;
+
+        public FolderResolver(ISecretRepository secretRepository) {
+            SecretRepository = secretRepository;
+
             Replacements = new Dictionary<string, string>();
 
-            var secretRepository = componentProvider.SecretRepository;
             var errorsAndInfos = new ErrorsAndInfos();
             var machineDrivesSecret = new MachineDrivesSecret();
-            var machineDrives = secretRepository.GetAsync(machineDrivesSecret, errorsAndInfos).Result;
+            var machineDrives = SecretRepository.GetAsync(machineDrivesSecret, errorsAndInfos).Result;
             if (errorsAndInfos.AnyErrors()) {
                 throw new Exception(errorsAndInfos.ErrorsToString());
             }
             machineDrives.DrivesOnThisMachine().ToList().ForEach(d => AddReplacement(d));
 
             var logicalFoldersSecret = new LogicalFoldersSecret();
-            var logicalFolders = secretRepository.GetAsync(logicalFoldersSecret, errorsAndInfos).Result;
+            var logicalFolders = SecretRepository.GetAsync(logicalFoldersSecret, errorsAndInfos).Result;
             if (errorsAndInfos.AnyErrors()) {
                 throw new Exception(errorsAndInfos.ErrorsToString());
             }
@@ -74,8 +75,8 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
 
             var startIndex = -1;
             int endIndex;
-            var machineDriveSecretFileName = ComponentProvider.SecretRepository.FileName(new MachineDrivesSecret(), false, false);
-            var logicalFolderSecretFileName = ComponentProvider.SecretRepository.FileName(new LogicalFoldersSecret(), false, false);
+            var machineDriveSecretFileName = SecretRepository.FileName(new MachineDrivesSecret(), false, false);
+            var logicalFolderSecretFileName = SecretRepository.FileName(new LogicalFoldersSecret(), false, false);
             var missingPlaceHolders = new List<string>();
             do {
                 startIndex = folderToResolve.IndexOf("$(", startIndex + 1, StringComparison.Ordinal);

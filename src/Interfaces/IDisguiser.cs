@@ -2,6 +2,6 @@
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces {
     public interface IDisguiser {
-        Task<string> Disguise(string s, IErrorsAndInfos errorsAndInfos);
+        Task<string> Disguise(ISecretRepository secretRepository, string s, IErrorsAndInfos errorsAndInfos);
     }
 }

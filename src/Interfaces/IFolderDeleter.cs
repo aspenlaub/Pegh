@@ -14,6 +14,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces {
         /// <param name="folder">The folder that shall be deleted</param>
         /// <param name="folderDeleteGates">Characteristics of the folder that led to the result</param>
         /// <returns>true if the folder may be deleted</returns>
+        // ReSharper disable once UnusedMemberInSuper.Global
         bool CanDeleteFolder(IFolder folder, out IFolderDeleteGates folderDeleteGates);
 
         /// <summary>

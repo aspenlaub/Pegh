@@ -1,15 +1,23 @@
-﻿using Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
-using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
+﻿using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components;
+using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Entities {
     [TestClass]
     public class SecretStringCrypterFunctionTest {
+        private static IContainer Container { get; set; }
+
+        public SecretStringCrypterFunctionTest() {
+            var builder = new ContainerBuilder().RegisterForPeghTest();
+            Container = builder.Build();
+        }
+
         [TestMethod]
         public void CanEncryptAndDecryptStrings() {
-            var componentProvider = new ComponentProvider();
-            var secretRepository = componentProvider.SecretRepository;
+            var secretRepository = Container.Resolve<ISecretRepository>();
 
             var encrypterSecret = new SecretStringEncrypterFunction();
             Assert.IsFalse(string.IsNullOrEmpty(encrypterSecret.Guid));
@@ -28,8 +36,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Entities {
 
         [TestMethod]
         public void CanEncryptAndDecryptStringsUsingRealEncrypter() {
-            var componentProvider = new ComponentProvider();
-            var secretRepository = componentProvider.SecretRepository;
+            var secretRepository = Container.Resolve<ISecretRepository>();
 
             var encrypterSecret = new SecretStringEncrypterFunction();
             Assert.IsFalse(string.IsNullOrEmpty(encrypterSecret.Guid));

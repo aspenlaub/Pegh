@@ -2,9 +2,9 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities;
+using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
@@ -18,14 +18,18 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         protected CrewMember[] CrewMemberArray;
         protected int FleetPropertyChangedDuringInitialization;
 
-        protected IComponentProvider Components;
-
         private const string Ncc1701C = "CEAEBF2E-DE0A-8882-672B-E1CA71728587";
         private const string UssEnterpriseNcc1701C = "USS Enterprise NCC-1701C";
 
+        private static Autofac.IContainer Container { get; set; }
+
+        public XmlSerializationTest() {
+            var builder = new ContainerBuilder().RegisterForPeghTest();
+            Container = builder.Build();
+        }
+
         [TestInitialize]
         public void Initialize() {
-            Components = new ComponentProvider();
             FleetPropertyChangedDuringInitialization = 0;
             Fleet = new StarFleet();
             ((INotifyPropertyChanged)Fleet.StarShips).PropertyChanged += FleetPropertyChanged;
@@ -105,7 +109,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         }
 
         private void RegenerateUnverifiedResultFile(out string unverifiedResultFileName, out string unverifiedResultFileContents, out string verifiedResultFileName) {
-            var serializer = Components.XmlSerializer;
+            var serializer = Container.Resolve<IXmlSerializer>();
             unverifiedResultFileContents = serializer.Serialize(Universes);
             unverifiedResultFileName = XmlResultsPath() + "fleet_unverified.xml";
             verifiedResultFileName = XmlResultsPath() + "fleet_verified.xml";
@@ -127,7 +131,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         public void CanDeserializeFleet() {
             RegenerateUnverifiedResultFile(out var unverifiedResultFileName, out _, out var verifiedResultFileName);
             File.Copy(unverifiedResultFileName, verifiedResultFileName);
-            var deserializer = Components.XmlDeserializer;
+            var deserializer = Container.Resolve<IXmlDeserializer>();
             var fleets = deserializer.Deserialize<ParallelUniverses>(File.ReadAllText(verifiedResultFileName, Encoding.UTF8));
             Assert.AreEqual(1, fleets.StarFleets.Count);
             var fleet = fleets.StarFleets[0];
