@@ -33,8 +33,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             var builder = new ContainerBuilder().RegisterForPeghTest(secretRepositoryMock.Object);
             Container = builder.Build();
 
-            var csArgumentPrompterMock = new Mock<ICsArgumentPrompter>();
-            builder = new ContainerBuilder().RegisterForPegh(csArgumentPrompterMock.Object);
+            builder = new ContainerBuilder().RegisterForPegh(new DummyCsArgumentPrompter());
             ProductionContainer = builder.Build();
 
             vSut = Container.Resolve<IFolderResolver>();

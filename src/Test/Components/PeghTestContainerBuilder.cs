@@ -10,8 +10,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             builder.RegisterType<SecretRepository>().As<ISecretRepository>();
             builder.RegisterType<PeghEnvironment>().As<IPeghEnvironment>();
             builder.RegisterType<Disguiser>().As<IDisguiser>();
-            var csArgumentPrompterMock = new Mock<ICsArgumentPrompter>();
-            builder.RegisterInstance(csArgumentPrompterMock.Object).As<ICsArgumentPrompter>();
+            builder.RegisterType<DummyCsArgumentPrompter>().As<ICsArgumentPrompter>();
             return builder;
         }
 
