@@ -41,22 +41,22 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             CsArgumentPrompterMock = new Mock<ICsArgumentPrompter>();
             CsArgumentPrompterMock.Setup(p => p.PromptForArgument(It.IsAny<string>(), It.IsAny<string>())).Returns(Passphrase);
 
-            var builder = new ContainerBuilder().RegisterForPeghTest(CsArgumentPrompterMock.Object);
+            var builder = new ContainerBuilder().UseForPeghTest(CsArgumentPrompterMock.Object);
             Container = builder.Build();
 
             AlternativeCsArgumentPrompterMock = new Mock<ICsArgumentPrompter>();
             AlternativeCsArgumentPrompterMock.Setup(p => p.PromptForArgument(It.IsAny<string>(), It.IsAny<string>())).Returns(Passphrase);
 
             var peghEnvironment = new PeghEnvironment(AppDataSpecialFolder);
-            builder = new ContainerBuilder().RegisterForPeghTest(peghEnvironment, AlternativeCsArgumentPrompterMock.Object);
+            builder = new ContainerBuilder().UseForPeghTest(peghEnvironment, AlternativeCsArgumentPrompterMock.Object);
             AlternativeContainer = builder.Build();
 
             var disguiserMock = new Mock<IDisguiser>();
             disguiserMock.Setup(d => d.Disguise(It.IsAny<ISecretRepository>(), It.IsAny<string>(), It.IsAny<IErrorsAndInfos>())).Returns(Task.FromResult(""));
-            builder = new ContainerBuilder().RegisterForPeghTest(disguiserMock.Object, CsArgumentPrompterMock.Object);
+            builder = new ContainerBuilder().UseForPeghTest(disguiserMock.Object, CsArgumentPrompterMock.Object);
             ContainerWithMockedDisguiser = builder.Build();
 
-            builder = new ContainerBuilder().RegisterForPeghTest(disguiserMock.Object, AlternativeCsArgumentPrompterMock.Object);
+            builder = new ContainerBuilder().UseForPeghTest(disguiserMock.Object, AlternativeCsArgumentPrompterMock.Object);
             AlternativeContainerWithMockedDisguiser = builder.Build();
 
             SecretRepositoryFolder(false, false);

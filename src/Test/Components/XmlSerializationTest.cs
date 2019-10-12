@@ -24,7 +24,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         private static Autofac.IContainer Container { get; set; }
 
         public XmlSerializationTest() {
-            var builder = new ContainerBuilder().RegisterForPeghTest();
+            var builder = new ContainerBuilder().UseForPeghTest();
             Container = builder.Build();
         }
 

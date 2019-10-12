@@ -3,7 +3,7 @@ using Autofac;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
     public static class PeghContainerBuilder {
-        public static ContainerBuilder RegisterForPegh(this ContainerBuilder builder, ICsArgumentPrompter csArgumentPrompter) {
+        public static ContainerBuilder UsePegh(this ContainerBuilder builder, ICsArgumentPrompter csArgumentPrompter) {
             builder.RegisterInstance(csArgumentPrompter).As<ICsArgumentPrompter>();
             builder.RegisterType<CsLambdaCompiler>().As<ICsLambdaCompiler>();
             builder.RegisterType<Disguiser>().As<IDisguiser>();

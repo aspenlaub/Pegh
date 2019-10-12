@@ -5,7 +5,7 @@ using Moq;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
     public static class PeghTestContainerBuilder {
-        public static ContainerBuilder RegisterForPeghTest(this ContainerBuilder builder) {
+        public static ContainerBuilder UseForPeghTest(this ContainerBuilder builder) {
             RegisterDefaultTypes(builder);
             builder.RegisterType<SecretRepository>().As<ISecretRepository>();
             builder.RegisterType<PeghEnvironment>().As<IPeghEnvironment>();
@@ -14,7 +14,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             return builder;
         }
 
-        public static ContainerBuilder RegisterForPeghTest(this ContainerBuilder builder, ICsArgumentPrompter csArgumentPrompter) {
+        public static ContainerBuilder UseForPeghTest(this ContainerBuilder builder, ICsArgumentPrompter csArgumentPrompter) {
             RegisterDefaultTypes(builder);
             builder.RegisterType<SecretRepository>().As<ISecretRepository>();
             builder.RegisterType<PeghEnvironment>().As<IPeghEnvironment>();
@@ -23,7 +23,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             return builder;
         }
 
-        public static ContainerBuilder RegisterForPeghTest(this ContainerBuilder builder, ISecretRepository secretRepository) {
+        public static ContainerBuilder UseForPeghTest(this ContainerBuilder builder, ISecretRepository secretRepository) {
             RegisterDefaultTypes(builder);
             builder.RegisterInstance(secretRepository).As<ISecretRepository>();
             builder.RegisterType<PeghEnvironment>().As<IPeghEnvironment>();
@@ -31,7 +31,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             return builder;
         }
 
-        public static ContainerBuilder RegisterForPeghTest(this ContainerBuilder builder, IPeghEnvironment peghEnvironment, ICsArgumentPrompter csArgumentPrompter) {
+        public static ContainerBuilder UseForPeghTest(this ContainerBuilder builder, IPeghEnvironment peghEnvironment, ICsArgumentPrompter csArgumentPrompter) {
             RegisterDefaultTypes(builder);
             builder.RegisterType<SecretRepository>().As<ISecretRepository>();
             builder.RegisterInstance(peghEnvironment).As<IPeghEnvironment>();
@@ -40,7 +40,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             return builder;
         }
 
-        public static ContainerBuilder RegisterForPeghTest(this ContainerBuilder builder, IDisguiser disguiser, ICsArgumentPrompter csArgumentPrompter) {
+        public static ContainerBuilder UseForPeghTest(this ContainerBuilder builder, IDisguiser disguiser, ICsArgumentPrompter csArgumentPrompter) {
             RegisterDefaultTypes(builder);
             builder.RegisterType<SecretRepository>().As<ISecretRepository>();
             builder.RegisterType<PeghEnvironment>().As<IPeghEnvironment>();

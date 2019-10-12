@@ -30,10 +30,10 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             secretRepositoryMock.Setup(s => s.GetAsync(It.IsAny<MachineDrivesSecret>(), It.IsAny<IErrorsAndInfos>())).Returns(Task.FromResult(machineDrives));
             secretRepositoryMock.Setup(s => s.GetAsync(It.IsAny<LogicalFoldersSecret>(), It.IsAny<IErrorsAndInfos>())).Returns(Task.FromResult(logicalFolders));
 
-            var builder = new ContainerBuilder().RegisterForPeghTest(secretRepositoryMock.Object);
+            var builder = new ContainerBuilder().UseForPeghTest(secretRepositoryMock.Object);
             Container = builder.Build();
 
-            builder = new ContainerBuilder().RegisterForPegh(new DummyCsArgumentPrompter());
+            builder = new ContainerBuilder().UsePegh(new DummyCsArgumentPrompter());
             ProductionContainer = builder.Build();
 
             vSut = Container.Resolve<IFolderResolver>();

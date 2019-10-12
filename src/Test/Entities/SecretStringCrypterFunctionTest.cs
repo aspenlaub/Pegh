@@ -11,7 +11,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Entities {
         private static IContainer Container { get; set; }
 
         public SecretStringCrypterFunctionTest() {
-            var builder = new ContainerBuilder().RegisterForPeghTest();
+            var builder = new ContainerBuilder().UseForPeghTest();
             Container = builder.Build();
         }
 

@@ -19,7 +19,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             var secretRepositoryMock = new Mock<ISecretRepository>();
             secretRepositoryMock.Setup(repository => repository.GetAsync(It.IsAny<LongSecretString>(), It.IsAny<IErrorsAndInfos>())).Returns(Task.FromResult(secretLongString));
 
-            var builder = new ContainerBuilder().RegisterForPeghTest(secretRepositoryMock.Object);
+            var builder = new ContainerBuilder().UseForPeghTest(secretRepositoryMock.Object);
             Container = builder.Build();
         }
 
