@@ -5,9 +5,11 @@
     <AssemblyName>Aspenlaub.Net.GitHub.CSharp.Pegh</AssemblyName>
     <RootNamespace>Aspenlaub.Net.GitHub.CSharp.Pegh</RootNamespace>
     <Deterministic>false</Deterministic>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateBuildInfoConfigFile>false</GenerateBuildInfoConfigFile>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AssemblyVersion>1.0.*</AssemblyVersion>
+    <AssemblyTitle>Aspenlaub.Net.GitHub.CSharp.Pegh</AssemblyTitle>
+    <AssemblyProduct>Aspenlaub.Net.GitHub.CSharp.Pegh</AssemblyProduct>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
