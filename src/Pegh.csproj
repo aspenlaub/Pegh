@@ -7,9 +7,12 @@
     <Deterministic>false</Deterministic>
     <GenerateBuildInfoConfigFile>false</GenerateBuildInfoConfigFile>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <AssemblyVersion>1.0.*</AssemblyVersion>
     <AssemblyTitle>Aspenlaub.Net.GitHub.CSharp.Pegh</AssemblyTitle>
     <AssemblyProduct>Aspenlaub.Net.GitHub.CSharp.Pegh</AssemblyProduct>
+    <VersionSuffix>$([System.DateTime]::UtcNow.ToString(yyMMdd.HHmm))</VersionSuffix>
+    <VersionDays>$([System.DateTime]::UtcNow.Subtract($([System.DateTime]::Parse("2019-07-24"))).Days.ToString())</VersionDays>
+    <VersionMinutes>$([System.Math]::Floor($([System.DateTime]::UtcNow.Subtract($([System.DateTime]::UtcNow.Date)).TotalMinutes)).ToString())</VersionMinutes>
+    <Version>2.0.$(VersionDays).$(VersionMinutes)</Version>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
