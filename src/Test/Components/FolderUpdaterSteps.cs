@@ -35,7 +35,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             SourceFiles = new Dictionary<int, string>();
             DestinationFiles = new Dictionary<int, string>();
             UpdateFolderErrorsAndInfos = new ErrorsAndInfos();
-            Sut = new FolderUpdater();
+            Sut = new FolderUpdater(new JsonDepsDifferencer());
         }
 
         [AfterScenario("FolderUpdater")]
