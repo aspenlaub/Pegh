@@ -36,6 +36,14 @@
     <Folder Include="SampleEntities\" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="packageicon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="packageicon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Autofac" Version="4.9.4" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.3.1" />
     <PackageReference Include="SharpZipLib.NETStandard" Version="1.0.7" />
