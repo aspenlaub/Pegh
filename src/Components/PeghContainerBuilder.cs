@@ -9,7 +9,6 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             builder.RegisterType<Disguiser>().As<IDisguiser>();
             builder.RegisterType<FolderDeleter>().As<IFolderDeleter>();
             builder.RegisterType<FolderResolver>().As<IFolderResolver>();
-            builder.RegisterType<JsonDepsDifferencer>().As<IJsonDepsDifferencer>();
             builder.RegisterType<PassphraseProvider>().As<IPassphraseProvider>();
             builder.RegisterType<PeghEnvironment>().As<IPeghEnvironment>();
             builder.RegisterType<PrimeNumberGenerator>().As<IPrimeNumberGenerator>();
