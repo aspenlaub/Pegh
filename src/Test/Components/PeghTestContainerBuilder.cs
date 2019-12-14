@@ -1,7 +1,6 @@
 ﻿using Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Autofac;
-using Moq;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
     public static class PeghTestContainerBuilder {
@@ -53,7 +52,6 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             builder.RegisterType<CsLambdaCompiler>().As<ICsLambdaCompiler>();
             builder.RegisterType<FolderDeleter>().As<IFolderDeleter>();
             builder.RegisterType<FolderResolver>().As<IFolderResolver>();
-            builder.RegisterType<FolderUpdater>().As<IFolderUpdater>();
             builder.RegisterType<PassphraseProvider>().As<IPassphraseProvider>();
             builder.RegisterType<PrimeNumberGenerator>().As<IPrimeNumberGenerator>();
             builder.RegisterType<StringCrypter>().As<IStringCrypter>();

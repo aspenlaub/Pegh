@@ -4,7 +4,7 @@ using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
     public class SecretStringFunction : ISecret<CsLambda> {
         private static CsLambda vDefaultCsLambda;
-        public CsLambda DefaultValue => vDefaultCsLambda ?? (vDefaultCsLambda = CreateDefaultCsLambda());
+        public CsLambda DefaultValue => vDefaultCsLambda ??= CreateDefaultCsLambda();
 
         private static CsLambda CreateDefaultCsLambda() {
             var lambda = new CsLambda {
