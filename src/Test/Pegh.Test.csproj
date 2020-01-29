@@ -16,13 +16,13 @@
     <NuspecFile>Pegh.nuspec</NuspecFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="4.9.4" />
+    <PackageReference Include="Autofac" Version="5.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
     <PackageReference Include="Moq" Version="4.13.1" />
     <PackageReference Include="MSTest.TestAdapter" Version="2.0.0" />
     <PackageReference Include="MSTest.TestFramework" Version="2.0.0" />
-    <PackageReference Include="SpecFlow.MsTest" Version="3.1.78" />
-    <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.1.78" />
+    <PackageReference Include="SpecFlow.MsTest" Version="3.1.80" />
+    <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.1.80" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Pegh.csproj" />
