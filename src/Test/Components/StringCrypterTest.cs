@@ -13,10 +13,12 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         }
 
         [TestMethod]
-        public void CanEncryptStringWithoutEscapingUnicodeCharacters() {
+        public void CanEncryptAndDecryptString() {
             var sut = Container.Resolve<IStringCrypter>();
-            var encrypted = sut.Encrypt("2018-10-3076MuWwlgbBtCHxwW");
-            Assert.IsFalse(encrypted.Contains("\\u"));
+            var s = "2018-10-3076MuWwlgbBtCHxwW";
+            var encrypted = sut.Encrypt(s);
+            var decrypted = sut.Decrypt(encrypted);
+            Assert.AreEqual(s, decrypted);
         }
     }
 }
