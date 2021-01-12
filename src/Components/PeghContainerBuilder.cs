@@ -1,8 +1,11 @@
 ﻿using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Autofac;
+using Microsoft.Extensions.Logging;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
     public static class PeghContainerBuilder {
+        private static readonly ISimpleLogger SimpleLogger = new SimpleLogger(new SimpleLogFlusher());
+
         public static ContainerBuilder UsePegh(this ContainerBuilder builder, ICsArgumentPrompter csArgumentPrompter) {
             builder.RegisterInstance(csArgumentPrompter).As<ICsArgumentPrompter>();
             builder.RegisterType<CsLambdaCompiler>().As<ICsLambdaCompiler>();
@@ -17,6 +20,9 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             builder.RegisterType<XmlDeserializer>().As<IXmlDeserializer>();
             builder.RegisterType<XmlSerializer>().As<IXmlSerializer>();
             builder.RegisterType<XmlSchemer>().As<IXmlSchemer>();
+            builder.RegisterInstance(SimpleLogger);
+            builder.RegisterInstance<ILogger>(SimpleLogger);
+
             return builder;
         }
     }

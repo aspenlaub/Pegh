@@ -15,7 +15,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         [TestMethod]
         public void CanEncryptAndDecryptString() {
             var sut = Container.Resolve<IStringCrypter>();
-            var s = "2018-10-3076MuWwlgbBtCHxwW";
+            const string s = "2018-10-3076MuWwlgbBtCHxwW";
             var encrypted = sut.Encrypt(s);
             var decrypted = sut.Decrypt(encrypted);
             Assert.AreEqual(s, decrypted);
