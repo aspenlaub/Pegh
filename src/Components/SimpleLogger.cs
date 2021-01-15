@@ -17,13 +17,18 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
 
         public string LogSubFolder { get; set; } = @"AspenlaubLogs\Miscellaneous";
 
+        public bool Enabled { get; set; }
+
         public SimpleLogger(ISimpleLogFlusher simpleLogFlusher) {
             vLogEntries = new List<ISimpleLogEntry>();
             vStack = new List<string>();
             vSimpleLogFlusher = simpleLogFlusher;
+            Enabled = true;
         }
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter) {
+            if (!Enabled) { return; }
+
             lock (LockObject) {
                 vLogEntries.Add(SimpleLogEntry.Create(logLevel, vStack, formatter(state, exception)));
             }
@@ -31,7 +36,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         }
 
         public bool IsEnabled(LogLevel logLevel) {
-            return true;
+            return Enabled;
         }
 
         public IDisposable BeginScope<TState>(TState state) {

@@ -23,7 +23,11 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
                 foreach (var id in ids) {
                     var fileName = folder.FullName + '\\' + id + ".log";
                     var entries = logEntries.Where(e => !e.Flushed && e.Stack[0] == id).ToList();
-                    File.AppendAllLines(fileName, entries.Select(Format));
+                    try {
+                        File.AppendAllLines(fileName, entries.Select(Format));
+                    } catch {
+                        return;
+                    }
                     logger.OnEntriesFlushed(entries);
                     FileNames.Add(fileName);
                 }
