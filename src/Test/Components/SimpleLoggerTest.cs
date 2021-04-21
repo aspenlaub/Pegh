@@ -20,11 +20,11 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             ISimpleLogger sut = new SimpleLogger(flusher);
             using (sut.BeginScope(SimpleLoggingScopeId.Create("Scope", "A"))) {
                 using (sut.BeginScope(SimpleLoggingScopeId.Create("Scope", "B"))) {
-                    sut.Log(LogLevel.Information, new EventId(0), new Dictionary<string, object>(), null, (state, exception) => { return NotAMessage; } );
+                    sut.Log(LogLevel.Information, new EventId(0), new Dictionary<string, object>(), null, (_, _) => { return NotAMessage; } );
                 }
             }
 
-            var logEntries = sut.FindLogEntries(e => true);
+            var logEntries = sut.FindLogEntries(_ => true);
             Assert.AreEqual(1, logEntries.Count);
             Assert.AreEqual(LogLevel.Information, logEntries[0].LogLevel);
             Assert.AreEqual(2, logEntries[0].Stack.Count);

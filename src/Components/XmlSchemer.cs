@@ -71,7 +71,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             } else {
                 errorsAndInfos.Errors.Add(string.Format(Properties.Resources.InvalidSchema, $"{secretGuid}.xsd"));
             }
-            settings.ValidationEventHandler += (sender, args) => {
+            settings.ValidationEventHandler += (_, args) => {
                 errorsAndInfos.Errors.Add(string.Format(Properties.Resources.InvalidXml, $"{secretGuid}.xml", $"{secretGuid}.xsd", args.Message));
                 schemaIsValid = false;
             };

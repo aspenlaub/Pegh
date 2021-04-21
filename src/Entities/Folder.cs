@@ -6,7 +6,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities {
         public string FullName { get; }
 
         public Folder(string fullName) {
-            if (fullName != "" && fullName[fullName.Length - 1] == '\\') {
+            if (fullName != "" && fullName[^1] == '\\') {
                 fullName = fullName.Substring(0, fullName.Length - 1);
             }
 

@@ -5,7 +5,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities {
     public class LongSecretString : ISecret<LongString> {
         private LongString vDefaultValue;
 
-        public LongString DefaultValue => vDefaultValue ?? (vDefaultValue = new LongString { TheLongString = GenerateLongString(128) });
+        public LongString DefaultValue => vDefaultValue ??= new LongString { TheLongString = GenerateLongString(128) };
 
         public string Guid => "B2C6C45C-C77F-4227-9BC1-62419AC4BB3C";
 

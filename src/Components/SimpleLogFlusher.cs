@@ -9,9 +9,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
     public class SimpleLogFlusher : ISimpleLogFlusher {
-        private static readonly object LockObject = new object();
+        private static readonly object LockObject = new();
         private static DateTime vCleanupTime = DateTime.Now;
-        public HashSet<string> FileNames { get; } = new HashSet<string>();
+        public HashSet<string> FileNames { get; } = new();
 
         public void Flush(ISimpleLogger logger, string subFolder) {
             var folder = new Folder(Path.GetTempPath()).SubFolder(subFolder);

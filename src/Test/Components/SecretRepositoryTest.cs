@@ -566,7 +566,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
 
             var secret = new SecretListOfElements();
             sut.Reset(secret, false);
-            var listOfElements = new ListOfElements { new ListElement { Value = "One" }, new ListElement { Value = "Two" }};
+            var listOfElements = new ListOfElements { new() { Value = "One" }, new() { Value = "Two" }};
             sut.Values[secret.Guid] = listOfElements;
             var errorsAndInfos = new ErrorsAndInfos();
             await sut.SetAsync(secret, errorsAndInfos);

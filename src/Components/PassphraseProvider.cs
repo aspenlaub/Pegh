@@ -6,7 +6,7 @@ using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 [assembly: InternalsVisibleTo("Aspenlaub.Net.GitHub.CSharp.Pegh.SpecFlow.Test")]
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
     public class PassphraseProvider : IPassphraseProvider {
-        internal static Dictionary<string, string> Passphrases = new Dictionary<string, string>();
+        internal static Dictionary<string, string> Passphrases = new();
 
         public string Passphrase(string passphraseGuid, string title, string description, Func<IPassphraseDialog> passphraseDialogFactory) {
             if (Passphrases.ContainsKey(passphraseGuid)) { return Passphrases[passphraseGuid]; }

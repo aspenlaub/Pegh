@@ -9,7 +9,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
     public class SimpleLogger : ISimpleLogger {
         private const int MaxLogEntries = 10000;
 
-        private static readonly object LockObject = new object();
+        private static readonly object LockObject = new();
 
         private readonly List<ISimpleLogEntry> vLogEntries;
         private readonly IList<string> vStack;

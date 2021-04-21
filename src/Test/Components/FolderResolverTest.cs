@@ -19,11 +19,11 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
 
         public FolderResolverTest() {
             var machineDrives = new MachineDrives {
-                new MachineDrive { Machine = Environment.MachineName, Name = "SomeDrive", Drive = "e" }
+                new() { Machine = Environment.MachineName, Name = "SomeDrive", Drive = "e" }
             };
             var logicalFolders = new LogicalFolders {
-                new LogicalFolder { Name = "SomeLogicalFolder", Folder = @"$(SomeDrive)\Logical\Folder" },
-                new LogicalFolder { Name = "SomeOtherLogicalFolder", Folder = @"$(SomeLogicalFolder)\Other" }
+                new() { Name = "SomeLogicalFolder", Folder = @"$(SomeDrive)\Logical\Folder" },
+                new() { Name = "SomeOtherLogicalFolder", Folder = @"$(SomeLogicalFolder)\Other" }
             };
 
             var secretRepositoryMock = new Mock<ISecretRepository>();

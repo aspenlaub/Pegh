@@ -33,7 +33,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
 
         protected void EnsurePrimeNumbers(byte[] bytes) {
             var needed = (bytes.Length  + 1) * 256;
-            if (PrimeNumbers != null && PrimeNumbers.Count >= needed) { return; }
+            if (PrimeNumbers?.Count >= needed) { return; }
 
             PrimeNumbers = PrimeNumberGenerator.Generate(needed).ToList();
         }

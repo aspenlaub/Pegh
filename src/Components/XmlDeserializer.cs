@@ -7,11 +7,9 @@ using SystemXmlSerializer = System.Xml.Serialization.XmlSerializer;
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
     public class XmlDeserializer : IXmlDeserializer {
         public TItemType Deserialize<TItemType>(string xml) {
-            TItemType result;
-            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml))) {
-                var xmlReader = XmlReader.Create(stream);
-                result = DeserializeFromXmlDocument<TItemType>(xmlReader);
-            }
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
+            var xmlReader = XmlReader.Create(stream);
+            var result = DeserializeFromXmlDocument<TItemType>(xmlReader);
             return result;
         }
 

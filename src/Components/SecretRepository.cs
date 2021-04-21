@@ -161,8 +161,8 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
 
             var fileName = FileName(secret, sample, encrypted);
             if (!encrypted) {
-                File.WriteAllText(fileName, xml);
-                File.WriteAllText(fileName.Replace(".xml", ".xsd"), XmlSchemer.Create(typeof(TResult)));
+                await File.WriteAllTextAsync(fileName, xml);
+                await File.WriteAllTextAsync(fileName.Replace(".xml", ".xsd"), XmlSchemer.Create(typeof(TResult)));
                 return;
             }
 
@@ -171,25 +171,23 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
 
             var unencryptedFileName = FileName(secret, sample, false);
             unencryptedFileName = unencryptedFileName.Substring(unencryptedFileName.LastIndexOf("\\", StringComparison.Ordinal) + 1);
-            using (var fileStream = File.Create(fileName)) {
-                using (var zipStream = new ZipOutputStream(fileStream)) {
-                    zipStream.SetLevel(9);
-                    zipStream.Password = disguisedPassphrase;
-                    var newEntry = new ZipEntry(unencryptedFileName) {
-                        DateTime = DateTime.Now,
-                        Size = xml.Length,
-                        // AESKeySize = 256
-                    };
-                    zipStream.PutNextEntry(newEntry);
-                    var buffer = new byte[4096];
-                    using (var streamReader = new MemoryStream(Encoding.UTF8.GetBytes(xml))) {
-                        StreamUtils.Copy(streamReader, zipStream, buffer);
-                    }
-                    zipStream.CloseEntry();
-                    zipStream.IsStreamOwner = true;
-                    zipStream.Close();
-                }
+            await using var fileStream = File.Create(fileName);
+            await using var zipStream = new ZipOutputStream(fileStream);
+            zipStream.SetLevel(9);
+            zipStream.Password = disguisedPassphrase;
+            var newEntry = new ZipEntry(unencryptedFileName) {
+                DateTime = DateTime.Now,
+                Size = xml.Length,
+                // AESKeySize = 256
+            };
+            zipStream.PutNextEntry(newEntry);
+            var buffer = new byte[4096];
+            await using (var streamReader = new MemoryStream(Encoding.UTF8.GetBytes(xml))) {
+                StreamUtils.Copy(streamReader, zipStream, buffer);
             }
+            zipStream.CloseEntry();
+            zipStream.IsStreamOwner = true;
+            zipStream.Close();
         }
 
         // ReSharper disable once SuggestBaseTypeForParameter
@@ -198,7 +196,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
 
             var fileName = FileName(secret, sample, encrypted);
             if (!encrypted) {
-                xml = File.ReadAllText(fileName);
+                xml = await File.ReadAllTextAsync(fileName);
                 return XmlSchemer.Valid(secret.Guid, xml, typeof(TResult), errorsAndInfos) ? xml : "";
             }
 
@@ -207,7 +205,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
 
             var unencryptedFileName = FileName(secret, sample, false);
             unencryptedFileName = unencryptedFileName.Substring(unencryptedFileName.LastIndexOf("\\", StringComparison.Ordinal) + 1);
-            using (var zipStream = new FileStream(fileName, FileMode.Open)) {
+            await using (var zipStream = new FileStream(fileName, FileMode.Open)) {
                 var zipInputStream = new ZipInputStream(zipStream) { Password = disguisedPassphrase };
                 var zipEntry = zipInputStream.GetNextEntry();
                 while (zipEntry != null) {
@@ -217,7 +215,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
                     }
 
                     var buffer = new byte[4096];
-                    using (var stream = new MemoryStream()) {
+                    await using (var stream = new MemoryStream()) {
                         StreamUtils.Copy(zipInputStream, stream, buffer);
                         xml = Encoding.UTF8.GetString(stream.ToArray());
                     }
