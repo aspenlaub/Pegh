@@ -1,4 +1,6 @@
-﻿namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces {
+﻿using System.Threading.Tasks;
+
+namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces {
     public interface IFolderResolver {
         /// <summary>
         /// Resolve placeholders in folderToResolve
@@ -7,6 +9,6 @@
         /// <param name="folderToResolve"></param>
         /// <param name="errorsAndInfos"></param>
         /// <returns>The resolved folder</returns>
-        IFolder Resolve(string folderToResolve, IErrorsAndInfos errorsAndInfos);
+        Task<IFolder> ResolveAsync(string folderToResolve, IErrorsAndInfos errorsAndInfos);
     }
 }

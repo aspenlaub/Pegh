@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
@@ -15,17 +16,21 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             SecretRepository = secretRepository;
 
             Replacements = new Dictionary<string, string>();
+        }
+
+        private async Task FindReplacementsIfNecessaryAsync() {
+            if (Replacements.Any()) { return; }
 
             var errorsAndInfos = new ErrorsAndInfos();
             var machineDrivesSecret = new MachineDrivesSecret();
-            var machineDrives = SecretRepository.GetAsync(machineDrivesSecret, errorsAndInfos).Result;
+            var machineDrives = await SecretRepository.GetAsync(machineDrivesSecret, errorsAndInfos);
             if (errorsAndInfos.AnyErrors()) {
                 throw new Exception(errorsAndInfos.ErrorsToString());
             }
             machineDrives.DrivesOnThisMachine().ToList().ForEach(d => AddReplacement(d));
 
             var logicalFoldersSecret = new LogicalFoldersSecret();
-            var logicalFolders = SecretRepository.GetAsync(logicalFoldersSecret, errorsAndInfos).Result;
+            var logicalFolders = await SecretRepository.GetAsync(logicalFoldersSecret, errorsAndInfos);
             if (errorsAndInfos.AnyErrors()) {
                 throw new Exception(errorsAndInfos.ErrorsToString());
             }
@@ -66,7 +71,9 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             return new Folder(folderToResolve);
         }
 
-        public IFolder Resolve(string folderToResolve, IErrorsAndInfos errorsAndInfos) {
+        public async Task<IFolder> ResolveAsync(string folderToResolve, IErrorsAndInfos errorsAndInfos) {
+            await FindReplacementsIfNecessaryAsync();
+
             foreach (var replacement in Replacements.Where(replacement => folderToResolve.Contains(replacement.Key))) {
                 folderToResolve = folderToResolve.Replace(replacement.Key, replacement.Value);
             }

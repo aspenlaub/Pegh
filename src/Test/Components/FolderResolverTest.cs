@@ -40,28 +40,28 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         }
 
         [TestMethod]
-        public void DriveResolvesToActualDrive() {
+        public async Task DriveResolvesToActualDrive() {
             IErrorsAndInfos errorsAndInfos = new ErrorsAndInfos();
-            Assert.AreEqual(@"E:", vSut.Resolve(@"$(SomeDrive)", errorsAndInfos).FullName);
+            Assert.AreEqual(@"E:", (await vSut.ResolveAsync(@"$(SomeDrive)", errorsAndInfos)).FullName);
             Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
-            Assert.AreEqual(@"E:", vSut.Resolve(@"$(SomeDrive)\", errorsAndInfos).FullName);
+            Assert.AreEqual(@"E:", (await vSut.ResolveAsync(@"$(SomeDrive)\", errorsAndInfos)).FullName);
             Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
         }
 
         [TestMethod]
-        public void CanResolveLogicalFolder() {
+        public async Task CanResolveLogicalFolder() {
             var errorsAndInfos = new ErrorsAndInfos();
-            Assert.AreEqual(@"E:\Logical\Folder", vSut.Resolve(@"$(SomeLogicalFolder)", errorsAndInfos).FullName);
+            Assert.AreEqual(@"E:\Logical\Folder", (await vSut.ResolveAsync(@"$(SomeLogicalFolder)", errorsAndInfos)).FullName);
             Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
-            Assert.AreEqual(@"E:\Logical\Folder\Other", vSut.Resolve(@"$(SomeOtherLogicalFolder)", errorsAndInfos).FullName);
+            Assert.AreEqual(@"E:\Logical\Folder\Other", (await vSut.ResolveAsync(@"$(SomeOtherLogicalFolder)", errorsAndInfos)).FullName);
             Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
         }
 
         [TestMethod]
-        public void CanUseRealResolver() {
+        public async Task CanUseRealResolver() {
             var sut = ProductionContainer.Resolve<IFolderResolver>();
             var errorsAndInfos = new ErrorsAndInfos();
-            var folder = sut.Resolve("$(MainUserFolder)", errorsAndInfos);
+            var folder = await sut.ResolveAsync("$(MainUserFolder)", errorsAndInfos);
             Assert.IsTrue(folder.SubFolder("CSharp").Exists());
             Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
             Assert.IsTrue(folder.SubFolder("GitHub").Exists());
@@ -69,10 +69,10 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         }
 
         [TestMethod]
-        public void ProperErrorMessagesAreReturnedIfPlaceholderIsNotDefined() {
+        public async Task ProperErrorMessagesAreReturnedIfPlaceholderIsNotDefined() {
             var sut = ProductionContainer.Resolve<IFolderResolver>();
             var errorsAndInfos = new ErrorsAndInfos();
-            sut.Resolve("$(CSharpDrive)/$(OopsNotExisting)/$(OopsNotExistingEither)", errorsAndInfos);
+            await sut.ResolveAsync("$(CSharpDrive)/$(OopsNotExisting)/$(OopsNotExistingEither)", errorsAndInfos);
             Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("$(OopsNotExisting)")));
             Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("$(OopsNotExistingEither)")));
         }

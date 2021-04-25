@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
@@ -12,26 +13,32 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
 
         public StringCrypter(ISecretRepository secretRepository) {
             SecretRepository = secretRepository;
+        }
+
+        protected async Task LoadSecretsIfNecessaryAsync() {
+            if (SecretEncrypterFunction != null) { return; }
 
             var encrypterSecret = new SecretStringEncrypterFunction();
             var errorsAndInfos = new ErrorsAndInfos();
-            var csLambda = SecretRepository.GetAsync(encrypterSecret, errorsAndInfos).Result;
-            SecretEncrypterFunction = SecretRepository.CompileCsLambdaAsync<string, string>(csLambda).Result;
+            var csLambda = await SecretRepository.GetAsync(encrypterSecret, errorsAndInfos);
+            SecretEncrypterFunction = await SecretRepository.CompileCsLambdaAsync<string, string>(csLambda);
 
             var decrypterSecret = new SecretStringDecrypterFunction();
-            csLambda = SecretRepository.GetAsync(decrypterSecret, errorsAndInfos).Result;
-            SecretDecrypterFunction = SecretRepository.CompileCsLambdaAsync<string, string>(csLambda).Result;
+            csLambda = await SecretRepository.GetAsync(decrypterSecret, errorsAndInfos);
+            SecretDecrypterFunction = await SecretRepository.CompileCsLambdaAsync<string, string>(csLambda);
 
             if (!errorsAndInfos.AnyErrors()) { return; }
 
             throw new Exception(errorsAndInfos.ErrorsToString());
         }
 
-        public string Encrypt(string s) {
+        public async Task<string> EncryptAsync(string s) {
+            await LoadSecretsIfNecessaryAsync();
             return SecretEncrypterFunction(s);
         }
 
-        public string Decrypt(string s) {
+        public async Task<string> DecryptAsync(string s) {
+            await LoadSecretsIfNecessaryAsync();
             return SecretDecrypterFunction(s);
         }
     }
