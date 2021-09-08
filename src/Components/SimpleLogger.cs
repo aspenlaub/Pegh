@@ -15,7 +15,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         private readonly IList<string> Stack;
         private readonly ISimpleLogFlusher SimpleLogFlusher;
 
-        public string LogSubFolder => @"AspenlaubLogs\Miscellaneous";
+        public string LogSubFolder { get; set; } = @"AspenlaubLogs\Miscellaneous";
 
         public bool Enabled { get; }
 
