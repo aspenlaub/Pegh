@@ -14,7 +14,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions {
         }
 
         public static IFolder ParentFolder(this IFolder folder) {
-            return !folder.FullName.Contains("\\") ? null : new Folder(folder.FullName.Substring(0, folder.FullName.LastIndexOf('\\')));
+            return !folder.FullName.Contains("\\") ? null : new Folder(folder.FullName[..folder.FullName.LastIndexOf('\\')]);
         }
 
         public static IFolder SubFolder(this IFolder folder, string subFolder) {

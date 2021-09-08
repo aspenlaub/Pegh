@@ -12,7 +12,7 @@ using Moq;
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
     [TestClass]
     public class FolderResolverTest {
-        private readonly IFolderResolver vSut;
+        private readonly IFolderResolver Sut;
 
         private static IContainer Container { get; set; }
         private static IContainer ProductionContainer { get; set; }
@@ -36,24 +36,24 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             builder = new ContainerBuilder().UsePegh(new DummyCsArgumentPrompter());
             ProductionContainer = builder.Build();
 
-            vSut = Container.Resolve<IFolderResolver>();
+            Sut = Container.Resolve<IFolderResolver>();
         }
 
         [TestMethod]
         public async Task DriveResolvesToActualDrive() {
             IErrorsAndInfos errorsAndInfos = new ErrorsAndInfos();
-            Assert.AreEqual(@"E:", (await vSut.ResolveAsync(@"$(SomeDrive)", errorsAndInfos)).FullName);
+            Assert.AreEqual(@"E:", (await Sut.ResolveAsync(@"$(SomeDrive)", errorsAndInfos)).FullName);
             Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
-            Assert.AreEqual(@"E:", (await vSut.ResolveAsync(@"$(SomeDrive)\", errorsAndInfos)).FullName);
+            Assert.AreEqual(@"E:", (await Sut.ResolveAsync(@"$(SomeDrive)\", errorsAndInfos)).FullName);
             Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
         }
 
         [TestMethod]
         public async Task CanResolveLogicalFolder() {
             var errorsAndInfos = new ErrorsAndInfos();
-            Assert.AreEqual(@"E:\Logical\Folder", (await vSut.ResolveAsync(@"$(SomeLogicalFolder)", errorsAndInfos)).FullName);
+            Assert.AreEqual(@"E:\Logical\Folder", (await Sut.ResolveAsync(@"$(SomeLogicalFolder)", errorsAndInfos)).FullName);
             Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
-            Assert.AreEqual(@"E:\Logical\Folder\Other", (await vSut.ResolveAsync(@"$(SomeOtherLogicalFolder)", errorsAndInfos)).FullName);
+            Assert.AreEqual(@"E:\Logical\Folder\Other", (await Sut.ResolveAsync(@"$(SomeOtherLogicalFolder)", errorsAndInfos)).FullName);
             Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
         }
 

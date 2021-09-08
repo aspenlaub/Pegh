@@ -16,7 +16,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         internal readonly Dictionary<string, object> Values;
         internal SecretShouldDefaultSecretsBeStored SecretShouldDefaultSecretsBeStored;
 
-        public ICsArgumentPrompter CsArgumentPrompter { get; set; }
+        public ICsArgumentPrompter CsArgumentPrompter { get; }
 
         protected readonly ICsLambdaCompiler CsLambdaCompiler;
         protected readonly IDisguiser Disguiser;
@@ -170,14 +170,14 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             if (string.IsNullOrEmpty(disguisedPassphrase)) { return; }
 
             var unencryptedFileName = FileName(secret, sample, false);
-            unencryptedFileName = unencryptedFileName.Substring(unencryptedFileName.LastIndexOf("\\", StringComparison.Ordinal) + 1);
+            unencryptedFileName = unencryptedFileName[(unencryptedFileName.LastIndexOf("\\", StringComparison.Ordinal) + 1)..];
             await using var fileStream = File.Create(fileName);
             await using var zipStream = new ZipOutputStream(fileStream);
             zipStream.SetLevel(9);
             zipStream.Password = disguisedPassphrase;
             var newEntry = new ZipEntry(unencryptedFileName) {
                 DateTime = DateTime.Now,
-                Size = xml.Length,
+                Size = xml.Length
                 // AESKeySize = 256
             };
             zipStream.PutNextEntry(newEntry);
@@ -204,7 +204,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             if (string.IsNullOrEmpty(disguisedPassphrase)) { return ""; }
 
             var unencryptedFileName = FileName(secret, sample, false);
-            unencryptedFileName = unencryptedFileName.Substring(unencryptedFileName.LastIndexOf("\\", StringComparison.Ordinal) + 1);
+            unencryptedFileName = unencryptedFileName[(unencryptedFileName.LastIndexOf("\\", StringComparison.Ordinal) + 1)..];
             await using (var zipStream = new FileStream(fileName, FileMode.Open)) {
                 var zipInputStream = new ZipInputStream(zipStream) { Password = disguisedPassphrase };
                 var zipEntry = zipInputStream.GetNextEntry();

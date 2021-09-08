@@ -7,7 +7,7 @@ using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
     public class Disguiser : IDisguiser {
-        protected IPrimeNumberGenerator PrimeNumberGenerator;
+        protected readonly IPrimeNumberGenerator PrimeNumberGenerator;
         protected IList<int> PrimeNumbers;
 
         public Disguiser(IPrimeNumberGenerator primeNumberGenerator) {
@@ -23,9 +23,9 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             var secretLongString = await secretRepository.GetAsync(new LongSecretString(), errorsAndInfos);
             var longString = secretLongString.TheLongString;
             foreach (var aByte in bytes) {
-                pos = pos + aByte * PrimeNumbers[primePos];
-                primePos = primePos + aByte;
-                disguised = disguised + longString.Substring((int)(pos % (longString.Length - 3)), 3);
+                pos += aByte * PrimeNumbers[primePos];
+                primePos += aByte;
+                disguised += longString.Substring((int)(pos % (longString.Length - 3)), 3);
             }
 
             return disguised;

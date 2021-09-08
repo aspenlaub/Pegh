@@ -119,7 +119,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             File.WriteAllText(unverifiedResultFileName, unverifiedResultFileContents, Encoding.UTF8);
         }
 
-        private void VerifyExpected(string result, string expected) {
+        private static void VerifyExpected(string result, string expected) {
             Assert.IsNotNull(result);
             Assert.IsNotNull(expected);
             if (result.Contains(expected)) { return; }

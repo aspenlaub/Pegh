@@ -40,7 +40,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             Assert.AreEqual(0, logEntries.Count(e => !e.Flushed));
 
             File.SetLastWriteTime(fileName, DateTime.Now.AddHours(-25));
-            flusher.ResetCleanupTime();
+            SimpleLogFlusher.ResetCleanupTime();
             flusher.Flush(sut, @"AspenlaubLogs\Miscellaneous");
             Assert.IsFalse(File.Exists(fileName));
         }

@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Helpers {
-    public class Wait {
+    public static class Wait {
         public static void Until(Func<bool> condition, TimeSpan timeSpan) {
             var milliseconds = timeSpan.Milliseconds + 1000 * timeSpan.TotalSeconds;
             var internalMilliseconds = (int)Math.Ceiling(1 + milliseconds / 20);
@@ -11,7 +11,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Helpers {
                 if (condition()) { return; }
 
                 Thread.Sleep(internalMilliseconds); // Do not use await Task.Delay here
-                milliseconds = milliseconds - internalMilliseconds;
+                milliseconds -= internalMilliseconds;
             } while (milliseconds >= 0);
 
         }
@@ -23,7 +23,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Helpers {
                 if (await condition()) { return; }
 
                 Thread.Sleep(internalMilliseconds); // Do not use await Task.Delay here
-                milliseconds = milliseconds - internalMilliseconds;
+                milliseconds -= internalMilliseconds;
             } while (milliseconds >= 0);
 
         }

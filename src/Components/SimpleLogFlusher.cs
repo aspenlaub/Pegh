@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
     public class SimpleLogFlusher : ISimpleLogFlusher {
         private static readonly object LockObject = new();
-        private static DateTime vCleanupTime = DateTime.Now;
+        private static DateTime CleanupTime = DateTime.Now;
         public HashSet<string> FileNames { get; } = new();
 
         public void Flush(ISimpleLogger logger, string subFolder) {
@@ -33,7 +33,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
                 }
             }
 
-            if (DateTime.Now < vCleanupTime) { return; }
+            if (DateTime.Now < CleanupTime) { return; }
 
             var minWriteTime = DateTime.Now.AddDays(-1);
             var files = Directory.GetFiles(folder.FullName, "*.log", SearchOption.TopDirectoryOnly).Where(f => File.GetLastWriteTime(f) < minWriteTime).ToList();
@@ -41,7 +41,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
                 File.Delete(file);
             }
 
-            vCleanupTime = DateTime.Now.AddHours(2);
+            CleanupTime = DateTime.Now.AddHours(2);
         }
 
         private static string Format(ISimpleLogEntry entry) {
@@ -52,8 +52,8 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
                                                         + entry.Message;
         }
 
-        internal void ResetCleanupTime() {
-            vCleanupTime = DateTime.Now;
+        internal static void ResetCleanupTime() {
+            CleanupTime = DateTime.Now;
         }
     }
 }

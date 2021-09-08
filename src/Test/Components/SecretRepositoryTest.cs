@@ -19,9 +19,8 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
         protected IContainer Container;
         protected IContainer AlternativeContainer;
         protected IContainer ContainerWithMockedDisguiser;
-        protected IContainer AlternativeContainerWithMockedDisguiser;
 
-        protected IFolder AppDataSpecialFolder { get; set; }
+        protected IFolder AppDataSpecialFolder { get; }
 
         protected const string SomeFirstName = "Some First Name", SomeSurName = "Some Surname", SomeRank = "Some Rank";
         protected const string Passphrase = "DbDy38Dk973-5DeC9-4A.10-A7$45-DB§66C15!!05B80";
@@ -57,7 +56,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             ContainerWithMockedDisguiser = builder.Build();
 
             builder = new ContainerBuilder().UseForPeghTest(disguiserMock.Object, AlternativeCsArgumentPrompterMock.Object);
-            AlternativeContainerWithMockedDisguiser = builder.Build();
+            builder.Build();
 
             SecretRepositoryFolder(false, false);
             SecretRepositoryFolder(true, false);
@@ -84,11 +83,11 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             return folder;
         }
 
-        protected CrewMember GetSecretCrewMember(SecretRepository sut, IGuid secret) {
+        protected static CrewMember GetSecretCrewMember(SecretRepository sut, IGuid secret) {
             return sut.Values.ContainsKey(secret.Guid) ? sut.Values[secret.Guid] as CrewMember : null;
         }
 
-        protected ListOfElements GetSecretListOfElements(SecretRepository sut, IGuid secret) {
+        protected static ListOfElements GetSecretListOfElements(SecretRepository sut, IGuid secret) {
             return sut.Values.ContainsKey(secret.Guid) ? sut.Values[secret.Guid] as ListOfElements : null;
         }
 
@@ -259,7 +258,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             CleanUpSecretRepository(false);
         }
 
-        private async Task SetShouldDefaultSecretsBeStored(ISecretRepository sut, bool shouldThey, IErrorsAndInfos errorsAndInfos) {
+        private static async Task SetShouldDefaultSecretsBeStored(ISecretRepository sut, bool shouldThey, IErrorsAndInfos errorsAndInfos) {
             var shouldDefaultSecretsBeStored = await ShouldDefaultSecretsBeStoredAsync(sut, errorsAndInfos);
             if (shouldThey == shouldDefaultSecretsBeStored.AutomaticallySaveDefaultSecretIfAbsent) {
                 return;
@@ -270,7 +269,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             Assert.AreEqual(shouldThey, shouldDefaultSecretsBeStored.AutomaticallySaveDefaultSecretIfAbsent);
         }
 
-        private async Task<ShouldDefaultSecretsBeStored> ShouldDefaultSecretsBeStoredAsync(ISecretRepository sut, IErrorsAndInfos errorsAndInfos) {
+        private static async Task<ShouldDefaultSecretsBeStored> ShouldDefaultSecretsBeStoredAsync(ISecretRepository sut, IErrorsAndInfos errorsAndInfos) {
             var secret = new SecretShouldDefaultSecretsBeStored();
             var shouldDefaultSecretsBeStored = await sut.GetAsync(secret, errorsAndInfos);
             Assert.IsNotNull(shouldDefaultSecretsBeStored);

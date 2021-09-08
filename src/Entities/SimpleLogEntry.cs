@@ -5,12 +5,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities {
     public class SimpleLogEntry : ISimpleLogEntry {
-        public DateTime LogTime { get; set; }
-        public LogLevel LogLevel { get; set; }
-        public List<string> Stack { get; set; }
-        public string Message { get; set; }
+        public DateTime LogTime { get; init; }
+        public LogLevel LogLevel { get; init; }
+        public List<string> Stack { get; init; }
+        public string Message { get; init; }
         public bool Flushed { get; set; }
 
+        // ReSharper disable once ParameterTypeCanBeEnumerable.Global
         public static ISimpleLogEntry Create(LogLevel logLevel, IList<string> stack, string message) {
             var entry = new SimpleLogEntry {
                 LogTime = DateTime.Now,

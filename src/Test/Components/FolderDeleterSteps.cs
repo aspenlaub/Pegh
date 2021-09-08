@@ -11,7 +11,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
     [Binding]
     public class FolderDeleterSteps {
         protected IFolder Folder, SubFolder;
-        protected IFolderDeleter Sut;
+        protected readonly IFolderDeleter Sut;
         protected bool CanDeleteFolder, DoubleCheckOkay;
 
         public FolderDeleterSteps() {

@@ -8,7 +8,7 @@ using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
     public class FolderResolver : IFolderResolver {
-        protected IDictionary<string, string> Replacements;
+        protected readonly IDictionary<string, string> Replacements;
 
         protected readonly ISecretRepository SecretRepository;
 
@@ -64,18 +64,20 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             string oldFolderToResolve;
             do {
                 oldFolderToResolve = folderToResolve;
-                foreach (var replacement in Replacements.Where(replacement => folderToResolve.Contains(replacement.Key))) {
-                    folderToResolve = folderToResolve.Replace(replacement.Key, replacement.Value);
+                foreach (var (key, value) in Replacements.Where(replacement => folderToResolve.Contains(replacement.Key))) {
+                    folderToResolve = folderToResolve.Replace(key, value);
                 }
             } while (oldFolderToResolve != folderToResolve);
             return new Folder(folderToResolve);
         }
 
         public async Task<IFolder> ResolveAsync(string folderToResolve, IErrorsAndInfos errorsAndInfos) {
+            if (folderToResolve == null) { return null; }
+
             await FindReplacementsIfNecessaryAsync();
 
-            foreach (var replacement in Replacements.Where(replacement => folderToResolve.Contains(replacement.Key))) {
-                folderToResolve = folderToResolve.Replace(replacement.Key, replacement.Value);
+            foreach (var (key, value) in Replacements.Where(replacement => folderToResolve.Contains(replacement.Key))) {
+                folderToResolve = folderToResolve.Replace(key, value);
             }
 
             if (!folderToResolve.Contains("$(")) { return new Folder(folderToResolve); }

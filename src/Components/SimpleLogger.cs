@@ -11,18 +11,18 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
 
         private static readonly object LockObject = new();
 
-        private readonly List<ISimpleLogEntry> vLogEntries;
-        private readonly IList<string> vStack;
-        private readonly ISimpleLogFlusher vSimpleLogFlusher;
+        private readonly List<ISimpleLogEntry> LogEntries;
+        private readonly IList<string> Stack;
+        private readonly ISimpleLogFlusher SimpleLogFlusher;
 
-        public string LogSubFolder { get; set; } = @"AspenlaubLogs\Miscellaneous";
+        public string LogSubFolder => @"AspenlaubLogs\Miscellaneous";
 
-        public bool Enabled { get; set; }
+        public bool Enabled { get; }
 
         public SimpleLogger(ISimpleLogFlusher simpleLogFlusher) {
-            vLogEntries = new List<ISimpleLogEntry>();
-            vStack = new List<string>();
-            vSimpleLogFlusher = simpleLogFlusher;
+            LogEntries = new List<ISimpleLogEntry>();
+            Stack = new List<string>();
+            SimpleLogFlusher = simpleLogFlusher;
             Enabled = true;
         }
 
@@ -30,9 +30,9 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             if (!Enabled) { return; }
 
             lock (LockObject) {
-                vLogEntries.Add(SimpleLogEntry.Create(logLevel, vStack, formatter(state, exception)));
+                LogEntries.Add(SimpleLogEntry.Create(logLevel, Stack, formatter(state, exception)));
             }
-            vSimpleLogFlusher.Flush(this, LogSubFolder);
+            SimpleLogFlusher.Flush(this, LogSubFolder);
         }
 
         public bool IsEnabled(LogLevel logLevel) {
@@ -40,17 +40,17 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         }
 
         public IDisposable BeginScope<TState>(TState state) {
-            if (!(state is ISimpleLoggingScopeId loggingScope)) {
+            if (state is not ISimpleLoggingScopeId loggingScope) {
                 return new LoggingScope(() => { });
             }
 
             var stackEntry = $"{loggingScope.Class}({loggingScope.Id})";
             lock (LockObject) {
-                vStack.Add(stackEntry);
+                Stack.Add(stackEntry);
             }
             return new LoggingScope(() => {
                 lock (LockObject) {
-                    vStack.Remove(stackEntry);
+                    Stack.Remove(stackEntry);
                 }
             });
         }
@@ -58,7 +58,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         public IList<ISimpleLogEntry> FindLogEntries(Func<ISimpleLogEntry, bool> condition) {
             lock (LockObject) {
                 var logEntries = new List<ISimpleLogEntry>();
-                logEntries.AddRange(vLogEntries.Where(condition));
+                logEntries.AddRange(LogEntries.Where(condition));
                 return logEntries;
             }
         }
@@ -69,12 +69,12 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
                     entry.Flushed = true;
                 }
 
-                if (vLogEntries.Count < MaxLogEntries) { return; }
+                if (LogEntries.Count < MaxLogEntries) { return; }
 
                 int i;
-                for (i = 0; vLogEntries[i].Flushed && i < MaxLogEntries / 2; i++) {
+                for (i = 0; LogEntries[i].Flushed && i < MaxLogEntries / 2; i++) {
                 }
-                vLogEntries.RemoveRange(0, i);
+                LogEntries.RemoveRange(0, i);
             }
         }
     }

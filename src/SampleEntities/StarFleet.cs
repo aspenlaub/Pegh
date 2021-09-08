@@ -10,22 +10,22 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities {
 
         [XmlElement("StarShip")]
         public StarShips StarShips {
-            get => vStarShips;
-            set { vStarShips = value; OnPropertyChanged(nameof(StarShips)); }
+            get => PrivateStarShips;
+            set { PrivateStarShips = value; OnPropertyChanged(nameof(StarShips)); }
         }
-        private StarShips vStarShips;
+        private StarShips PrivateStarShips;
 
         [XmlElement("StarBase")]
         public StarBases StarBases {
-            get => vStarBases;
-            set { vStarBases = value; OnPropertyChanged(nameof(StarBases)); }
+            get => PrivateStarBases;
+            set { PrivateStarBases = value; OnPropertyChanged(nameof(StarBases)); }
         }
-        private StarBases vStarBases;
+        private StarBases PrivateStarBases;
 
         public StarFleet() {
             Guid = System.Guid.NewGuid().ToString();
-            vStarShips = new StarShips();
-            vStarBases = new StarBases();
+            PrivateStarShips = new StarShips();
+            PrivateStarBases = new StarBases();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

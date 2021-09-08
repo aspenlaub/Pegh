@@ -7,9 +7,12 @@ using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
     public class FolderDeleter : IFolderDeleter {
-        protected readonly string Obj = @"\obj", CTemp = @"C:\Temp\", TestResults = @"\TestResults", Bin = @"\bin";
-        protected readonly int MinimumFolderNameLength = 20;
-        public bool IgnoreUserTempFolder { get; set; }
+        protected const string Obj = @"\obj";
+        protected const string CTemp = @"C:\Temp\";
+        protected const string TestResults = @"\TestResults";
+        protected const string Bin = @"\bin";
+        protected const int MinimumFolderNameLength = 20;
+        public bool IgnoreUserTempFolder { get; init; }
         public bool IgnoreFoldersEndingWithBin { get; set; }
 
         public bool CanDeleteFolder(IFolder folder, out IFolderDeleteGates folderDeleteGates) {
@@ -70,12 +73,12 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             Directory.Delete(folder.FullName, true);
         }
 
-        protected void MakeFilesDeletable(IFolder folder) {
+        protected static void MakeFilesDeletable(IFolder folder) {
             if (!folder.GitSubFolder().Exists()) { return; }
 
             folder = folder.GitSubFolder();
             var directoryInfo = new DirectoryInfo(folder.FullName) { Attributes = FileAttributes.Normal };
-            directoryInfo.Attributes = directoryInfo.Attributes & ~FileAttributes.Hidden;
+            directoryInfo.Attributes &= ~FileAttributes.Hidden;
             foreach (var fileInfo in directoryInfo.GetFileSystemInfos("*", SearchOption.AllDirectories).Where(fileName => (fileName.Attributes & FileAttributes.Normal) == 0)) {
                 fileInfo.Attributes = FileAttributes.Normal;
             }

@@ -35,20 +35,20 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             const string endTag = "</xs:complexType>";
 
             var tagPos = xsd.IndexOf(tag, StringComparison.Ordinal);
-            var startPos = tagPos > 0 ? xsd.Substring(tagPos).IndexOf(startTag, StringComparison.Ordinal) : 0;
-            var endPos = startPos > 0 ? xsd.Substring(tagPos + startPos).IndexOf(endTag, StringComparison.Ordinal) : 0;
+            var startPos = tagPos > 0 ? xsd[tagPos..].IndexOf(startTag, StringComparison.Ordinal) : 0;
+            var endPos = startPos > 0 ? xsd[(tagPos + startPos)..].IndexOf(endTag, StringComparison.Ordinal) : 0;
 
             if (tagPos <= 0 || startPos <= 0 || endPos <= 0) { return xsd; }
 
-            xsd = xsd.Substring(0, tagPos + startPos) + xsd.Substring(tagPos + startPos + endPos + endTag.Length);
+            xsd = xsd[..(tagPos + startPos)] + xsd[(tagPos + startPos + endPos + endTag.Length)..];
             return xsd;
         }
 
         public bool Valid(string secretGuid, string xml, Type t, IErrorsAndInfos errorsAndInfos) {
-            return Valid(secretGuid, xml, Create(t), t, errorsAndInfos);
+            return Valid(secretGuid, xml, Create(t), errorsAndInfos);
         }
 
-        internal bool Valid(string secretGuid, string xml, string xsd, Type t, IErrorsAndInfos errorsAndInfos) {
+        internal static bool Valid(string secretGuid, string xml, string xsd, IErrorsAndInfos errorsAndInfos) {
             if (xml == "") {
                 return false;
             }

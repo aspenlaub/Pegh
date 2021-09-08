@@ -13,7 +13,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             return result;
         }
 
-        protected TItemType DeserializeFromXmlDocument<TItemType>(XmlReader xmlReader) {
+        protected static TItemType DeserializeFromXmlDocument<TItemType>(XmlReader xmlReader) {
             var serializer = new SystemXmlSerializer(typeof(TItemType), "http://www.aspenlaub.net");
             var deserialized = serializer.Deserialize(xmlReader);
             return (TItemType)deserialized;

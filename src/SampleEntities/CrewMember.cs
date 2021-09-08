@@ -10,21 +10,21 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities {
 
         [XmlAttribute("rank")]
         public string Rank {
-            get => vRank;
-            set { vRank = value; OnPropertyChanged(nameof(Rank)); } }
-        private string vRank;
+            get => PrivateRank;
+            set { PrivateRank = value; OnPropertyChanged(nameof(Rank)); } }
+        private string PrivateRank;
 
         [XmlAttribute("firstname")]
         public string FirstName {
-            get => vFirstName;
-            set { vFirstName = value; OnPropertyChanged(nameof(FirstName)); } }
-        private string vFirstName;
+            get => PrivateFirstName;
+            set { PrivateFirstName = value; OnPropertyChanged(nameof(FirstName)); } }
+        private string PrivateFirstName;
 
         [XmlAttribute("surname")]
         public string SurName {
-            get => vSurName;
-            set { vSurName = value; OnPropertyChanged(nameof(SurName)); } }
-        private string vSurName;
+            get => PrivateSurName;
+            set { PrivateSurName = value; OnPropertyChanged(nameof(SurName)); } }
+        private string PrivateSurName;
 
         public CrewMember() {
             Guid = System.Guid.NewGuid().ToString();

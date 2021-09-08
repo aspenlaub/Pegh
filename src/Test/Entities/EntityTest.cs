@@ -24,11 +24,11 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Entities {
             CanUseEntity<CsLambda>();
         }
 
-        protected void CanUseEntity<T>() where T : class, new() {
+        protected static void CanUseEntity<T>() where T : class, new() {
             CanUseEntity<T, T>(new List<string>());
         }
 
-        protected void CanUseEntity<T, TClone>(IEnumerable<string> excludeProperties) where T : new() where TClone : class, new() {
+        protected static void CanUseEntity<T, TClone>(IEnumerable<string> excludeProperties) where T : new() where TClone : class, new() {
             var sut = new T();
             var clone = default(TClone);
             var canClone = sut is ISecretResult<TClone>;
@@ -78,16 +78,15 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Entities {
         }
 
         private static bool DoListsMatch<T, TClone>(object value, PropertyInfo property, TClone clone) {
-            if (!(value is List<T> valueAsList)) { return false; }
+            if (value is not List<T> valueAsList) { return false; }
 
-            var clonedValueAsList = property.GetValue(clone) as List<T>;
-            if (clonedValueAsList == null) { return false; }
+            if (property.GetValue(clone) is not List<T> clonedValueAsList) { return false; }
             if (valueAsList.Count != clonedValueAsList.Count) { return false; }
 
             return !valueAsList.Where((t, i) => !t.Equals(clonedValueAsList[i])).Any();
         }
 
-        private void NotifyPropertyChanged_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+        private static void NotifyPropertyChanged_PropertyChanged(object sender, PropertyChangedEventArgs e) {
         }
     }
 }

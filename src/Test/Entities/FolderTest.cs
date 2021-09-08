@@ -10,7 +10,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Entities {
             var tempFolder = Path.GetTempPath();
             Assert.IsTrue(tempFolder.EndsWith("\\"));
             var sut = new Folder(tempFolder);
-            Assert.AreEqual(tempFolder.Substring(0, tempFolder.Length - 1), sut.FullName);
+            Assert.AreEqual(tempFolder[..^1], sut.FullName);
             tempFolder = sut.FullName;
             sut = new Folder(tempFolder);
             Assert.AreEqual(tempFolder, sut.FullName);

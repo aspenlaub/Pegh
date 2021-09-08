@@ -22,7 +22,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
             return await CSharpScript.EvaluateAsync<Func<TArgument, TResult>>(csLambda.LambdaExpression, options);
         }
 
-        public Assembly Type2Assembly(string type) {
+        public static Assembly Type2Assembly(string type) {
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             return assemblies.FirstOrDefault(a => a.GetType(type, false) != null);
         }

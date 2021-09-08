@@ -33,7 +33,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("The \'http://www.aspenlaub.net:CrewMember\' element is not declared")));
             var xsd = sut.Create(typeof(CrewMember)).Replace("firstname", "worstname");
             errorsAndInfos = new ErrorsAndInfos();
-            Assert.IsFalse(sut.Valid(CrewMemberSecretGuid, xml, xsd, typeof(CrewMember), errorsAndInfos));
+            Assert.IsFalse(XmlSchemer.Valid(CrewMemberSecretGuid, xml, xsd, errorsAndInfos));
             Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("The \'firstname\' attribute is not declared")));
         }
     }

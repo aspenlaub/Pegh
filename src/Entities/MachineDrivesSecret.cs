@@ -3,8 +3,8 @@ using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities {
     public class MachineDrivesSecret : ISecret<MachineDrives> {
-        private MachineDrives vMachineDrives;
-        public MachineDrives DefaultValue => vMachineDrives ??= new MachineDrives {
+        private MachineDrives DefaultMachineDrives;
+        public MachineDrives DefaultValue => DefaultMachineDrives ??= new MachineDrives {
             new() { Machine = Environment.MachineName, Name = "MachineTest", Drive = "c" }
         };
 

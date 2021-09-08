@@ -4,10 +4,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces {
     public interface ISimpleLogEntry {
-        DateTime LogTime { get; set; }
-        LogLevel LogLevel { get; set; }
-        List<string> Stack { get; set; }
-        string Message { get; set; }
+        DateTime LogTime { get; }
+        LogLevel LogLevel { get; }
+        List<string> Stack { get; }
+        string Message { get; }
         bool Flushed { get; set; }
     }
 }
