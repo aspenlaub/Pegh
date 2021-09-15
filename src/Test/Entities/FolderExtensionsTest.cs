@@ -51,5 +51,21 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Entities {
             folder.CreateIfNecessary();
             Assert.IsTrue(folder.Exists());
         }
+
+        [TestMethod]
+        public void CanDeleteLinksInFolder() {
+            var folder = new Folder(Path.GetTempPath()).SubFolder("AspenlaubTemp").SubFolder("FolderWithLinks");
+            folder.CreateIfNecessary();
+            var subFolder = folder.SubFolder("ThisIsNotLinked");
+            subFolder.CreateIfNecessary();
+            var linkFile = folder.FullName + @"\ThisIsLinked.lnk";
+            File.WriteAllText(linkFile, "");
+            Assert.IsTrue(File.Exists(linkFile));
+            folder.DeleteLinks();
+            Assert.IsTrue(subFolder.Exists());
+            Assert.IsFalse(File.Exists(linkFile));
+            Directory.Delete(subFolder.FullName);
+            Directory.Delete(folder.FullName);
+        }
     }
 }

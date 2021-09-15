@@ -36,5 +36,18 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions {
             Directory.CreateDirectory(folder.FullName);
         }
 
+        public static void DeleteLinks(this IFolder folder) {
+            var directories = Directory.GetDirectories(folder.FullName, "*", SearchOption.TopDirectoryOnly)
+                .Select(d => new DirectoryInfo(d))
+                .Where(d => (d.Attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint)
+                .ToList();
+            foreach (var directory in directories) {
+                directory.Delete();
+            }
+            var files = Directory.GetFiles(folder.FullName, "*.lnk", SearchOption.TopDirectoryOnly).ToList();
+            foreach (var file in files) {
+                File.Delete(file);
+            }
+        }
     }
 }
