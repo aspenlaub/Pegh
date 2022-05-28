@@ -146,6 +146,9 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
         internal void SaveSample<TResult>(ISecret<TResult> secret, bool update) where TResult : class, ISecretResult<TResult>, new() {
             var encrypted = secret is IEncryptedSecret<TResult>;
             var fileName = FileName(secret, true, encrypted);
+            if (fileName == null) {
+                throw new NullReferenceException(nameof(fileName));
+            }
             if (File.Exists(fileName) && !update) { return; }
 
             var xml = XmlSerializer.Serialize(secret.DefaultValue);

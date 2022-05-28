@@ -23,7 +23,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions {
 
         // ReSharper disable once UnusedMember.Global
         public static string LastWrittenFileFullName(this IFolder folder) {
-            return Directory.GetFiles(folder.FullName, "*.*").OrderByDescending(f => File.GetLastWriteTime(f)).FirstOrDefault();
+            return Directory.GetFiles(folder.FullName, "*.*").MaxBy(f => File.GetLastWriteTime(f));
         }
 
         public static IFolder GitSubFolder(this IFolder folder) {

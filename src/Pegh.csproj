@@ -2,6 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+	<Nullable>disable</Nullable>
     <AssemblyName>Aspenlaub.Net.GitHub.CSharp.Pegh</AssemblyName>
     <RootNamespace>Aspenlaub.Net.GitHub.CSharp.Pegh</RootNamespace>
     <Deterministic>false</Deterministic>
