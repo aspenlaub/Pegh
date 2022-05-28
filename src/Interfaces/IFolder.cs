@@ -1,9 +1,9 @@
-﻿namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces {
-    public interface IFolder {
+﻿namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
-        /// <summary>
-        /// Full name without the trailing backslash
-        /// </summary>
-        string FullName { get; }
-    }
+public interface IFolder {
+
+    /// <summary>
+    /// Full name without the trailing backslash
+    /// </summary>
+    string FullName { get; }
 }

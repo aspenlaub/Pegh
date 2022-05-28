@@ -4,25 +4,25 @@ using System.Runtime.CompilerServices;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 [assembly: InternalsVisibleTo("Aspenlaub.Net.GitHub.CSharp.Pegh.SpecFlow.Test")]
-namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
-    public class PassphraseProvider : IPassphraseProvider {
-        internal static readonly Dictionary<string, string> Passphrases = new();
+namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 
-        public string Passphrase(string passphraseGuid, string title, string description, Func<IPassphraseDialog> passphraseDialogFactory) {
-            if (Passphrases.ContainsKey(passphraseGuid)) { return Passphrases[passphraseGuid]; }
+public class PassphraseProvider : IPassphraseProvider {
+    internal static readonly Dictionary<string, string> Passphrases = new();
 
-            var passphraseDialog = passphraseDialogFactory();
-            if (passphraseDialog == null) { return ""; }
+    public string Passphrase(string passphraseGuid, string title, string description, Func<IPassphraseDialog> passphraseDialogFactory) {
+        if (Passphrases.ContainsKey(passphraseGuid)) { return Passphrases[passphraseGuid]; }
 
-            passphraseDialog.ClearPassphrases();
-            passphraseDialog.SetTitle(title);
-            passphraseDialog.SetDescription(description);
-            passphraseDialog.BringToFront();
-            var passphrase = passphraseDialog.ShowDialog() != true ? "" : passphraseDialog.Passphrase();
-            if (passphrase == "") { return passphrase; }
+        var passphraseDialog = passphraseDialogFactory();
+        if (passphraseDialog == null) { return ""; }
 
-            Passphrases[passphraseGuid] = passphrase;
-            return passphrase;
-        }
+        passphraseDialog.ClearPassphrases();
+        passphraseDialog.SetTitle(title);
+        passphraseDialog.SetDescription(description);
+        passphraseDialog.BringToFront();
+        var passphrase = passphraseDialog.ShowDialog() != true ? "" : passphraseDialog.Passphrase();
+        if (passphrase == "") { return passphrase; }
+
+        Passphrases[passphraseGuid] = passphrase;
+        return passphrase;
     }
 }

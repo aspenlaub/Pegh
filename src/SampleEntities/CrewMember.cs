@@ -2,45 +2,45 @@ using System.ComponentModel;
 using System.Xml.Serialization;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
-namespace Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities {
-    public class CrewMember : IGuid, INotifyPropertyChanged, ISecretResult<CrewMember> {
+namespace Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities;
 
-        [XmlAttribute("guid")]
-        public string Guid { get; set; }
+public class CrewMember : IGuid, INotifyPropertyChanged, ISecretResult<CrewMember> {
 
-        [XmlAttribute("rank")]
-        public string Rank {
-            get => PrivateRank;
-            set { PrivateRank = value; OnPropertyChanged(nameof(Rank)); } }
-        private string PrivateRank;
+    [XmlAttribute("guid")]
+    public string Guid { get; set; }
 
-        [XmlAttribute("firstname")]
-        public string FirstName {
-            get => PrivateFirstName;
-            set { PrivateFirstName = value; OnPropertyChanged(nameof(FirstName)); } }
-        private string PrivateFirstName;
+    [XmlAttribute("rank")]
+    public string Rank {
+        get => PrivateRank;
+        set { PrivateRank = value; OnPropertyChanged(nameof(Rank)); } }
+    private string PrivateRank;
 
-        [XmlAttribute("surname")]
-        public string SurName {
-            get => PrivateSurName;
-            set { PrivateSurName = value; OnPropertyChanged(nameof(SurName)); } }
-        private string PrivateSurName;
+    [XmlAttribute("firstname")]
+    public string FirstName {
+        get => PrivateFirstName;
+        set { PrivateFirstName = value; OnPropertyChanged(nameof(FirstName)); } }
+    private string PrivateFirstName;
 
-        public CrewMember() {
-            Guid = System.Guid.NewGuid().ToString();
-        }
+    [XmlAttribute("surname")]
+    public string SurName {
+        get => PrivateSurName;
+        set { PrivateSurName = value; OnPropertyChanged(nameof(SurName)); } }
+    private string PrivateSurName;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+    public CrewMember() {
+        Guid = System.Guid.NewGuid().ToString();
+    }
 
-        protected void OnPropertyChanged(string propertyName) {
-            // ReSharper disable once UseNullPropagation
-            if (PropertyChanged != null) { PropertyChanged(this, new PropertyChangedEventArgs(propertyName)); }
-        }
+    public event PropertyChangedEventHandler PropertyChanged;
 
-        public CrewMember Clone() {
-            var clone = (CrewMember)MemberwiseClone();
-            clone.Guid = System.Guid.NewGuid().ToString();
-            return clone;
-        }
+    protected void OnPropertyChanged(string propertyName) {
+        // ReSharper disable once UseNullPropagation
+        if (PropertyChanged != null) { PropertyChanged(this, new PropertyChangedEventArgs(propertyName)); }
+    }
+
+    public CrewMember Clone() {
+        var clone = (CrewMember)MemberwiseClone();
+        clone.Guid = System.Guid.NewGuid().ToString();
+        return clone;
     }
 }

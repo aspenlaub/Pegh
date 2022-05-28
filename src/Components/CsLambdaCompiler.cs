@@ -6,25 +6,25 @@ using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 
-namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
-    public class CsLambdaCompiler : ICsLambdaCompiler {
-        public async Task<Func<TArgument, TResult>> CompileCsLambdaAsync<TArgument, TResult>(ICsLambda csLambda) {
-            var options = ScriptOptions.Default;
-            if (csLambda.Namespaces.Any()) {
-                options = options.AddImports(csLambda.Namespaces);
-            }
-            if (csLambda.Types.Any()) {
-                options = options.AddReferences(csLambda.Types.Select(Type2Assembly));
-            }
+namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 
-            options = options.AddReferences(typeof(TArgument).Assembly);
-            options = options.AddReferences(typeof(TResult).Assembly);
-            return await CSharpScript.EvaluateAsync<Func<TArgument, TResult>>(csLambda.LambdaExpression, options);
+public class CsLambdaCompiler : ICsLambdaCompiler {
+    public async Task<Func<TArgument, TResult>> CompileCsLambdaAsync<TArgument, TResult>(ICsLambda csLambda) {
+        var options = ScriptOptions.Default;
+        if (csLambda.Namespaces.Any()) {
+            options = options.AddImports(csLambda.Namespaces);
+        }
+        if (csLambda.Types.Any()) {
+            options = options.AddReferences(csLambda.Types.Select(Type2Assembly));
         }
 
-        public static Assembly Type2Assembly(string type) {
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            return assemblies.FirstOrDefault(a => a.GetType(type, false) != null);
-        }
+        options = options.AddReferences(typeof(TArgument).Assembly);
+        options = options.AddReferences(typeof(TResult).Assembly);
+        return await CSharpScript.EvaluateAsync<Func<TArgument, TResult>>(csLambda.LambdaExpression, options);
+    }
+
+    public static Assembly Type2Assembly(string type) {
+        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        return assemblies.FirstOrDefault(a => a.GetType(type, false) != null);
     }
 }

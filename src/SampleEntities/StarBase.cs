@@ -2,43 +2,43 @@ using System.ComponentModel;
 using System.Xml.Serialization;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
-namespace Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities {
-    public class StarBase : IGuid, INotifyPropertyChanged {
+namespace Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities;
 
-        [XmlAttribute("guid")]
-        public string Guid { get; set; }
+public class StarBase : IGuid, INotifyPropertyChanged {
 
-        [XmlAttribute("name")]
-        public string Name {
-            get => PrivateName;
-            set { PrivateName = value; OnPropertyChanged(nameof(Name)); } }
-        private string PrivateName;
+    [XmlAttribute("guid")]
+    public string Guid { get; set; }
 
-        [XmlElement("CrewMember")]
-        public CrewMembers Personnel {
-            get => PrivatePersonnel;
-            set { PrivatePersonnel = value; OnPropertyChanged(nameof(Personnel)); }
-        }
-        private CrewMembers PrivatePersonnel;
+    [XmlAttribute("name")]
+    public string Name {
+        get => PrivateName;
+        set { PrivateName = value; OnPropertyChanged(nameof(Name)); } }
+    private string PrivateName;
 
-        [XmlElement("StarShip")]
-        public StarShips DockedShips {
-            get => PrivateDockedShips;
-            set { PrivateDockedShips = value; OnPropertyChanged(nameof(DockedShips)); }
-        }
-        private StarShips PrivateDockedShips;
+    [XmlElement("CrewMember")]
+    public CrewMembers Personnel {
+        get => PrivatePersonnel;
+        set { PrivatePersonnel = value; OnPropertyChanged(nameof(Personnel)); }
+    }
+    private CrewMembers PrivatePersonnel;
 
-        public StarBase() {
-            Guid = System.Guid.NewGuid().ToString();
-            PrivatePersonnel = new CrewMembers();
-            PrivateDockedShips = new StarShips();
-        }
+    [XmlElement("StarShip")]
+    public StarShips DockedShips {
+        get => PrivateDockedShips;
+        set { PrivateDockedShips = value; OnPropertyChanged(nameof(DockedShips)); }
+    }
+    private StarShips PrivateDockedShips;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+    public StarBase() {
+        Guid = System.Guid.NewGuid().ToString();
+        PrivatePersonnel = new CrewMembers();
+        PrivateDockedShips = new StarShips();
+    }
 
-        protected void OnPropertyChanged(string propertyName) {
-            // ReSharper disable once UseNullPropagation
-            if (PropertyChanged != null) { PropertyChanged(this, new PropertyChangedEventArgs(propertyName)); }
-        }
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected void OnPropertyChanged(string propertyName) {
+        // ReSharper disable once UseNullPropagation
+        if (PropertyChanged != null) { PropertyChanged(this, new PropertyChangedEventArgs(propertyName)); }
     }
 }

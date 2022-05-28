@@ -1,17 +1,17 @@
 ﻿using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
-namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities {
-    public class SecretStringDecrypterFunction : ISecret<CsLambda> {
-        private static CsLambda DefaultCsLambda;
-        public CsLambda DefaultValue => DefaultCsLambda ??= CreateDefaultCsLambda();
+namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 
-        private static CsLambda CreateDefaultCsLambda() {
-            var lambda = new CsLambda {
-                LambdaExpression = "s => s.Substring(0, s.Length - 25)"
-            };
-            return lambda;
-        }
+public class SecretStringDecrypterFunction : ISecret<CsLambda> {
+    private static CsLambda DefaultCsLambda;
+    public CsLambda DefaultValue => DefaultCsLambda ??= CreateDefaultCsLambda();
 
-        public string Guid => "BE7B608B-BE7BAB2C07AA-4241-B765-49B3";
+    private static CsLambda CreateDefaultCsLambda() {
+        var lambda = new CsLambda {
+            LambdaExpression = "s => s.Substring(0, s.Length - 25)"
+        };
+        return lambda;
     }
+
+    public string Guid => "BE7B608B-BE7BAB2C07AA-4241-B765-49B3";
 }

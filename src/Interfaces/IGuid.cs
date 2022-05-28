@@ -1,5 +1,5 @@
-﻿namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces {
-    public interface IGuid {
-        string Guid { get; }
-    }
+﻿namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
+
+public interface IGuid {
+    string Guid { get; }
 }

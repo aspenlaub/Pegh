@@ -4,42 +4,42 @@ using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
-namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
-    public class StringCrypter : IStringCrypter {
-        protected Func<string, string> SecretEncrypterFunction;
-        protected Func<string, string> SecretDecrypterFunction;
+namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 
-        protected readonly ISecretRepository SecretRepository;
+public class StringCrypter : IStringCrypter {
+    protected Func<string, string> SecretEncrypterFunction;
+    protected Func<string, string> SecretDecrypterFunction;
 
-        public StringCrypter(ISecretRepository secretRepository) {
-            SecretRepository = secretRepository;
-        }
+    protected readonly ISecretRepository SecretRepository;
 
-        protected async Task LoadSecretsIfNecessaryAsync() {
-            if (SecretEncrypterFunction != null) { return; }
+    public StringCrypter(ISecretRepository secretRepository) {
+        SecretRepository = secretRepository;
+    }
 
-            var encrypterSecret = new SecretStringEncrypterFunction();
-            var errorsAndInfos = new ErrorsAndInfos();
-            var csLambda = await SecretRepository.GetAsync(encrypterSecret, errorsAndInfos);
-            SecretEncrypterFunction = await SecretRepository.CompileCsLambdaAsync<string, string>(csLambda);
+    protected async Task LoadSecretsIfNecessaryAsync() {
+        if (SecretEncrypterFunction != null) { return; }
 
-            var decrypterSecret = new SecretStringDecrypterFunction();
-            csLambda = await SecretRepository.GetAsync(decrypterSecret, errorsAndInfos);
-            SecretDecrypterFunction = await SecretRepository.CompileCsLambdaAsync<string, string>(csLambda);
+        var encrypterSecret = new SecretStringEncrypterFunction();
+        var errorsAndInfos = new ErrorsAndInfos();
+        var csLambda = await SecretRepository.GetAsync(encrypterSecret, errorsAndInfos);
+        SecretEncrypterFunction = await SecretRepository.CompileCsLambdaAsync<string, string>(csLambda);
 
-            if (!errorsAndInfos.AnyErrors()) { return; }
+        var decrypterSecret = new SecretStringDecrypterFunction();
+        csLambda = await SecretRepository.GetAsync(decrypterSecret, errorsAndInfos);
+        SecretDecrypterFunction = await SecretRepository.CompileCsLambdaAsync<string, string>(csLambda);
 
-            throw new Exception(errorsAndInfos.ErrorsToString());
-        }
+        if (!errorsAndInfos.AnyErrors()) { return; }
 
-        public async Task<string> EncryptAsync(string s) {
-            await LoadSecretsIfNecessaryAsync();
-            return SecretEncrypterFunction(s);
-        }
+        throw new Exception(errorsAndInfos.ErrorsToString());
+    }
 
-        public async Task<string> DecryptAsync(string s) {
-            await LoadSecretsIfNecessaryAsync();
-            return SecretDecrypterFunction(s);
-        }
+    public async Task<string> EncryptAsync(string s) {
+        await LoadSecretsIfNecessaryAsync();
+        return SecretEncrypterFunction(s);
+    }
+
+    public async Task<string> DecryptAsync(string s) {
+        await LoadSecretsIfNecessaryAsync();
+        return SecretDecrypterFunction(s);
     }
 }

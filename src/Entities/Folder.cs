@@ -1,20 +1,20 @@
 ﻿using System;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
-namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities {
-    public class Folder : IFolder {
-        public string FullName { get; }
+namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 
-        public Folder(string fullName) {
-            if (fullName != "" && fullName[^1] == '\\') {
-                fullName = fullName[..^1];
-            }
+public class Folder : IFolder {
+    public string FullName { get; }
 
-            FullName = fullName;
+    public Folder(string fullName) {
+        if (fullName != "" && fullName[^1] == '\\') {
+            fullName = fullName[..^1];
         }
 
-        public override string ToString() {
-            throw new NotSupportedException();
-        }
+        FullName = fullName;
+    }
+
+    public override string ToString() {
+        throw new NotSupportedException();
     }
 }

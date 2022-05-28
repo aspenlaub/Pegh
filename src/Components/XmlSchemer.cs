@@ -6,85 +6,85 @@ using System.Xml.Schema;
 using System.Xml.Serialization;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
-namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components {
-    public class XmlSchemer : IXmlSchemer {
-        public string Create(Type t) {
-            string xsd;
-            using (var stream = new MemoryStream()) {
-                using (var writer = new StreamWriter(stream, Encoding.UTF8)) {
-                    var schemas = new XmlSchemas();
-                    var exporter = new XmlSchemaExporter(schemas);
-                    var mapping = new XmlReflectionImporter().ImportTypeMapping(t);
-                    exporter.ExportTypeMapping(mapping);
-                    foreach (XmlSchema schema in schemas) {
-                        schema.Write(writer);
-                    }
+namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 
-                    writer.Flush();
-                    xsd = Encoding.UTF8.GetString(stream.ToArray());
+public class XmlSchemer : IXmlSchemer {
+    public string Create(Type t) {
+        string xsd;
+        using (var stream = new MemoryStream()) {
+            using (var writer = new StreamWriter(stream, Encoding.UTF8)) {
+                var schemas = new XmlSchemas();
+                var exporter = new XmlSchemaExporter(schemas);
+                var mapping = new XmlReflectionImporter().ImportTypeMapping(t);
+                exporter.ExportTypeMapping(mapping);
+                foreach (XmlSchema schema in schemas) {
+                    schema.Write(writer);
                 }
-            }
 
-            xsd = ManipulateXsdForScriptContent(xsd);
-            return xsd;
+                writer.Flush();
+                xsd = Encoding.UTF8.GetString(stream.ToArray());
+            }
         }
 
-        private static string ManipulateXsdForScriptContent(string xsd) {
-            const string tag = "name=\"script\"";
-            const string startTag = "<xs:complexType mixed=\"true\">";
-            const string endTag = "</xs:complexType>";
+        xsd = ManipulateXsdForScriptContent(xsd);
+        return xsd;
+    }
 
-            var tagPos = xsd.IndexOf(tag, StringComparison.Ordinal);
-            var startPos = tagPos > 0 ? xsd[tagPos..].IndexOf(startTag, StringComparison.Ordinal) : 0;
-            var endPos = startPos > 0 ? xsd[(tagPos + startPos)..].IndexOf(endTag, StringComparison.Ordinal) : 0;
+    private static string ManipulateXsdForScriptContent(string xsd) {
+        const string tag = "name=\"script\"";
+        const string startTag = "<xs:complexType mixed=\"true\">";
+        const string endTag = "</xs:complexType>";
 
-            if (tagPos <= 0 || startPos <= 0 || endPos <= 0) { return xsd; }
+        var tagPos = xsd.IndexOf(tag, StringComparison.Ordinal);
+        var startPos = tagPos > 0 ? xsd[tagPos..].IndexOf(startTag, StringComparison.Ordinal) : 0;
+        var endPos = startPos > 0 ? xsd[(tagPos + startPos)..].IndexOf(endTag, StringComparison.Ordinal) : 0;
 
-            xsd = xsd[..(tagPos + startPos)] + xsd[(tagPos + startPos + endPos + endTag.Length)..];
-            return xsd;
+        if (tagPos <= 0 || startPos <= 0 || endPos <= 0) { return xsd; }
+
+        xsd = xsd[..(tagPos + startPos)] + xsd[(tagPos + startPos + endPos + endTag.Length)..];
+        return xsd;
+    }
+
+    public bool Valid(string secretGuid, string xml, Type t, IErrorsAndInfos errorsAndInfos) {
+        return Valid(secretGuid, xml, Create(t), errorsAndInfos);
+    }
+
+    internal static bool Valid(string secretGuid, string xml, string xsd, IErrorsAndInfos errorsAndInfos) {
+        if (xml == "") {
+            return false;
         }
 
-        public bool Valid(string secretGuid, string xml, Type t, IErrorsAndInfos errorsAndInfos) {
-            return Valid(secretGuid, xml, Create(t), errorsAndInfos);
+        var schemaSet = new XmlSchemaSet();
+        using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(xsd))) {
+            schemaSet.Add("http://www.aspenlaub.net", XmlReader.Create(stream));
         }
 
-        internal static bool Valid(string secretGuid, string xml, string xsd, IErrorsAndInfos errorsAndInfos) {
-            if (xml == "") {
-                return false;
-            }
-
-            var schemaSet = new XmlSchemaSet();
-            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(xsd))) {
-                schemaSet.Add("http://www.aspenlaub.net", XmlReader.Create(stream));
-            }
-
-            XmlSchema compiledXmlSchema = null;
-            foreach (XmlSchema schema in schemaSet.Schemas()) {
-                compiledXmlSchema = schema;
-            }
-
-            var schemaIsValid = compiledXmlSchema != null;
-
-            var settings = new XmlReaderSettings();
-            if (schemaIsValid) {
-                settings.Schemas.Add(compiledXmlSchema);
-            } else {
-                errorsAndInfos.Errors.Add(string.Format(Properties.Resources.InvalidSchema, $"{secretGuid}.xsd"));
-            }
-            settings.ValidationEventHandler += (_, args) => {
-                errorsAndInfos.Errors.Add(string.Format(Properties.Resources.InvalidXml, $"{secretGuid}.xml", $"{secretGuid}.xsd", args.Message));
-                schemaIsValid = false;
-            };
-            settings.ValidationType = ValidationType.Schema;
-
-            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml))) {
-                var reader = XmlReader.Create(stream, settings);
-                while (reader.Read()) {}
-
-                reader.Close();
-            }
-
-            return schemaIsValid;
+        XmlSchema compiledXmlSchema = null;
+        foreach (XmlSchema schema in schemaSet.Schemas()) {
+            compiledXmlSchema = schema;
         }
+
+        var schemaIsValid = compiledXmlSchema != null;
+
+        var settings = new XmlReaderSettings();
+        if (schemaIsValid) {
+            settings.Schemas.Add(compiledXmlSchema);
+        } else {
+            errorsAndInfos.Errors.Add(string.Format(Properties.Resources.InvalidSchema, $"{secretGuid}.xsd"));
+        }
+        settings.ValidationEventHandler += (_, args) => {
+            errorsAndInfos.Errors.Add(string.Format(Properties.Resources.InvalidXml, $"{secretGuid}.xml", $"{secretGuid}.xsd", args.Message));
+            schemaIsValid = false;
+        };
+        settings.ValidationType = ValidationType.Schema;
+
+        using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml))) {
+            var reader = XmlReader.Create(stream, settings);
+            while (reader.Read()) {}
+
+            reader.Close();
+        }
+
+        return schemaIsValid;
     }
 }

@@ -2,22 +2,22 @@
 using System.Linq;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
-namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities {
-    public class ErrorsAndInfos : IErrorsAndInfos {
-        public IList<string> Errors { get; }
-        public IList<string> Infos { get; }
+namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 
-        public ErrorsAndInfos() {
-            Errors = new List<string>();
-            Infos = new List<string>();
-        }
+public class ErrorsAndInfos : IErrorsAndInfos {
+    public IList<string> Errors { get; }
+    public IList<string> Infos { get; }
 
-        public bool AnyErrors() {
-            return Errors.Any();
-        }
+    public ErrorsAndInfos() {
+        Errors = new List<string>();
+        Infos = new List<string>();
+    }
 
-        public bool AnyInfos() {
-            return Infos.Any();
-        }
+    public bool AnyErrors() {
+        return Errors.Any();
+    }
+
+    public bool AnyInfos() {
+        return Infos.Any();
     }
 }

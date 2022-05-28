@@ -2,37 +2,37 @@ using System.ComponentModel;
 using System.Xml.Serialization;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
-namespace Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities {
-    public class StarFleet : IGuid, INotifyPropertyChanged {
+namespace Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities;
 
-        [XmlAttribute("guid")]
-        public string Guid { get; set; }
+public class StarFleet : IGuid, INotifyPropertyChanged {
 
-        [XmlElement("StarShip")]
-        public StarShips StarShips {
-            get => PrivateStarShips;
-            set { PrivateStarShips = value; OnPropertyChanged(nameof(StarShips)); }
-        }
-        private StarShips PrivateStarShips;
+    [XmlAttribute("guid")]
+    public string Guid { get; set; }
 
-        [XmlElement("StarBase")]
-        public StarBases StarBases {
-            get => PrivateStarBases;
-            set { PrivateStarBases = value; OnPropertyChanged(nameof(StarBases)); }
-        }
-        private StarBases PrivateStarBases;
+    [XmlElement("StarShip")]
+    public StarShips StarShips {
+        get => PrivateStarShips;
+        set { PrivateStarShips = value; OnPropertyChanged(nameof(StarShips)); }
+    }
+    private StarShips PrivateStarShips;
 
-        public StarFleet() {
-            Guid = System.Guid.NewGuid().ToString();
-            PrivateStarShips = new StarShips();
-            PrivateStarBases = new StarBases();
-        }
+    [XmlElement("StarBase")]
+    public StarBases StarBases {
+        get => PrivateStarBases;
+        set { PrivateStarBases = value; OnPropertyChanged(nameof(StarBases)); }
+    }
+    private StarBases PrivateStarBases;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+    public StarFleet() {
+        Guid = System.Guid.NewGuid().ToString();
+        PrivateStarShips = new StarShips();
+        PrivateStarBases = new StarBases();
+    }
 
-        protected void OnPropertyChanged(string propertyName) {
-            // ReSharper disable once UseNullPropagation
-            if (PropertyChanged != null) { PropertyChanged(this, new PropertyChangedEventArgs(propertyName)); }
-        }
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected void OnPropertyChanged(string propertyName) {
+        // ReSharper disable once UseNullPropagation
+        if (PropertyChanged != null) { PropertyChanged(this, new PropertyChangedEventArgs(propertyName)); }
     }
 }

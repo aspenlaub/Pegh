@@ -1,10 +1,10 @@
 ﻿using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
-namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
-    public class SecretListOfElements : ISecret<ListOfElements> {
-        private ListOfElements DefaultListOfElements;
-        public ListOfElements DefaultValue => DefaultListOfElements ??= new ListOfElements();
+namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components;
 
-        public string Guid => "DC6A816E-9C63-510B-4B24-3265C9B03FCF";
-    }
+public class SecretListOfElements : ISecret<ListOfElements> {
+    private ListOfElements DefaultListOfElements;
+    public ListOfElements DefaultValue => DefaultListOfElements ??= new ListOfElements();
+
+    public string Guid => "DC6A816E-9C63-510B-4B24-3265C9B03FCF";
 }
