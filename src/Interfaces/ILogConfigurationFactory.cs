@@ -1,6 +1,7 @@
-﻿namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
+﻿// ReSharper disable UnusedMember.Global
+namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 public interface ILogConfigurationFactory {
-    // ReSharper disable once UnusedMember.Global
-    ILogConfiguration Create(string applicationName, bool detailedLogging);
+    ILogConfiguration Create();
+    ILogConfigurationFactory CreateOtherFactory(string applicationName, bool detailedLogging);
 }

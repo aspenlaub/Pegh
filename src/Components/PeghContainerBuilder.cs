@@ -9,7 +9,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 
 public static class PeghContainerBuilder {
     private static readonly ISimpleLogger SimpleLogger = new SimpleLogger(new SimpleLogFlusher());
-    private static readonly ILogConfigurationFactory LogConfigurationFactory = new LogConfigurationFactory();
+    private static readonly ILogConfigurationFactory LogConfigurationFactory = new LogConfigurationFactory("Pegh", true);
 
     public static ContainerBuilder UsePegh(this ContainerBuilder builder, ICsArgumentPrompter csArgumentPrompter) {
         builder.RegisterInstance(csArgumentPrompter).As<ICsArgumentPrompter>();
