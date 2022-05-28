@@ -48,7 +48,7 @@ public class SimpleLoggerTest {
 
     [TestMethod]
     public void CanResolveInstance() {
-        var container = new ContainerBuilder().UsePegh(new DummyCsArgumentPrompter()).Build();
+        var container = new ContainerBuilder().UsePegh("Pegh", new DummyCsArgumentPrompter()).Build();
         var logger = container.Resolve<ILogger>();
         Assert.IsNotNull(logger);
         Assert.IsTrue(logger is SimpleLogger);

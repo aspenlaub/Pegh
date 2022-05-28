@@ -9,9 +9,9 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 
 public static class PeghContainerBuilder {
     private static readonly ISimpleLogger SimpleLogger = new SimpleLogger(new SimpleLogFlusher());
-    private static readonly ILogConfigurationFactory LogConfigurationFactory = new LogConfigurationFactory();
+    private static ILogConfigurationFactory LogConfigurationFactory;
 
-    public static ContainerBuilder UsePegh(this ContainerBuilder builder, ICsArgumentPrompter csArgumentPrompter) {
+    public static ContainerBuilder UsePegh(this ContainerBuilder builder, string applicationName, ICsArgumentPrompter csArgumentPrompter) {
         builder.RegisterInstance(csArgumentPrompter).As<ICsArgumentPrompter>();
         builder.RegisterType<CsLambdaCompiler>().As<ICsLambdaCompiler>();
         builder.RegisterType<Disguiser>().As<IDisguiser>();
@@ -27,12 +27,13 @@ public static class PeghContainerBuilder {
         builder.RegisterType<XmlSchemer>().As<IXmlSchemer>();
         builder.RegisterInstance(SimpleLogger);
         builder.RegisterInstance<ILogger>(SimpleLogger);
+        LogConfigurationFactory ??= new LogConfigurationFactory(applicationName);
         builder.RegisterInstance(LogConfigurationFactory);
 
         return builder;
     }
 
-    public static IServiceCollection UsePegh(this IServiceCollection services, ICsArgumentPrompter csArgumentPrompter) {
+    public static IServiceCollection UsePegh(this IServiceCollection services, string applicationName, ICsArgumentPrompter csArgumentPrompter) {
         services.AddSingleton(csArgumentPrompter);
         services.AddTransient<ICsLambdaCompiler, CsLambdaCompiler>();
         services.AddTransient<IDisguiser, Disguiser>();
@@ -48,6 +49,7 @@ public static class PeghContainerBuilder {
         services.AddTransient<IXmlSchemer, XmlSchemer>();
         services.AddSingleton(SimpleLogger);
         services.AddSingleton<ILogger>(SimpleLogger);
+        LogConfigurationFactory ??= new LogConfigurationFactory(applicationName);
         services.AddSingleton(LogConfigurationFactory);
 
         return services;

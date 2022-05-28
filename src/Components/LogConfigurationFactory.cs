@@ -7,13 +7,17 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 
 // ReSharper disable once UnusedMember.Global
 public class LogConfigurationFactory : ILogConfigurationFactory {
-    private string ApplicationName = "";
+    private readonly string ApplicationName;
     private bool DetailedLogging = true;
 
-    public ILogConfiguration Create() {
-        if (string.IsNullOrEmpty(ApplicationName)) {
-            throw new Exception($"{nameof(LogConfigurationFactory)} was not initialized");
+    internal LogConfigurationFactory(string applicationName) {
+        if (string.IsNullOrEmpty(applicationName)) {
+            throw new ArgumentNullException(nameof(applicationName));
         }
+        ApplicationName = applicationName;
+    }
+
+    public ILogConfiguration Create() {
         return new LogConfiguration {
             LogSubFolder = @"AspenlaubLogs\" + ApplicationName,
             LogId = $"{DateTime.Today:yyyy-MM-dd}-{Process.GetCurrentProcess().Id}",
@@ -21,10 +25,7 @@ public class LogConfigurationFactory : ILogConfigurationFactory {
         };
     }
 
-    public void InitializeIfNecessary(string applicationName, bool detailedLogging) {
-        if (!string.IsNullOrEmpty(ApplicationName)) { return; }
-
-        ApplicationName = applicationName;
+    public void SetDetailedLogging(bool detailedLogging) {
         DetailedLogging = detailedLogging;
     }
 }

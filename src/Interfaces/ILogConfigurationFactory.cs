@@ -3,5 +3,5 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 public interface ILogConfigurationFactory {
     ILogConfiguration Create();
-    void InitializeIfNecessary(string applicationName, bool detailedLogging);
+    void SetDetailedLogging(bool detailedLogging);
 }

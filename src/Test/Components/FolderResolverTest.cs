@@ -34,7 +34,7 @@ public class FolderResolverTest {
         var builder = new ContainerBuilder().UseForPeghTest(secretRepositoryMock.Object);
         Container = builder.Build();
 
-        builder = new ContainerBuilder().UsePegh(new DummyCsArgumentPrompter());
+        builder = new ContainerBuilder().UsePegh("Pegh", new DummyCsArgumentPrompter());
         ProductionContainer = builder.Build();
 
         Sut = Container.Resolve<IFolderResolver>();
