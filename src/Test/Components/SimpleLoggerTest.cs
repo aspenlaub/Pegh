@@ -14,19 +14,29 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components;
 [TestClass]
 public class SimpleLoggerTest {
     private const string NotAMessage = "This is not a message";
+    private const int NumberOfLogEntries = 1000;
+
+    [TestMethod, ExpectedException(typeof(Exception), "Attempt to create a log entry without a scope. Use BeginScope<>, and on the same thread")]
+    public void SimpleLogger_WithoutScope_ThrowsException() {
+        var flusher = new SimpleLogFlusher();
+        ISimpleLogger sut = new SimpleLogger(flusher);
+        sut.Log(LogLevel.Information, new EventId(0), new Dictionary<string, object>(), null, (_, _) => { return NotAMessage; });
+    }
 
     [TestMethod]
-    public void CanUseLogger() {
+    public void SimpleLogger_WithManyLogCalls_IsWorking() {
         var flusher = new SimpleLogFlusher();
         ISimpleLogger sut = new SimpleLogger(flusher);
         using (sut.BeginScope(SimpleLoggingScopeId.Create("Scope", "A"))) {
             using (sut.BeginScope(SimpleLoggingScopeId.Create("Scope", "B"))) {
-                sut.Log(LogLevel.Information, new EventId(0), new Dictionary<string, object>(), null, (_, _) => { return NotAMessage; } );
+                for (var i = 0; i < NumberOfLogEntries; i++) {
+                    sut.Log(LogLevel.Information, new EventId(0), new Dictionary<string, object>(), null, (_, _) => { return NotAMessage; });
+                }
             }
         }
 
         var logEntries = sut.FindLogEntries(_ => true);
-        Assert.AreEqual(1, logEntries.Count);
+        Assert.AreEqual(NumberOfLogEntries, logEntries.Count);
         Assert.AreEqual(LogLevel.Information, logEntries[0].LogLevel);
         Assert.AreEqual(2, logEntries[0].Stack.Count);
         Assert.AreEqual("Scope(A)", logEntries[0].Stack[0]);

@@ -20,7 +20,7 @@ public class SimpleLogFlusher : ISimpleLogFlusher {
 
         lock (LockObject) {
             var logEntries = logger.FindLogEntries(e => !e.Flushed);
-            var ids = logEntries.Select(e => e.Stack[0]).Distinct().ToList();
+            var ids = logEntries.Select(GetTopOfStack).Distinct().ToList();
             foreach (var id in ids) {
                 var fileName = folder.FullName + '\\' + id + ".log";
                 var entries = logEntries.Where(e => !e.Flushed && e.Stack[0] == id).ToList();
@@ -51,6 +51,10 @@ public class SimpleLogFlusher : ISimpleLogFlusher {
                                                     + string.Join("-", entry.Stack) + '\t'
                                                     + Enum.GetName(typeof(LogLevel), entry.LogLevel) + '\t'
                                                     + entry.Message;
+    }
+
+    private static string GetTopOfStack(ISimpleLogEntry logEntry) {
+        return logEntry.Stack[0];
     }
 
     internal static void ResetCleanupTime() {

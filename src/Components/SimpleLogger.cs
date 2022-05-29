@@ -30,6 +30,9 @@ public class SimpleLogger : ISimpleLogger {
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter) {
         if (!Enabled) { return; }
 
+        if (Stack.Count == 0) {
+            throw new Exception(Properties.Resources.AttemptToLogWithoutScope);
+        }
         lock (LockObject) {
             LogEntries.Add(SimpleLogEntry.Create(logLevel, Stack, formatter(state, exception)));
         }

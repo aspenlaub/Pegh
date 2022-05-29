@@ -120,6 +120,9 @@
   <data name="AddedPropertyNotFoundInLoadedSecret" xml:space="preserve">
     <value>A secret has been enhanced, '{0}' is not found in "{1}", copy it from "{2}" and adjust it</value>
   </data>
+  <data name="AttemptToLogWithoutScope" xml:space="preserve">
+    <value>Attempt to create a log entry without a scope. Use BeginScope&lt;&gt;, and on the same thread</value>
+  </data>
   <data name="FailedToCopy" xml:space="preserve">
     <value>Failed to copy "{0}" to "{1}"</value>
   </data>
