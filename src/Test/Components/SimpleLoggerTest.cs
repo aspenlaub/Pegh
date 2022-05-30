@@ -25,18 +25,21 @@ public class SimpleLoggerTest {
     [TestInitialize]
     public void Initialize() {
         Flusher = new SimpleLogFlusher();
-        Sut = new SimpleLogger(Flusher, MethodNamesFromStackFramesExtractor);
+    }
+
+    private ILogConfiguration CreateLogConfiguration(string pseudoApplicationName) {
+        return new LogConfiguration(pseudoApplicationName);
     }
 
     [TestMethod, ExpectedException(typeof(Exception), "Attempt to create a log entry without a scope. Use BeginScope<>, and on the same thread")]
     public void SimpleLogger_WithoutScope_ThrowsException() {
-        Sut.LogSubFolder = $"AspenlaubLogs\\{nameof(SimpleLogger_WithoutScope_ThrowsException)}";
+        Sut = new SimpleLogger(CreateLogConfiguration(nameof(SimpleLogger_WithoutScope_ThrowsException)), Flusher, MethodNamesFromStackFramesExtractor);
         Sut.Log(LogLevel.Information, new EventId(0), new Dictionary<string, object>(), null, (_, _) => { return NotAMessage; });
     }
 
     [TestMethod]
     public void SimpleLogger_WithManyLogCalls_IsWorking() {
-        Sut.LogSubFolder = $"AspenlaubLogs\\{nameof(SimpleLogger_WithManyLogCalls_IsWorking)}";
+        Sut = new SimpleLogger(CreateLogConfiguration(nameof(SimpleLogger_WithManyLogCalls_IsWorking)), Flusher, MethodNamesFromStackFramesExtractor);
         using (Sut.BeginScope(SimpleLoggingScopeId.Create("Scope", "A"))) {
             using (Sut.BeginScope(SimpleLoggingScopeId.Create("Scope", "B"))) {
                 for (var i = 0; i < NumberOfLogEntries; i++) {
@@ -79,7 +82,7 @@ public class SimpleLoggerTest {
 
     [TestMethod]
     public async Task SimpleLogger_WithParallelTasks_IsWorking() {
-        Sut.LogSubFolder = $"AspenlaubLogs\\{nameof(SimpleLogger_WithParallelTasks_IsWorking)}";
+        Sut = new SimpleLogger(CreateLogConfiguration(nameof(SimpleLogger_WithParallelTasks_IsWorking)), Flusher, MethodNamesFromStackFramesExtractor);
         var tasks = new List<Task> {
             new ImLogging(TimeSpan.FromMilliseconds(77), DateTime.Now.AddSeconds(4), Sut).ImLoggingWorkAsync(),
             new ImLoggingToo(TimeSpan.FromMilliseconds(222), DateTime.Now.AddSeconds(7), Sut).ImLoggingWorkTooAsync()

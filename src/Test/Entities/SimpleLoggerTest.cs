@@ -1,4 +1,5 @@
 ﻿using Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -8,7 +9,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Entities;
 public class SimpleLoggerTest {
     [TestMethod]
     public void CanSetLogSubFolder() {
-        ISimpleLogger sut = new SimpleLogger(new SimpleLogFlusher(), new MethodNamesFromStackFramesExtractor());
-        sut.LogSubFolder = @"AspenlaubLogs\" + nameof(SimpleLoggerTest);
+        ISimpleLogger sut = new SimpleLogger(new LogConfiguration(nameof(CanSetLogSubFolder)), new SimpleLogFlusher(), new MethodNamesFromStackFramesExtractor());
+        Assert.AreEqual(@"AspenlaubLogs\" + nameof(CanSetLogSubFolder), sut.LogSubFolder);
     }
 }

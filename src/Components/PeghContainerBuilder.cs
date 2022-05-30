@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 
 public static class PeghContainerBuilder {
-    private static readonly ISimpleLogger SimpleLogger = new SimpleLogger(new SimpleLogFlusher(), new MethodNamesFromStackFramesExtractor());
+    private static ISimpleLogger SimpleLogger;
     private static ILogConfiguration LogConfiguration;
 
     public static ContainerBuilder UsePegh(this ContainerBuilder builder, string applicationName, ICsArgumentPrompter csArgumentPrompter) {
@@ -27,10 +27,11 @@ public static class PeghContainerBuilder {
         builder.RegisterType<XmlDeserializer>().As<IXmlDeserializer>();
         builder.RegisterType<XmlSerializer>().As<IXmlSerializer>();
         builder.RegisterType<XmlSchemer>().As<IXmlSchemer>();
-        builder.RegisterInstance(SimpleLogger);
-        builder.RegisterInstance<ILogger>(SimpleLogger);
         LogConfiguration ??= new LogConfiguration(applicationName);
         builder.RegisterInstance(LogConfiguration);
+        SimpleLogger ??= new SimpleLogger(LogConfiguration, new SimpleLogFlusher(), new MethodNamesFromStackFramesExtractor());
+        builder.RegisterInstance(SimpleLogger);
+        builder.RegisterInstance<ILogger>(SimpleLogger);
 
         return builder;
     }
@@ -50,10 +51,9 @@ public static class PeghContainerBuilder {
         services.AddTransient<IXmlDeserializer, XmlDeserializer>();
         services.AddTransient<IXmlSerializer, XmlSerializer>();
         services.AddTransient<IXmlSchemer, XmlSchemer>();
-        services.AddSingleton(SimpleLogger);
-        services.AddSingleton<ILogger>(SimpleLogger);
         LogConfiguration ??= new LogConfiguration(applicationName);
         services.AddSingleton(LogConfiguration);
+        SimpleLogger ??= new SimpleLogger(LogConfiguration, new SimpleLogFlusher(), new MethodNamesFromStackFramesExtractor());
 
         return services;
     }

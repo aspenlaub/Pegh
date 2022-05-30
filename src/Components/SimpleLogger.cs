@@ -20,11 +20,14 @@ public class SimpleLogger : ISimpleLogger {
 
     private readonly IDictionary<string, string> ScopeToCreatorMethodMapping;
 
-    public string LogSubFolder { get; set; } = @"AspenlaubLogs\Miscellaneous";
+    public string LogSubFolder { get; }
+    public string LogId { get; }
 
     public bool Enabled { get; }
 
-    public SimpleLogger(ISimpleLogFlusher simpleLogFlusher, IMethodNamesFromStackFramesExtractor methodNamesFromStackFramesExtractor) {
+    public SimpleLogger(ILogConfiguration logConfiguration, ISimpleLogFlusher simpleLogFlusher, IMethodNamesFromStackFramesExtractor methodNamesFromStackFramesExtractor) {
+        LogSubFolder = logConfiguration.LogSubFolder;
+        LogId = logConfiguration.LogId;
         LogEntries = new List<ISimpleLogEntry>();
         StackOfScopes = new List<string>();
         SimpleLogFlusher = simpleLogFlusher;
