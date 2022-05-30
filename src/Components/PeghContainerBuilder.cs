@@ -54,6 +54,7 @@ public static class PeghContainerBuilder {
         LogConfiguration ??= new LogConfiguration(applicationName);
         services.AddSingleton(LogConfiguration);
         SimpleLogger ??= new SimpleLogger(LogConfiguration, new SimpleLogFlusher(), new MethodNamesFromStackFramesExtractor());
+        services.AddSingleton(SimpleLogger);
 
         return services;
     }
