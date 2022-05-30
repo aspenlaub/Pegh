@@ -1,4 +1,5 @@
-﻿using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
+﻿using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -9,7 +10,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 
 public static class PeghContainerBuilder {
     private static readonly ISimpleLogger SimpleLogger = new SimpleLogger(new SimpleLogFlusher(), new MethodNamesFromStackFramesExtractor());
-    private static ILogConfigurationFactory LogConfigurationFactory;
+    private static ILogConfiguration LogConfiguration;
 
     public static ContainerBuilder UsePegh(this ContainerBuilder builder, string applicationName, ICsArgumentPrompter csArgumentPrompter) {
         builder.RegisterInstance(csArgumentPrompter).As<ICsArgumentPrompter>();
@@ -28,8 +29,8 @@ public static class PeghContainerBuilder {
         builder.RegisterType<XmlSchemer>().As<IXmlSchemer>();
         builder.RegisterInstance(SimpleLogger);
         builder.RegisterInstance<ILogger>(SimpleLogger);
-        LogConfigurationFactory ??= new LogConfigurationFactory(applicationName);
-        builder.RegisterInstance(LogConfigurationFactory);
+        LogConfiguration ??= new LogConfiguration(applicationName);
+        builder.RegisterInstance(LogConfiguration);
 
         return builder;
     }
@@ -51,8 +52,8 @@ public static class PeghContainerBuilder {
         services.AddTransient<IXmlSchemer, XmlSchemer>();
         services.AddSingleton(SimpleLogger);
         services.AddSingleton<ILogger>(SimpleLogger);
-        LogConfigurationFactory ??= new LogConfigurationFactory(applicationName);
-        services.AddSingleton(LogConfigurationFactory);
+        LogConfiguration ??= new LogConfiguration(applicationName);
+        services.AddSingleton(LogConfiguration);
 
         return services;
     }

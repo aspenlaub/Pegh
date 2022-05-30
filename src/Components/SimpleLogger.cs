@@ -53,7 +53,7 @@ public class SimpleLogger : ISimpleLogger {
         SimpleLogFlusher.Flush(this, LogSubFolder);
     }
 
-    private IList<string> ReduceStackAccordingToCallStack(IList<string> stackOfScopes) {
+    private IList<string> ReduceStackAccordingToCallStack(IEnumerable<string> stackOfScopes) {
         var callStackMethodNames = MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames();
         return stackOfScopes
                .Where(x => ScopeToCreatorMethodMapping.ContainsKey(x) && callStackMethodNames.Contains(ScopeToCreatorMethodMapping[x]))
