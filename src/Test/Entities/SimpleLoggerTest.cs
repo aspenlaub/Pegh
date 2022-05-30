@@ -8,7 +8,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Entities;
 public class SimpleLoggerTest {
     [TestMethod]
     public void CanSetLogSubFolder() {
-        ISimpleLogger sut = new SimpleLogger(new SimpleLogFlusher());
+        ISimpleLogger sut = new SimpleLogger(new SimpleLogFlusher(), new MethodNamesFromStackFramesExtractor());
         sut.LogSubFolder = @"AspenlaubLogs\" + nameof(SimpleLoggerTest);
     }
 }

@@ -79,6 +79,15 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Call stack is too small to extract a creator method.
+        /// </summary>
+        internal static string CallStackTooSmallToFindCreatorMethodName {
+            get {
+                return ResourceManager.GetString("CallStackTooSmallToFindCreatorMethodName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to copy &quot;{0}&quot; to &quot;{1}&quot;.
         /// </summary>
         internal static string FailedToCopy {
@@ -138,6 +147,15 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Properties {
         internal static string PleaseLoadSecretSampleAdjustAndThenSaveAs {
             get {
                 return ResourceManager.GetString("PleaseLoadSecretSampleAdjustAndThenSaveAs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A scope exists, but it has not been created by the methods in the call stack.
+        /// </summary>
+        internal static string ScopeExistsButOutsideCallStack {
+            get {
+                return ResourceManager.GetString("ScopeExistsButOutsideCallStack", resourceCulture);
             }
         }
     }

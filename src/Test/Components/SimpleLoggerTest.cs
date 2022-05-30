@@ -17,28 +17,35 @@ public class SimpleLoggerTest {
     private const string NotAMessage = "This is not a message";
     private const int NumberOfLogEntries = 1000;
 
+    private readonly IMethodNamesFromStackFramesExtractor MethodNamesFromStackFramesExtractor = new MethodNamesFromStackFramesExtractor();
+
+    private SimpleLogFlusher Flusher;
+    private SimpleLogger Sut;
+
+    [TestInitialize]
+    public void Initialize() {
+        Flusher = new SimpleLogFlusher();
+        Sut = new SimpleLogger(Flusher, MethodNamesFromStackFramesExtractor);
+    }
+
     [TestMethod, ExpectedException(typeof(Exception), "Attempt to create a log entry without a scope. Use BeginScope<>, and on the same thread")]
     public void SimpleLogger_WithoutScope_ThrowsException() {
-        var flusher = new SimpleLogFlusher();
-        ISimpleLogger sut = new SimpleLogger(flusher);
-        sut.LogSubFolder = $"AspenlaubLogs\\{nameof(SimpleLogger_WithoutScope_ThrowsException)}";
-        sut.Log(LogLevel.Information, new EventId(0), new Dictionary<string, object>(), null, (_, _) => { return NotAMessage; });
+        Sut.LogSubFolder = $"AspenlaubLogs\\{nameof(SimpleLogger_WithoutScope_ThrowsException)}";
+        Sut.Log(LogLevel.Information, new EventId(0), new Dictionary<string, object>(), null, (_, _) => { return NotAMessage; });
     }
 
     [TestMethod]
     public void SimpleLogger_WithManyLogCalls_IsWorking() {
-        var flusher = new SimpleLogFlusher();
-        ISimpleLogger sut = new SimpleLogger(flusher);
-        sut.LogSubFolder = $"AspenlaubLogs\\{nameof(SimpleLogger_WithManyLogCalls_IsWorking)}";
-        using (sut.BeginScope(SimpleLoggingScopeId.Create("Scope", "A"))) {
-            using (sut.BeginScope(SimpleLoggingScopeId.Create("Scope", "B"))) {
+        Sut.LogSubFolder = $"AspenlaubLogs\\{nameof(SimpleLogger_WithManyLogCalls_IsWorking)}";
+        using (Sut.BeginScope(SimpleLoggingScopeId.Create("Scope", "A"))) {
+            using (Sut.BeginScope(SimpleLoggingScopeId.Create("Scope", "B"))) {
                 for (var i = 0; i < NumberOfLogEntries; i++) {
-                    sut.Log(LogLevel.Information, new EventId(0), new Dictionary<string, object>(), null, (_, _) => { return NotAMessage; });
+                    Sut.Log(LogLevel.Information, new EventId(0), new Dictionary<string, object>(), null, (_, _) => { return NotAMessage; });
                 }
             }
         }
 
-        var logEntries = sut.FindLogEntries(_ => true);
+        var logEntries = Sut.FindLogEntries(_ => true);
         Assert.AreEqual(NumberOfLogEntries, logEntries.Count);
         Assert.AreEqual(LogLevel.Information, logEntries[0].LogLevel);
         Assert.AreEqual(2, logEntries[0].Stack.Count);
@@ -46,7 +53,7 @@ public class SimpleLoggerTest {
         Assert.AreEqual("Scope(B)", logEntries[0].Stack[1]);
         Assert.AreEqual(NotAMessage, logEntries[0].Message);
 
-        var fileNames = flusher.FileNames;
+        var fileNames = Flusher.FileNames;
         Assert.AreEqual(1, fileNames.Count);
         var fileName = fileNames.First();
         Assert.IsTrue(File.Exists(fileName));
@@ -55,7 +62,7 @@ public class SimpleLoggerTest {
 
         File.SetLastWriteTime(fileName, DateTime.Now.AddHours(-25));
         SimpleLogFlusher.ResetCleanupTime();
-        flusher.Flush(sut, sut.LogSubFolder);
+        Flusher.Flush(Sut, Sut.LogSubFolder);
         Assert.IsFalse(File.Exists(fileName));
     }
 
@@ -72,12 +79,11 @@ public class SimpleLoggerTest {
 
     [TestMethod]
     public async Task SimpleLogger_WithParallelTasks_IsWorking() {
-        var flusher = new SimpleLogFlusher();
-        ISimpleLogger sut = new SimpleLogger(flusher);
-        sut.LogSubFolder = $"AspenlaubLogs\\{nameof(SimpleLogger_WithParallelTasks_IsWorking)}";
-        var timeSpans = new List<TimeSpan> { TimeSpan.FromMilliseconds(77), TimeSpan.FromMilliseconds(222), TimeSpan.FromMilliseconds(444) };
-        var endsOfWork = new List<DateTime> { DateTime.Now.AddSeconds(4), DateTime.Now.AddSeconds(2.4), DateTime.Now.AddSeconds(7) };
-        var tasks = new List<Task>(timeSpans.Select((t, i) => new ImLogging(t, endsOfWork[i], sut).Work()));
+        Sut.LogSubFolder = $"AspenlaubLogs\\{nameof(SimpleLogger_WithParallelTasks_IsWorking)}";
+        var tasks = new List<Task> {
+            new ImLogging(TimeSpan.FromMilliseconds(77), DateTime.Now.AddSeconds(4), Sut).ImLoggingWorkAsync(),
+            new ImLoggingToo(TimeSpan.FromMilliseconds(222), DateTime.Now.AddSeconds(7), Sut).ImLoggingWorkTooAsync()
+        };
         await Task.WhenAll(tasks);
     }
 }

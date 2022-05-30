@@ -123,6 +123,9 @@
   <data name="AttemptToLogWithoutScope" xml:space="preserve">
     <value>Attempt to create a log entry without a scope. Use BeginScope&lt;&gt;, and on the same thread</value>
   </data>
+  <data name="CallStackTooSmallToFindCreatorMethodName" xml:space="preserve">
+    <value>Call stack is too small to extract a creator method</value>
+  </data>
   <data name="FailedToCopy" xml:space="preserve">
     <value>Failed to copy "{0}" to "{1}"</value>
   </data>
@@ -143,5 +146,8 @@
   </data>
   <data name="PleaseLoadSecretSampleAdjustAndThenSaveAs" xml:space="preserve">
     <value>A secret has not been defined. Please load sample "{0}", adjust and then save as "{1}"</value>
+  </data>
+  <data name="ScopeExistsButOutsideCallStack" xml:space="preserve">
+    <value>A scope exists, but it has not been created by the methods in the call stack</value>
   </data>
 </root>

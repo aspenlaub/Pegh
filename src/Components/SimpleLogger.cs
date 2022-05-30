@@ -13,30 +13,51 @@ public class SimpleLogger : ISimpleLogger {
     private static readonly object LockObject = new();
 
     private readonly List<ISimpleLogEntry> LogEntries;
-    private readonly IList<string> Stack;
+    private readonly IList<string> StackOfScopes;
+
     private readonly ISimpleLogFlusher SimpleLogFlusher;
+    private readonly IMethodNamesFromStackFramesExtractor MethodNamesFromStackFramesExtractor;
+
+    private readonly IDictionary<string, string> ScopeToCreatorMethodMapping;
 
     public string LogSubFolder { get; set; } = @"AspenlaubLogs\Miscellaneous";
 
     public bool Enabled { get; }
 
-    public SimpleLogger(ISimpleLogFlusher simpleLogFlusher) {
+    public SimpleLogger(ISimpleLogFlusher simpleLogFlusher, IMethodNamesFromStackFramesExtractor methodNamesFromStackFramesExtractor) {
         LogEntries = new List<ISimpleLogEntry>();
-        Stack = new List<string>();
+        StackOfScopes = new List<string>();
         SimpleLogFlusher = simpleLogFlusher;
+        MethodNamesFromStackFramesExtractor = methodNamesFromStackFramesExtractor;
         Enabled = true;
+        ScopeToCreatorMethodMapping = new Dictionary<string, string>();
     }
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter) {
         if (!Enabled) { return; }
 
-        if (Stack.Count == 0) {
+        if (StackOfScopes.Count == 0) {
             throw new Exception(Properties.Resources.AttemptToLogWithoutScope);
         }
+
+        var reducesStackOfScopes = ReduceStackAccordingToCallStack(StackOfScopes);
+        /*
+        if (reducedStack.Count == 0) {
+            throw new Exception(Properties.Resources.ScopeExistsButOutsideCallStack);
+        }
+        */
+
         lock (LockObject) {
-            LogEntries.Add(SimpleLogEntry.Create(logLevel, Stack, formatter(state, exception)));
+            LogEntries.Add(SimpleLogEntry.Create(logLevel, reducesStackOfScopes.Count == 0 ? StackOfScopes : reducesStackOfScopes, formatter(state, exception)));
         }
         SimpleLogFlusher.Flush(this, LogSubFolder);
+    }
+
+    private IList<string> ReduceStackAccordingToCallStack(IList<string> stackOfScopes) {
+        var callStackMethodNames = MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames();
+        return stackOfScopes
+               .Where(x => ScopeToCreatorMethodMapping.ContainsKey(x) && callStackMethodNames.Contains(ScopeToCreatorMethodMapping[x]))
+               .ToList();
     }
 
     public bool IsEnabled(LogLevel logLevel) {
@@ -48,13 +69,18 @@ public class SimpleLogger : ISimpleLogger {
             return new LoggingScope(() => { });
         }
 
-        var stackEntry = $"{loggingScope.Class}({loggingScope.Id})";
+        var scope = $"{loggingScope.Class}({loggingScope.Id})";
         lock (LockObject) {
-            Stack.Add(stackEntry);
+            StackOfScopes.Add(scope);
+            var callStackMethodNames = MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames();
+            if (callStackMethodNames.Count < 2) {
+                throw new Exception(Properties.Resources.CallStackTooSmallToFindCreatorMethodName);
+            }
+            ScopeToCreatorMethodMapping[scope] = callStackMethodNames[1];
         }
         return new LoggingScope(() => {
             lock (LockObject) {
-                Stack.Remove(stackEntry);
+                StackOfScopes.Remove(scope);
             }
         });
     }

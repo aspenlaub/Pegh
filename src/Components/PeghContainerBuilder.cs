@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 
 public static class PeghContainerBuilder {
-    private static readonly ISimpleLogger SimpleLogger = new SimpleLogger(new SimpleLogFlusher());
+    private static readonly ISimpleLogger SimpleLogger = new SimpleLogger(new SimpleLogFlusher(), new MethodNamesFromStackFramesExtractor());
     private static ILogConfigurationFactory LogConfigurationFactory;
 
     public static ContainerBuilder UsePegh(this ContainerBuilder builder, string applicationName, ICsArgumentPrompter csArgumentPrompter) {
@@ -17,6 +17,7 @@ public static class PeghContainerBuilder {
         builder.RegisterType<Disguiser>().As<IDisguiser>();
         builder.RegisterType<FolderDeleter>().As<IFolderDeleter>();
         builder.RegisterType<FolderResolver>().As<IFolderResolver>();
+        builder.RegisterType<MethodNamesFromStackFramesExtractor>().As<IMethodNamesFromStackFramesExtractor>();
         builder.RegisterType<PassphraseProvider>().As<IPassphraseProvider>();
         builder.RegisterType<PeghEnvironment>().As<IPeghEnvironment>();
         builder.RegisterType<PrimeNumberGenerator>().As<IPrimeNumberGenerator>();
@@ -39,6 +40,7 @@ public static class PeghContainerBuilder {
         services.AddTransient<IDisguiser, Disguiser>();
         services.AddTransient<IFolderDeleter, FolderDeleter>();
         services.AddTransient<IFolderResolver, FolderResolver>();
+        services.AddTransient<IMethodNamesFromStackFramesExtractor, MethodNamesFromStackFramesExtractor>();
         services.AddTransient<IPassphraseProvider, PassphraseProvider>();
         services.AddTransient<IPeghEnvironment, PeghEnvironment>();
         services.AddTransient<IPrimeNumberGenerator, PrimeNumberGenerator>();
