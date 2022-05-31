@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -10,33 +11,33 @@ public class MethodNamesFromStackFramesExtractorTest {
     private readonly MethodNamesFromStackFramesExtractor Sut = new();
 
     [TestMethod]
-    public void MethodNamesFromStackFramesExtractor_WithMethodCall_ReturnsCallerAndCallee() {
-        var methodNames = MethodReturningMethodNamesFromStackFramesWhenCalled();
+    public void ExtractMethodNamesFromStackFrames_WithinMethodCall_ReturnsCallerAndCallee() {
+        var methodNames = MethodReturningMethodNamesFromStackFramesWhenCalled().ToList();
         Assert.IsTrue(methodNames.Contains(nameof(MethodReturningMethodNamesFromStackFramesWhenCalled)));
-        Assert.IsTrue(methodNames.Contains(nameof(MethodNamesFromStackFramesExtractor_WithMethodCall_ReturnsCallerAndCallee)));
+        Assert.IsTrue(methodNames.Contains(nameof(ExtractMethodNamesFromStackFrames_WithinMethodCall_ReturnsCallerAndCallee)));
         Assert.AreEqual(2, methodNames.Count);
     }
 
     [TestMethod]
-    public async Task MethodNamesFromStackFramesExtractor_WithAsyncMethodCall_ReturnsCallerAndCallee() {
-        var methodNames = await MethodReturningMethodNamesFromStackFramesWhenCalledAsync();
+    public async Task ExtractMethodNamesFromStackFrames_WithinAsyncMethodCall_ReturnsCallerAndCallee() {
+        var methodNames = (await MethodReturningMethodNamesFromStackFramesWhenCalledAsync()).ToList();
         Assert.IsTrue(methodNames.Contains(nameof(MethodReturningMethodNamesFromStackFramesWhenCalledAsync)));
-        Assert.IsTrue(methodNames.Contains(nameof(MethodNamesFromStackFramesExtractor_WithAsyncMethodCall_ReturnsCallerAndCallee)));
+        Assert.IsTrue(methodNames.Contains(nameof(ExtractMethodNamesFromStackFrames_WithinAsyncMethodCall_ReturnsCallerAndCallee)));
         Assert.AreEqual(2, methodNames.Count);
 
         await Task.WhenAll(new List<Task> {
-            Task.Run(async () => methodNames = await MethodReturningMethodNamesFromStackFramesWhenCalledAsync())
+            Task.Run(async () => methodNames = (await MethodReturningMethodNamesFromStackFramesWhenCalledAsync()).ToList())
         });
         Assert.IsTrue(methodNames.Contains(nameof(MethodReturningMethodNamesFromStackFramesWhenCalledAsync)));
-        Assert.IsTrue(methodNames.Contains(nameof(MethodNamesFromStackFramesExtractor_WithAsyncMethodCall_ReturnsCallerAndCallee)));
+        Assert.IsTrue(methodNames.Contains(nameof(ExtractMethodNamesFromStackFrames_WithinAsyncMethodCall_ReturnsCallerAndCallee)));
         Assert.AreEqual(2, methodNames.Count);
     }
 
-    protected IList<string> MethodReturningMethodNamesFromStackFramesWhenCalled() {
+    protected IEnumerable<string> MethodReturningMethodNamesFromStackFramesWhenCalled() {
         return Sut.ExtractMethodNamesFromStackFrames();
     }
 
-    protected async Task<IList<string>> MethodReturningMethodNamesFromStackFramesWhenCalledAsync() {
+    protected async Task<IEnumerable<string>> MethodReturningMethodNamesFromStackFramesWhenCalledAsync() {
         await Task.CompletedTask;
         return Sut.ExtractMethodNamesFromStackFrames();
     }

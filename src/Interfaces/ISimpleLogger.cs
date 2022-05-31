@@ -6,10 +6,8 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 public interface ISimpleLogger : ILogger {
     string LogSubFolder { get; }
-    // ReSharper disable once UnusedMember.Global
     string LogId { get; }
 
     IList<ISimpleLogEntry> FindLogEntries(Func<ISimpleLogEntry, bool> condition);
-    // ReSharper disable once ParameterTypeCanBeEnumerable.Global
     void OnEntriesFlushed(IList<ISimpleLogEntry> entries);
 }

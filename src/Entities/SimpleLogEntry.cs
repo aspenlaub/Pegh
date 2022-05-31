@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -14,6 +15,9 @@ public class SimpleLogEntry : ISimpleLogEntry {
 
     // ReSharper disable once ParameterTypeCanBeEnumerable.Global
     public static ISimpleLogEntry Create(LogLevel logLevel, IList<string> stack, string message) {
+        if (stack.Any(s => s.Contains("-"))) {
+            throw new NotSupportedException($"Stack entry must not contain '-': '{stack.First(s => s.Contains("-"))}'");
+        }
         var entry = new SimpleLogEntry {
             LogTime = DateTime.Now,
             LogLevel = logLevel,

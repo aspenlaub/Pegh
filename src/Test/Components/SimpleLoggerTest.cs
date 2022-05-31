@@ -5,8 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
-using Autofac;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -20,7 +20,7 @@ public class SimpleLoggerTest {
     private readonly IMethodNamesFromStackFramesExtractor MethodNamesFromStackFramesExtractor = new MethodNamesFromStackFramesExtractor();
 
     private SimpleLogFlusher Flusher;
-    private SimpleLogger Sut;
+    private ISimpleLogger Sut;
 
     [TestInitialize]
     public void Initialize() {
@@ -32,18 +32,18 @@ public class SimpleLoggerTest {
     }
 
     [TestMethod, ExpectedException(typeof(Exception), "Attempt to create a log entry without a scope. Use BeginScope<>, and on the same thread")]
-    public void SimpleLogger_WithoutScope_ThrowsException() {
-        Sut = new SimpleLogger(CreateLogConfiguration(nameof(SimpleLogger_WithoutScope_ThrowsException)), Flusher, MethodNamesFromStackFramesExtractor);
-        Sut.Log(LogLevel.Information, new EventId(0), new Dictionary<string, object>(), null, (_, _) => { return NotAMessage; });
+    public void Constructor_WithoutScope_ThrowsException() {
+        Sut = new SimpleLogger(CreateLogConfiguration(nameof(Constructor_WithoutScope_ThrowsException)), Flusher, MethodNamesFromStackFramesExtractor);
+        Sut.Log(LogLevel.Information, new EventId(0), "", null, (_, _) => { return NotAMessage; });
     }
 
     [TestMethod]
-    public void SimpleLogger_WithManyLogCalls_IsWorking() {
-        Sut = new SimpleLogger(CreateLogConfiguration(nameof(SimpleLogger_WithManyLogCalls_IsWorking)), Flusher, MethodNamesFromStackFramesExtractor);
+    public void Log_CalledManyTimes_IsWorking() {
+        Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_CalledManyTimes_IsWorking)), Flusher, MethodNamesFromStackFramesExtractor);
         using (Sut.BeginScope(SimpleLoggingScopeId.Create("Scope", "A"))) {
             using (Sut.BeginScope(SimpleLoggingScopeId.Create("Scope", "B"))) {
                 for (var i = 0; i < NumberOfLogEntries; i++) {
-                    Sut.Log(LogLevel.Information, new EventId(0), new Dictionary<string, object>(), null, (_, _) => { return NotAMessage; });
+                    Sut.LogInformationWithCallStack(NotAMessage, MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames());
                 }
             }
         }
@@ -70,23 +70,35 @@ public class SimpleLoggerTest {
     }
 
     [TestMethod]
-    public void PeghContainer_ReturnsSimpleLogger() {
-        var sut = new ContainerBuilder().UsePegh("Pegh", new DummyCsArgumentPrompter()).Build();
-        var logger = sut.Resolve<ILogger>();
-        Assert.IsNotNull(logger);
-        Assert.IsTrue(logger is SimpleLogger);
-
-        var simpleLogger = sut.Resolve<ISimpleLogger>();
-        Assert.IsNotNull(simpleLogger);
+    public async Task Log_WithinParallelDifferentTasks_IsWorking() {
+        Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_WithinParallelDifferentTasks_IsWorking)), Flusher, MethodNamesFromStackFramesExtractor);
+        var tasks = new List<Task> {
+            new ImLogging(TimeSpan.FromMilliseconds(77), DateTime.Now.AddSeconds(4), Sut, MethodNamesFromStackFramesExtractor).ImLoggingWorkAsync(),
+            new ImLoggingToo(TimeSpan.FromMilliseconds(222), DateTime.Now.AddSeconds(7), Sut, MethodNamesFromStackFramesExtractor).ImLoggingWorkTooAsync()
+        };
+        await Task.WhenAll(tasks);
     }
 
     [TestMethod]
-    public async Task SimpleLogger_WithParallelTasks_IsWorking() {
-        Sut = new SimpleLogger(CreateLogConfiguration(nameof(SimpleLogger_WithParallelTasks_IsWorking)), Flusher, MethodNamesFromStackFramesExtractor);
+    public async Task Log_WithinParallelSimilarTasks_IsWorking() {
+        Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_WithinParallelSimilarTasks_IsWorking)), Flusher, MethodNamesFromStackFramesExtractor);
         var tasks = new List<Task> {
-            new ImLogging(TimeSpan.FromMilliseconds(77), DateTime.Now.AddSeconds(4), Sut).ImLoggingWorkAsync(),
-            new ImLoggingToo(TimeSpan.FromMilliseconds(222), DateTime.Now.AddSeconds(7), Sut).ImLoggingWorkTooAsync()
+            new ImLogging(TimeSpan.FromMilliseconds(77), DateTime.Now.AddSeconds(4), Sut, MethodNamesFromStackFramesExtractor).ImLoggingWorkAsync(),
+            new ImLogging(TimeSpan.FromMilliseconds(222), DateTime.Now.AddSeconds(7), Sut, MethodNamesFromStackFramesExtractor).ImLoggingWorkAsync()
         };
         await Task.WhenAll(tasks);
+    }
+
+    [TestMethod]
+    public void Constructor_WithLogConfiguration_ProducesLoggerWithConfiguredLogId() {
+        var logConfiguration = CreateLogConfiguration(nameof(Constructor_WithLogConfiguration_ProducesLoggerWithConfiguredLogId));
+        Sut = new SimpleLogger(logConfiguration, Flusher, MethodNamesFromStackFramesExtractor);
+        Assert.AreEqual(logConfiguration.LogId, Sut.LogId);
+    }
+
+    [TestMethod]
+    public void Constructor_WithLogConfiguration_ProducesLoggerWithConfiguredSubFolder() {
+        ISimpleLogger sut = new SimpleLogger(new LogConfiguration(nameof(Constructor_WithLogConfiguration_ProducesLoggerWithConfiguredSubFolder)), new SimpleLogFlusher(), new MethodNamesFromStackFramesExtractor());
+        Assert.AreEqual(@"AspenlaubLogs\" + nameof(Constructor_WithLogConfiguration_ProducesLoggerWithConfiguredSubFolder), sut.LogSubFolder);
     }
 }

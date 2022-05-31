@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -43,23 +44,35 @@ public class SimpleLogger : ISimpleLogger {
             throw new Exception(Properties.Resources.AttemptToLogWithoutScope);
         }
 
-        var reducesStackOfScopes = ReduceStackAccordingToCallStack(StackOfScopes);
-        /*
-        if (reducedStack.Count == 0) {
+        const string noMessage = "(empty)";
+        LogMessageWithCallStack logMessageWithCallStack;
+        var message = state.ToString() ?? noMessage;
+        try {
+            if (message == noMessage) {
+                throw new JsonException($"Could not deserialize {message}");
+            }
+            logMessageWithCallStack = JsonSerializer.Deserialize<LogMessageWithCallStack>(message);
+            if (logMessageWithCallStack == null) {
+                throw new JsonException($"Could not deserialize {message}");
+            }
+        } catch {
+            throw new JsonException($"Could not deserialize {message}");
+        }
+
+        var reducesStackOfScopes = ReduceStackAccordingToCallStack(StackOfScopes, logMessageWithCallStack.MethodNamesInCallStack);
+        if (reducesStackOfScopes.Count == 0) {
             throw new Exception(Properties.Resources.ScopeExistsButOutsideCallStack);
         }
-        */
 
         lock (LockObject) {
-            LogEntries.Add(SimpleLogEntry.Create(logLevel, reducesStackOfScopes.Count == 0 ? StackOfScopes : reducesStackOfScopes, formatter(state, exception)));
+            LogEntries.Add(SimpleLogEntry.Create(logLevel, reducesStackOfScopes.Count == 0 ? StackOfScopes : reducesStackOfScopes, logMessageWithCallStack.Message));
         }
         SimpleLogFlusher.Flush(this, LogSubFolder);
     }
 
-    private IList<string> ReduceStackAccordingToCallStack(IEnumerable<string> stackOfScopes) {
-        var callStackMethodNames = MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames();
+    private IList<string> ReduceStackAccordingToCallStack(IEnumerable<string> stackOfScopes, IEnumerable<string> methodNamesFromCallStack) {
         return stackOfScopes
-               .Where(x => ScopeToCreatorMethodMapping.ContainsKey(x) && callStackMethodNames.Contains(ScopeToCreatorMethodMapping[x]))
+               .Where(x => ScopeToCreatorMethodMapping.ContainsKey(x) && methodNamesFromCallStack.Contains(ScopeToCreatorMethodMapping[x]))
                .ToList();
     }
 
@@ -81,11 +94,13 @@ public class SimpleLogger : ISimpleLogger {
             }
             ScopeToCreatorMethodMapping[scope] = callStackMethodNames[1];
         }
-        return new LoggingScope(() => {
-            lock (LockObject) {
-                StackOfScopes.Remove(scope);
-            }
-        });
+        return new LoggingScope(() => OnLoggingScopeDisposing(scope));
+    }
+
+    private void OnLoggingScopeDisposing(string scope) {
+       lock (LockObject) {
+           StackOfScopes.Remove(scope);
+       }
     }
 
     public IList<ISimpleLogEntry> FindLogEntries(Func<ISimpleLogEntry, bool> condition) {

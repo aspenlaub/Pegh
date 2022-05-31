@@ -47,10 +47,10 @@ public class SimpleLogFlusher : ISimpleLogFlusher {
 
     private static string Format(ISimpleLogEntry entry) {
         return entry.LogTime.ToString("yyyy-MM-dd") + '\t'
-                                                    + entry.LogTime.ToString("HH:mm:ss.ffff") + '\t'
-                                                    + string.Join("-", entry.Stack) + '\t'
-                                                    + Enum.GetName(typeof(LogLevel), entry.LogLevel) + '\t'
-                                                    + entry.Message;
+            + entry.LogTime.ToString("HH:mm:ss.ffff") + '\t'
+            + string.Join("-", entry.Stack) + '\t'
+            + Enum.GetName(typeof(LogLevel), entry.LogLevel) + '\t'
+            + entry.Message;
     }
 
     private static string GetTopOfStack(ISimpleLogEntry logEntry) {
