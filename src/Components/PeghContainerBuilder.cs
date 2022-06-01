@@ -23,6 +23,7 @@ public static class PeghContainerBuilder {
         builder.RegisterType<PeghEnvironment>().As<IPeghEnvironment>();
         builder.RegisterType<PrimeNumberGenerator>().As<IPrimeNumberGenerator>();
         builder.RegisterType<SecretRepository>().As<ISecretRepository>();
+        builder.RegisterType<SimpleLogReader>().As<ISimpleLogReader>();
         builder.RegisterType<StringCrypter>().As<IStringCrypter>();
         builder.RegisterType<XmlDeserializer>().As<IXmlDeserializer>();
         builder.RegisterType<XmlSerializer>().As<IXmlSerializer>();
@@ -47,6 +48,7 @@ public static class PeghContainerBuilder {
         services.AddTransient<IPeghEnvironment, PeghEnvironment>();
         services.AddTransient<IPrimeNumberGenerator, PrimeNumberGenerator>();
         services.AddTransient<ISecretRepository, SecretRepository>();
+        services.AddTransient<ISimpleLogReader, SimpleLogReader>();
         services.AddTransient<IStringCrypter, StringCrypter>();
         services.AddTransient<IXmlDeserializer, XmlDeserializer>();
         services.AddTransient<IXmlSerializer, XmlSerializer>();

@@ -85,7 +85,7 @@ public class SimpleLogger : ISimpleLogger {
             return new LoggingScope(() => { });
         }
 
-        var scope = $"{loggingScope.Class}({loggingScope.Id})";
+        var scope = $"{loggingScope.ClassOrMethod}({loggingScope.Id})";
         lock (LockObject) {
             StackOfScopes.Add(scope);
             var callStackMethodNames = MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames();
