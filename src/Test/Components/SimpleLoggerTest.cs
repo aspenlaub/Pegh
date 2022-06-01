@@ -69,6 +69,19 @@ public class SimpleLoggerTest {
         Assert.IsFalse(File.Exists(fileName));
     }
 
+
+    [TestMethod]
+    public void Log_CalledManyTimesWithRandomId_IsWorking() {
+        Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_CalledManyTimes_IsWorking)), Flusher, MethodNamesFromStackFramesExtractor);
+        using (Sut.BeginScope(SimpleLoggingScopeId.CreateWithRandomId("Scope"))) {
+            using (Sut.BeginScope(SimpleLoggingScopeId.CreateWithRandomId("Scope"))) {
+                for (var i = 0; i < NumberOfLogEntries; i++) {
+                    Sut.LogInformationWithCallStack(NotAMessage, MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames());
+                }
+            }
+        }
+    }
+
     [TestMethod]
     public async Task Log_WithinParallelDifferentTasks_IsWorking() {
         Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_WithinParallelDifferentTasks_IsWorking)), Flusher, MethodNamesFromStackFramesExtractor);

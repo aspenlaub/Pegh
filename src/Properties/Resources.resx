@@ -147,6 +147,9 @@
   <data name="PleaseLoadSecretSampleAdjustAndThenSaveAs" xml:space="preserve">
     <value>A secret has not been defined. Please load sample "{0}", adjust and then save as "{1}"</value>
   </data>
+  <data name="ScopeAlreadyBegan" xml:space="preserve">
+    <value>Scope "{0}" already began and has not ended</value>
+  </data>
   <data name="ScopeExistsButOutsideCallStack" xml:space="preserve">
     <value>A scope exists, but it has not been created by the methods in the call stack</value>
   </data>

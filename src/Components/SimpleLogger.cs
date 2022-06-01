@@ -87,6 +87,9 @@ public class SimpleLogger : ISimpleLogger {
 
         var scope = $"{loggingScope.ClassOrMethod}({loggingScope.Id})";
         lock (LockObject) {
+            if (StackOfScopes.Contains(scope)) {
+                throw new Exception(string.Format(Properties.Resources.ScopeAlreadyBegan, scope));
+            }
             StackOfScopes.Add(scope);
             var callStackMethodNames = MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames();
             if (callStackMethodNames.Count < 2) {

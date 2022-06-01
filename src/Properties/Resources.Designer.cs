@@ -151,6 +151,15 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Scope &quot;{0}&quot; already began and has not ended.
+        /// </summary>
+        internal static string ScopeAlreadyBegan {
+            get {
+                return ResourceManager.GetString("ScopeAlreadyBegan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A scope exists, but it has not been created by the methods in the call stack.
         /// </summary>
         internal static string ScopeExistsButOutsideCallStack {
