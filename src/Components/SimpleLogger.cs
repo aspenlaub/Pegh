@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -10,6 +12,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 
 public class SimpleLogger : ISimpleLogger {
     private const int MaxLogEntries = 10000;
+    private const string CouldNotBeDetermined = nameof(CouldNotBeDetermined);
 
     private static readonly object LockObject = new();
 
@@ -26,6 +29,8 @@ public class SimpleLogger : ISimpleLogger {
 
     public bool Enabled { get; }
 
+    private readonly IFolder _ExceptionFolder;
+
     public SimpleLogger(ILogConfiguration logConfiguration, ISimpleLogFlusher simpleLogFlusher, IMethodNamesFromStackFramesExtractor methodNamesFromStackFramesExtractor) {
         LogSubFolder = logConfiguration.LogSubFolder;
         LogId = logConfiguration.LogId;
@@ -35,6 +40,8 @@ public class SimpleLogger : ISimpleLogger {
         _MethodNamesFromStackFramesExtractor = methodNamesFromStackFramesExtractor;
         Enabled = true;
         _ScopeToCreatorMethodMapping = new Dictionary<string, string>();
+        _ExceptionFolder = new Folder(Path.GetTempPath()).SubFolder("AspenlaubExceptions");
+        _ExceptionFolder.CreateIfNecessary();
     }
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter) {
@@ -61,7 +68,8 @@ public class SimpleLogger : ISimpleLogger {
 
         var reducesStackOfScopes = ReduceStackAccordingToCallStack(_StackOfScopes, logMessageWithCallStack.MethodNamesInCallStack);
         if (reducesStackOfScopes.Count == 0) {
-            throw new Exception(Properties.Resources.ScopeExistsButOutsideCallStack);
+            WriteErrorToExceptionFolder(string.Format(Properties.Resources.ScopeExistsButOutsideCallStack, string.Join(";", _StackOfScopes)));
+            reducesStackOfScopes = _StackOfScopes;
         }
 
         lock (LockObject) {
@@ -86,18 +94,25 @@ public class SimpleLogger : ISimpleLogger {
         }
 
         var scope = $"{loggingScope.ClassOrMethod}({loggingScope.Id})";
+        var callStackMethodNames = _MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames();
         lock (LockObject) {
             if (_StackOfScopes.Contains(scope)) {
-                throw new Exception(string.Format(Properties.Resources.ScopeAlreadyBegan, scope));
+                WriteErrorToExceptionFolder(string.Format(Properties.Resources.ScopeAlreadyBegan, scope));
             }
             _StackOfScopes.Add(scope);
-            var callStackMethodNames = _MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames();
             if (callStackMethodNames.Count < 2) {
-                throw new Exception(Properties.Resources.CallStackTooSmallToFindCreatorMethodName);
+                WriteErrorToExceptionFolder(string.Format(Properties.Resources.CallStackTooSmallToFindCreatorMethodName, scope));
+                _ScopeToCreatorMethodMapping[scope] = CouldNotBeDetermined;
+            } else {
+                _ScopeToCreatorMethodMapping[scope] = callStackMethodNames[1];
             }
-            _ScopeToCreatorMethodMapping[scope] = callStackMethodNames[1];
         }
         return new LoggingScope(() => OnLoggingScopeDisposing(scope));
+    }
+
+    private void WriteErrorToExceptionFolder(string errorMessage) {
+        var fileName = _ExceptionFolder.FullName + "\\" + nameof(SimpleLogger) + "-Error-" + Guid.NewGuid().ToString().Replace("-", "") + ".log";
+        File.WriteAllText(fileName, errorMessage);
     }
 
     private void OnLoggingScopeDisposing(string scope) {

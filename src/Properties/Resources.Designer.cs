@@ -79,7 +79,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Call stack is too small to extract a creator method.
+        ///   Looks up a localized string similar to Call stack is too small to extract a creator method for scope &quot;{0}&quot;.
         /// </summary>
         internal static string CallStackTooSmallToFindCreatorMethodName {
             get {
@@ -160,7 +160,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A scope exists, but it has not been created by the methods in the call stack.
+        ///   Looks up a localized string similar to A scope &quot;{0}&quot; exists, but it has not been created by the methods in the call stack.
         /// </summary>
         internal static string ScopeExistsButOutsideCallStack {
             get {

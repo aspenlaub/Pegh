@@ -124,7 +124,7 @@
     <value>Attempt to create a log entry without a scope. Use BeginScope&lt;&gt;, and on the same thread</value>
   </data>
   <data name="CallStackTooSmallToFindCreatorMethodName" xml:space="preserve">
-    <value>Call stack is too small to extract a creator method</value>
+    <value>Call stack is too small to extract a creator method for scope "{0}"</value>
   </data>
   <data name="FailedToCopy" xml:space="preserve">
     <value>Failed to copy "{0}" to "{1}"</value>
@@ -151,6 +151,6 @@
     <value>Scope "{0}" already began and has not ended</value>
   </data>
   <data name="ScopeExistsButOutsideCallStack" xml:space="preserve">
-    <value>A scope exists, but it has not been created by the methods in the call stack</value>
+    <value>A scope "{0}" exists, but it has not been created by the methods in the call stack</value>
   </data>
 </root>
