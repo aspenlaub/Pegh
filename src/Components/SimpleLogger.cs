@@ -95,17 +95,22 @@ public class SimpleLogger : ISimpleLogger {
 
         var scope = $"{loggingScope.ClassOrMethod}({loggingScope.Id})";
         var callStackMethodNames = _MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames();
+        string errorMessage = null;
         lock (LockObject) {
             if (_StackOfScopes.Contains(scope)) {
-                WriteErrorToExceptionFolder(string.Format(Properties.Resources.ScopeAlreadyBegan, scope));
+                errorMessage = string.Format(Properties.Resources.ScopeAlreadyBegan, scope);
             }
             _StackOfScopes.Add(scope);
             if (callStackMethodNames.Count < 2) {
-                WriteErrorToExceptionFolder(string.Format(Properties.Resources.CallStackTooSmallToFindCreatorMethodName, scope));
+                errorMessage ??= string.Format(Properties.Resources.CallStackTooSmallToFindCreatorMethodName, scope);
                 _ScopeToCreatorMethodMapping[scope] = CouldNotBeDetermined;
             } else {
                 _ScopeToCreatorMethodMapping[scope] = callStackMethodNames[1];
             }
+        }
+
+        if (!string.IsNullOrEmpty(errorMessage)) {
+            WriteErrorToExceptionFolder(errorMessage);
         }
         return new LoggingScope(() => OnLoggingScopeDisposing(scope));
     }
