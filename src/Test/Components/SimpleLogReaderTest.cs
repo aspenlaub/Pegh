@@ -5,6 +5,7 @@ using System.Linq;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.Helpers;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Autofac;
 using Microsoft.Extensions.Logging;
@@ -91,7 +92,11 @@ public class SimpleLogReaderTest {
     }
 
     private string FindLogFile() {
-        var fileNames = Directory.GetFiles(_LogFolder.FullName, "*.log").Where(f => File.GetLastWriteTime(f) >= _StartOfTestTime).ToList();
+        var fileNames = new List<string>();
+        Wait.Until(() => {
+            fileNames = Directory.GetFiles(_LogFolder.FullName, "*.log").Where(f => File.GetLastWriteTime(f) >= _StartOfTestTime).ToList();
+            return fileNames.Any();
+        }, TimeSpan.FromMilliseconds(500));
         Assert.IsTrue(fileNames.Count > 0, "No files found");
         return fileNames[0];
     }
