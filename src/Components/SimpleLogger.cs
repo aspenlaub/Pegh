@@ -117,7 +117,8 @@ public class SimpleLogger : ISimpleLogger {
 
     private void WriteErrorToExceptionFolder(string errorMessage) {
         var fileName = _ExceptionFolder.FullName + "\\" + nameof(SimpleLogger) + "-Error-" + Guid.NewGuid().ToString().Replace("-", "") + ".log";
-        File.WriteAllText(fileName, errorMessage);
+        var contents = errorMessage + "\r\n\r\n" + Environment.StackTrace;
+        File.WriteAllText(fileName, contents);
     }
 
     private void OnLoggingScopeDisposing(string scope) {
