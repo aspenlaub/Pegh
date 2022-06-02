@@ -39,8 +39,8 @@ public class SimpleLogReaderTest {
         foreach (var fileName in Directory.GetFiles(_LogFolder.FullName, "*.log")) {
             File.Delete(fileName);
         }
-        _Sut = new SimpleLogReader();
         _StartOfTestTime = DateTime.Now;
+        _Sut = new SimpleLogReader();
     }
 
     [TestMethod]
