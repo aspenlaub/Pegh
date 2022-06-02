@@ -11,21 +11,21 @@ public class CrewMember : IGuid, INotifyPropertyChanged, ISecretResult<CrewMembe
 
     [XmlAttribute("rank")]
     public string Rank {
-        get => PrivateRank;
-        set { PrivateRank = value; OnPropertyChanged(nameof(Rank)); } }
-    private string PrivateRank;
+        get => _PrivateRank;
+        set { _PrivateRank = value; OnPropertyChanged(nameof(Rank)); } }
+    private string _PrivateRank;
 
     [XmlAttribute("firstname")]
     public string FirstName {
-        get => PrivateFirstName;
-        set { PrivateFirstName = value; OnPropertyChanged(nameof(FirstName)); } }
-    private string PrivateFirstName;
+        get => _PrivateFirstName;
+        set { _PrivateFirstName = value; OnPropertyChanged(nameof(FirstName)); } }
+    private string _PrivateFirstName;
 
     [XmlAttribute("surname")]
     public string SurName {
-        get => PrivateSurName;
-        set { PrivateSurName = value; OnPropertyChanged(nameof(SurName)); } }
-    private string PrivateSurName;
+        get => _PrivateSurName;
+        set { _PrivateSurName = value; OnPropertyChanged(nameof(SurName)); } }
+    private string _PrivateSurName;
 
     public CrewMember() {
         Guid = System.Guid.NewGuid().ToString();

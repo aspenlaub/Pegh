@@ -3,8 +3,8 @@
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 
 public class LogicalFoldersSecret : ISecret<LogicalFolders> {
-    private LogicalFolders LogicalFolders;
-    public LogicalFolders DefaultValue => LogicalFolders ??= new LogicalFolders {
+    private LogicalFolders _LogicalFolders;
+    public LogicalFolders DefaultValue => _LogicalFolders ??= new LogicalFolders {
         new() { Name = "FolderTest", Folder = @"c:\temp\folder\test" }
     };
 

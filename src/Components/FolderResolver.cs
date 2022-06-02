@@ -28,14 +28,14 @@ public class FolderResolver : IFolderResolver {
         if (errorsAndInfos.AnyErrors()) {
             throw new Exception(errorsAndInfos.ErrorsToString());
         }
-        machineDrives.DrivesOnThisMachine().ToList().ForEach(d => AddReplacement(d));
+        machineDrives.DrivesOnThisMachine().ToList().ForEach(AddReplacement);
 
         var logicalFoldersSecret = new LogicalFoldersSecret();
         var logicalFolders = await SecretRepository.GetAsync(logicalFoldersSecret, errorsAndInfos);
         if (errorsAndInfos.AnyErrors()) {
             throw new Exception(errorsAndInfos.ErrorsToString());
         }
-        logicalFolders.ForEach(l => AddReplacement(l));
+        logicalFolders.ForEach(AddReplacement);
 
         var keys = Replacements.Keys.ToList();
         foreach (var key in keys) {

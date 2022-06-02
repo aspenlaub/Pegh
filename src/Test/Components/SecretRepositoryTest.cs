@@ -180,7 +180,7 @@ public class SecretRepositoryTest {
         var secrets = new List<IGuid> { new SecretCrewMember(), new SecretStringFunction(), new EncryptedSecretCrewMember(), new SecretListOfElements() };
         foreach (var files in new[] { false, true }.Select(sample => SecretRepositoryFolder(sample, alternative)).SelectMany(folder => secrets.Select(secret => Directory.GetFiles(folder, secret.Guid + "*.*").ToList()))) {
             Assert.IsTrue(files.Count < 3);
-            files.ForEach(f => File.Delete(f));
+            files.ForEach(File.Delete);
         }
     }
 
@@ -527,9 +527,7 @@ public class SecretRepositoryTest {
         sut = Container.Resolve<ISecretRepository>() as SecretRepository;
         Assert.IsNotNull(sut);
 
-        CsArgumentPrompterMock.Setup(p => p.PromptForArgument(It.IsAny<string>(), It.IsAny<string>())).Returns(() => {
-            return "Wrong-Password";
-        });
+        CsArgumentPrompterMock.Setup(p => p.PromptForArgument(It.IsAny<string>(), It.IsAny<string>())).Returns(() => "Wrong-Password");
         Assert.IsNull(GetSecretCrewMember(sut, secret));
         try {
             await sut.GetAsync(secret, errorsAndInfos);

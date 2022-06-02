@@ -19,7 +19,6 @@ public class ImLoggingBase {
         SimpleLogger = simpleLogger;
         MethodNamesFromStackFramesExtractor = methodNamesFromStackFramesExtractor;
         WorkerId = Guid.NewGuid().ToString().Substring(0, 5);
-
     }
 
     protected async Task WorkAsync() {

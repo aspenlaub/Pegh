@@ -13,7 +13,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components;
 
 [TestClass]
 public class FolderResolverTest {
-    private readonly IFolderResolver Sut;
+    private readonly IFolderResolver _Sut;
 
     private static IContainer Container { get; set; }
     private static IContainer ProductionContainer { get; set; }
@@ -37,24 +37,24 @@ public class FolderResolverTest {
         builder = new ContainerBuilder().UsePegh("Pegh", new DummyCsArgumentPrompter());
         ProductionContainer = builder.Build();
 
-        Sut = Container.Resolve<IFolderResolver>();
+        _Sut = Container.Resolve<IFolderResolver>();
     }
 
     [TestMethod]
     public async Task DriveResolvesToActualDrive() {
         IErrorsAndInfos errorsAndInfos = new ErrorsAndInfos();
-        Assert.AreEqual(@"E:", (await Sut.ResolveAsync(@"$(SomeDrive)", errorsAndInfos)).FullName);
+        Assert.AreEqual(@"E:", (await _Sut.ResolveAsync(@"$(SomeDrive)", errorsAndInfos)).FullName);
         Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
-        Assert.AreEqual(@"E:", (await Sut.ResolveAsync(@"$(SomeDrive)\", errorsAndInfos)).FullName);
+        Assert.AreEqual(@"E:", (await _Sut.ResolveAsync(@"$(SomeDrive)\", errorsAndInfos)).FullName);
         Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
     }
 
     [TestMethod]
     public async Task CanResolveLogicalFolder() {
         var errorsAndInfos = new ErrorsAndInfos();
-        Assert.AreEqual(@"E:\Logical\Folder", (await Sut.ResolveAsync(@"$(SomeLogicalFolder)", errorsAndInfos)).FullName);
+        Assert.AreEqual(@"E:\Logical\Folder", (await _Sut.ResolveAsync(@"$(SomeLogicalFolder)", errorsAndInfos)).FullName);
         Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
-        Assert.AreEqual(@"E:\Logical\Folder\Other", (await Sut.ResolveAsync(@"$(SomeOtherLogicalFolder)", errorsAndInfos)).FullName);
+        Assert.AreEqual(@"E:\Logical\Folder\Other", (await _Sut.ResolveAsync(@"$(SomeOtherLogicalFolder)", errorsAndInfos)).FullName);
         Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
     }
 

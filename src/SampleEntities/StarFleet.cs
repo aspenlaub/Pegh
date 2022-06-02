@@ -11,22 +11,22 @@ public class StarFleet : IGuid, INotifyPropertyChanged {
 
     [XmlElement("StarShip")]
     public StarShips StarShips {
-        get => PrivateStarShips;
-        set { PrivateStarShips = value; OnPropertyChanged(nameof(StarShips)); }
+        get => _PrivateStarShips;
+        set { _PrivateStarShips = value; OnPropertyChanged(nameof(StarShips)); }
     }
-    private StarShips PrivateStarShips;
+    private StarShips _PrivateStarShips;
 
     [XmlElement("StarBase")]
     public StarBases StarBases {
-        get => PrivateStarBases;
-        set { PrivateStarBases = value; OnPropertyChanged(nameof(StarBases)); }
+        get => _PrivateStarBases;
+        set { _PrivateStarBases = value; OnPropertyChanged(nameof(StarBases)); }
     }
-    private StarBases PrivateStarBases;
+    private StarBases _PrivateStarBases;
 
     public StarFleet() {
         Guid = System.Guid.NewGuid().ToString();
-        PrivateStarShips = new StarShips();
-        PrivateStarBases = new StarBases();
+        _PrivateStarShips = new StarShips();
+        _PrivateStarBases = new StarBases();
     }
 
     public event PropertyChangedEventHandler PropertyChanged;

@@ -36,7 +36,7 @@ public class MethodNamesFromStackFramesExtractor : IMethodNamesFromStackFramesEx
         return ExtractMethodName(isAsyncStateMachine ? declaringType.FullName : method.Name);
     }
 
-    private readonly List<string> UnwantedMethods = new() {
+    private readonly List<string> _UnwantedMethods = new() {
         "BackgroundJobProcessor",
         "Dispatch",
         "Invoke", "InvokeMethod", "InvokeAsSynchronousTask",
@@ -58,7 +58,7 @@ public class MethodNamesFromStackFramesExtractor : IMethodNamesFromStackFramesEx
         var ltPos = stringContainingMethodName.IndexOf('<');
         var gtPos = ltPos >= 0 ? stringContainingMethodName.IndexOf('>', ltPos) : -1;
         var methodName = ltPos >= 0 && gtPos > 0 ? stringContainingMethodName.Substring(ltPos + 1, gtPos - ltPos - 1) : stringContainingMethodName;
-        methodName = UnwantedMethods.Contains(methodName) ? null : methodName;
+        methodName = _UnwantedMethods.Contains(methodName) ? null : methodName;
         return methodName;
     }
 }

@@ -8,7 +8,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components;
 
 [TestClass]
 public class MethodNamesFromStackFramesExtractorTest {
-    private readonly MethodNamesFromStackFramesExtractor Sut = new();
+    private readonly MethodNamesFromStackFramesExtractor _Sut = new();
 
     [TestMethod]
     public void ExtractMethodNamesFromStackFrames_WithinMethodCall_ReturnsCallerAndCallee() {
@@ -34,12 +34,12 @@ public class MethodNamesFromStackFramesExtractorTest {
     }
 
     protected IEnumerable<string> MethodReturningMethodNamesFromStackFramesWhenCalled() {
-        return Sut.ExtractMethodNamesFromStackFrames();
+        return _Sut.ExtractMethodNamesFromStackFrames();
     }
 
     protected async Task<IEnumerable<string>> MethodReturningMethodNamesFromStackFramesWhenCalledAsync() {
         await Task.CompletedTask;
-        return Sut.ExtractMethodNamesFromStackFrames();
+        return _Sut.ExtractMethodNamesFromStackFrames();
     }
 
 }

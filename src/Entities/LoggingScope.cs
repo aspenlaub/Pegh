@@ -3,13 +3,13 @@
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 
 public class LoggingScope : IDisposable {
-    private readonly Action DoDispose;
+    private readonly Action _DoDispose;
 
     public LoggingScope(Action doDispose) {
-        DoDispose = doDispose;
+        _DoDispose = doDispose;
     }
 
     public void Dispose() {
-        DoDispose();
+        _DoDispose();
     }
 }

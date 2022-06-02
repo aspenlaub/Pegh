@@ -11,28 +11,28 @@ public class StarBase : IGuid, INotifyPropertyChanged {
 
     [XmlAttribute("name")]
     public string Name {
-        get => PrivateName;
-        set { PrivateName = value; OnPropertyChanged(nameof(Name)); } }
-    private string PrivateName;
+        get => _PrivateName;
+        set { _PrivateName = value; OnPropertyChanged(nameof(Name)); } }
+    private string _PrivateName;
 
     [XmlElement("CrewMember")]
     public CrewMembers Personnel {
-        get => PrivatePersonnel;
-        set { PrivatePersonnel = value; OnPropertyChanged(nameof(Personnel)); }
+        get => _PrivatePersonnel;
+        set { _PrivatePersonnel = value; OnPropertyChanged(nameof(Personnel)); }
     }
-    private CrewMembers PrivatePersonnel;
+    private CrewMembers _PrivatePersonnel;
 
     [XmlElement("StarShip")]
     public StarShips DockedShips {
-        get => PrivateDockedShips;
-        set { PrivateDockedShips = value; OnPropertyChanged(nameof(DockedShips)); }
+        get => _PrivateDockedShips;
+        set { _PrivateDockedShips = value; OnPropertyChanged(nameof(DockedShips)); }
     }
-    private StarShips PrivateDockedShips;
+    private StarShips _PrivateDockedShips;
 
     public StarBase() {
         Guid = System.Guid.NewGuid().ToString();
-        PrivatePersonnel = new CrewMembers();
-        PrivateDockedShips = new StarShips();
+        _PrivatePersonnel = new CrewMembers();
+        _PrivateDockedShips = new StarShips();
     }
 
     public event PropertyChangedEventHandler PropertyChanged;

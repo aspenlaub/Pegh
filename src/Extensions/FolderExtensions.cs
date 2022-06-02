@@ -24,7 +24,7 @@ public static class FolderExtensions {
 
     // ReSharper disable once UnusedMember.Global
     public static string LastWrittenFileFullName(this IFolder folder) {
-        return Directory.GetFiles(folder.FullName, "*.*").MaxBy(f => File.GetLastWriteTime(f));
+        return Directory.GetFiles(folder.FullName, "*.*").MaxBy(File.GetLastWriteTime);
     }
 
     public static IFolder GitSubFolder(this IFolder folder) {

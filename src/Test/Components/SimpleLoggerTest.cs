@@ -17,14 +17,14 @@ public class SimpleLoggerTest {
     private const string NotAMessage = "This is not a message";
     private const int NumberOfLogEntries = 1000;
 
-    private readonly IMethodNamesFromStackFramesExtractor MethodNamesFromStackFramesExtractor = new MethodNamesFromStackFramesExtractor();
+    private readonly IMethodNamesFromStackFramesExtractor _MethodNamesFromStackFramesExtractor = new MethodNamesFromStackFramesExtractor();
 
-    private SimpleLogFlusher Flusher;
-    private ISimpleLogger Sut;
+    private SimpleLogFlusher _Flusher;
+    private ISimpleLogger _Sut;
 
     [TestInitialize]
     public void Initialize() {
-        Flusher = new SimpleLogFlusher();
+        _Flusher = new SimpleLogFlusher();
     }
 
     private ILogConfiguration CreateLogConfiguration(string pseudoApplicationName) {
@@ -33,22 +33,22 @@ public class SimpleLoggerTest {
 
     [TestMethod, ExpectedException(typeof(Exception), "Attempt to create a log entry without a scope. Use BeginScope<>, and on the same thread")]
     public void Constructor_WithoutScope_ThrowsException() {
-        Sut = new SimpleLogger(CreateLogConfiguration(nameof(Constructor_WithoutScope_ThrowsException)), Flusher, MethodNamesFromStackFramesExtractor);
-        Sut.Log(LogLevel.Information, new EventId(0), "", null, (_, _) => { return NotAMessage; });
+        _Sut = new SimpleLogger(CreateLogConfiguration(nameof(Constructor_WithoutScope_ThrowsException)), _Flusher, _MethodNamesFromStackFramesExtractor);
+        _Sut.Log(LogLevel.Information, new EventId(0), "", null, (_, _) => NotAMessage);
     }
 
     [TestMethod]
     public void Log_CalledManyTimes_IsWorking() {
-        Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_CalledManyTimes_IsWorking)), Flusher, MethodNamesFromStackFramesExtractor);
-        using (Sut.BeginScope(SimpleLoggingScopeId.Create("Scope", "A"))) {
-            using (Sut.BeginScope(SimpleLoggingScopeId.Create("Scope", "B"))) {
+        _Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_CalledManyTimes_IsWorking)), _Flusher, _MethodNamesFromStackFramesExtractor);
+        using (_Sut.BeginScope(SimpleLoggingScopeId.Create("Scope", "A"))) {
+            using (_Sut.BeginScope(SimpleLoggingScopeId.Create("Scope", "B"))) {
                 for (var i = 0; i < NumberOfLogEntries; i++) {
-                    Sut.LogInformationWithCallStack(NotAMessage, MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames());
+                    _Sut.LogInformationWithCallStack(NotAMessage, _MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames());
                 }
             }
         }
 
-        var logEntries = Sut.FindLogEntries(_ => true);
+        var logEntries = _Sut.FindLogEntries(_ => true);
         Assert.AreEqual(NumberOfLogEntries, logEntries.Count);
         Assert.AreEqual(LogLevel.Information, logEntries[0].LogLevel);
         Assert.AreEqual(2, logEntries[0].Stack.Count);
@@ -56,7 +56,7 @@ public class SimpleLoggerTest {
         Assert.AreEqual("Scope(B)", logEntries[0].Stack[1]);
         Assert.AreEqual(NotAMessage, logEntries[0].Message);
 
-        var fileNames = Flusher.FileNames;
+        var fileNames = _Flusher.FileNames;
         Assert.AreEqual(1, fileNames.Count);
         var fileName = fileNames.First();
         Assert.IsTrue(File.Exists(fileName));
@@ -65,18 +65,18 @@ public class SimpleLoggerTest {
 
         File.SetLastWriteTime(fileName, DateTime.Now.AddHours(-25));
         SimpleLogFlusher.ResetCleanupTime();
-        Flusher.Flush(Sut, Sut.LogSubFolder);
+        _Flusher.Flush(_Sut, _Sut.LogSubFolder);
         Assert.IsFalse(File.Exists(fileName));
     }
 
 
     [TestMethod]
     public void Log_CalledManyTimesWithRandomId_IsWorking() {
-        Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_CalledManyTimes_IsWorking)), Flusher, MethodNamesFromStackFramesExtractor);
-        using (Sut.BeginScope(SimpleLoggingScopeId.CreateWithRandomId("Scope"))) {
-            using (Sut.BeginScope(SimpleLoggingScopeId.CreateWithRandomId("Scope"))) {
+        _Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_CalledManyTimes_IsWorking)), _Flusher, _MethodNamesFromStackFramesExtractor);
+        using (_Sut.BeginScope(SimpleLoggingScopeId.CreateWithRandomId("Scope"))) {
+            using (_Sut.BeginScope(SimpleLoggingScopeId.CreateWithRandomId("Scope"))) {
                 for (var i = 0; i < NumberOfLogEntries; i++) {
-                    Sut.LogInformationWithCallStack(NotAMessage, MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames());
+                    _Sut.LogInformationWithCallStack(NotAMessage, _MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames());
                 }
             }
         }
@@ -84,20 +84,20 @@ public class SimpleLoggerTest {
 
     [TestMethod]
     public async Task Log_WithinParallelDifferentTasks_IsWorking() {
-        Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_WithinParallelDifferentTasks_IsWorking)), Flusher, MethodNamesFromStackFramesExtractor);
+        _Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_WithinParallelDifferentTasks_IsWorking)), _Flusher, _MethodNamesFromStackFramesExtractor);
         var tasks = new List<Task> {
-            new ImLogging(TimeSpan.FromMilliseconds(77), DateTime.Now.AddSeconds(4), Sut, MethodNamesFromStackFramesExtractor).ImLoggingWorkAsync(),
-            new ImLoggingToo(TimeSpan.FromMilliseconds(222), DateTime.Now.AddSeconds(7), Sut, MethodNamesFromStackFramesExtractor).ImLoggingWorkTooAsync()
+            new ImLogging(TimeSpan.FromMilliseconds(77), DateTime.Now.AddSeconds(4), _Sut, _MethodNamesFromStackFramesExtractor).ImLoggingWorkAsync(),
+            new ImLoggingToo(TimeSpan.FromMilliseconds(222), DateTime.Now.AddSeconds(7), _Sut, _MethodNamesFromStackFramesExtractor).ImLoggingWorkTooAsync()
         };
         await Task.WhenAll(tasks);
     }
 
     [TestMethod]
     public async Task Log_WithinParallelSimilarTasks_IsWorking() {
-        Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_WithinParallelSimilarTasks_IsWorking)), Flusher, MethodNamesFromStackFramesExtractor);
+        _Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_WithinParallelSimilarTasks_IsWorking)), _Flusher, _MethodNamesFromStackFramesExtractor);
         var tasks = new List<Task> {
-            new ImLogging(TimeSpan.FromMilliseconds(77), DateTime.Now.AddSeconds(4), Sut, MethodNamesFromStackFramesExtractor).ImLoggingWorkAsync(),
-            new ImLogging(TimeSpan.FromMilliseconds(222), DateTime.Now.AddSeconds(7), Sut, MethodNamesFromStackFramesExtractor).ImLoggingWorkAsync()
+            new ImLogging(TimeSpan.FromMilliseconds(77), DateTime.Now.AddSeconds(4), _Sut, _MethodNamesFromStackFramesExtractor).ImLoggingWorkAsync(),
+            new ImLogging(TimeSpan.FromMilliseconds(222), DateTime.Now.AddSeconds(7), _Sut, _MethodNamesFromStackFramesExtractor).ImLoggingWorkAsync()
         };
         await Task.WhenAll(tasks);
     }
@@ -105,8 +105,8 @@ public class SimpleLoggerTest {
     [TestMethod]
     public void Constructor_WithLogConfiguration_ProducesLoggerWithConfiguredLogId() {
         var logConfiguration = CreateLogConfiguration(nameof(Constructor_WithLogConfiguration_ProducesLoggerWithConfiguredLogId));
-        Sut = new SimpleLogger(logConfiguration, Flusher, MethodNamesFromStackFramesExtractor);
-        Assert.AreEqual(logConfiguration.LogId, Sut.LogId);
+        _Sut = new SimpleLogger(logConfiguration, _Flusher, _MethodNamesFromStackFramesExtractor);
+        Assert.AreEqual(logConfiguration.LogId, _Sut.LogId);
     }
 
     [TestMethod]
