@@ -22,10 +22,10 @@ public class SimpleLogReaderTest {
     private IFolder _LogFolder;
     private DateTime _StartOfTestTime;
 
-    private const string MethodName = "WorkAsync";
-    private const string CallingMethodName = "Call_WorkAsync";
-    private const string Id1 = "1";
-    private const string Id2 = "2";
+    private readonly string _MethodName = "WorkAsync";
+    private readonly string _CallingMethodName = "Call_WorkAsync";
+    private readonly string _Id1 = "1";
+    private readonly string _Id2 = "2";
 
     [TestInitialize]
     public void Initialize() {
@@ -53,32 +53,32 @@ public class SimpleLogReaderTest {
 
     [TestMethod]
     public void ReadLogFile_WithSingleLogEntryOfStackDepth1InFile_ReturnsListWithSingleLogEntry() {
-        CreateLogEntries(MethodName, Id1, 1);
+        CreateLogEntries(_MethodName, _Id1, 1);
         var fileName = FindLogFile();
         var readLogEntries = _Sut.ReadLogFile(fileName);
         Assert.AreEqual(1, readLogEntries.Count);
-        VerifyLogEntry(readLogEntries[0], LogLevel.Error, "Log message #1", new List<string> { MethodName + "(" + Id1+ ")" });
+        VerifyLogEntry(readLogEntries[0], LogLevel.Error, "Log message #1", new List<string> { _MethodName + "(" + _Id1 + ")" });
     }
 
     [TestMethod]
     public void ReadLogFile_WithSingleLogEntryOfStackDepth2InFile_ReturnsListWithSingleLogEntry() {
-        using (_Logger.BeginScope(SimpleLoggingScopeId.Create(CallingMethodName, Id2))) {
-            CreateLogEntries(MethodName, Id1, 1);
+        using (_Logger.BeginScope(new SimpleLoggingScopeId { ClassOrMethod = _CallingMethodName, Id = _Id2 })) {
+            CreateLogEntries(_MethodName, _Id1, 1);
             var fileName = FindLogFile();
             var readLogEntries = _Sut.ReadLogFile(fileName);
             Assert.AreEqual(1, readLogEntries.Count);
-            VerifyLogEntry(readLogEntries[0], LogLevel.Error, "Log message #1", new List<string> { CallingMethodName + "(" + Id2 + ")", MethodName + "(" + Id1 + ")" });
+            VerifyLogEntry(readLogEntries[0], LogLevel.Error, "Log message #1", new List<string> { _CallingMethodName + "(" + _Id2 + ")", _MethodName + "(" + _Id1 + ")" });
         }
     }
 
     [TestMethod]
     public void ReadLogFile_WithTwoLogEntriesOfStackDepth1InFile_ReturnsListWithSingleLogEntry() {
-        CreateLogEntries(MethodName, Id1, 2);
+        CreateLogEntries(_MethodName, _Id1, 2);
         var fileName = FindLogFile();
         var readLogEntries = _Sut.ReadLogFile(fileName);
         Assert.AreEqual(2, readLogEntries.Count);
-        VerifyLogEntry(readLogEntries[0], LogLevel.Information, "Log message #1", new List<string> { MethodName + "(" + Id1 + ")" });
-        VerifyLogEntry(readLogEntries[1], LogLevel.Error, "Log message #2", new List<string> { MethodName + "(" + Id1 + ")" });
+        VerifyLogEntry(readLogEntries[0], LogLevel.Information, "Log message #1", new List<string> { _MethodName + "(" + _Id1 + ")" });
+        VerifyLogEntry(readLogEntries[1], LogLevel.Error, "Log message #2", new List<string> { _MethodName + "(" + _Id1 + ")" });
     }
 
     private void VerifyLogEntry(ISimpleLogEntry logEntry, LogLevel logLevel, string message, IList<string> stack) {
@@ -93,7 +93,8 @@ public class SimpleLogReaderTest {
 
     private string FindLogFile() {
         var fileNames = new List<string>();
-        Wait.Until(() => {
+        Wait.Until(() =>
+        {
             fileNames = Directory.GetFiles(_LogFolder.FullName, "*.log").Where(f => File.GetLastWriteTime(f) >= _StartOfTestTime).ToList();
             return fileNames.Any();
         }, TimeSpan.FromMilliseconds(500));
@@ -102,20 +103,20 @@ public class SimpleLogReaderTest {
     }
 
     private void CreateLogEntries(string methodName, string logId, int n) {
-        using (_Logger.BeginScope(SimpleLoggingScopeId.Create(methodName, logId))) {
+        using (_Logger.BeginScope(new SimpleLoggingScopeId { ClassOrMethod = methodName, Id = logId })) {
             var methodNamesInStack = _MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames();
             for (var counter = 0; n > 0; n--) {
-                var message = $"Log message #{++ counter}";
+                var message = $"Log message #{++counter}";
                 switch (n % 3) {
                     case 0:
                         _Logger.LogWarningWithCallStack(message, methodNamesInStack);
-                        break;
+                    break;
                     case 1:
                         _Logger.LogErrorWithCallStack(message, methodNamesInStack);
-                        break;
+                    break;
                     default:
                         _Logger.LogInformationWithCallStack(message, methodNamesInStack);
-                        break;
+                    break;
                 }
             }
         }

@@ -11,7 +11,7 @@ public class ImLoggingToo : ImLoggingBase {
     }
 
     public async Task ImLoggingWorkTooAsync() {
-        using (SimpleLogger.BeginScope(SimpleLoggingScopeId.Create(nameof(ImLogging), WorkerId))) {
+        using (SimpleLogger.BeginScope(SimpleLoggingScopeId.Create(nameof(ImLogging)))) {
             await WorkAsync();
         }
     }
