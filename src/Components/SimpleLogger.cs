@@ -40,7 +40,7 @@ public class SimpleLogger : ISimpleLogger {
         _MethodNamesFromStackFramesExtractor = methodNamesFromStackFramesExtractor;
         Enabled = true;
         _ScopeToCreatorMethodMapping = new Dictionary<string, string>();
-        _ExceptionFolder = new Folder(Path.GetTempPath()).SubFolder("AspenlaubExceptions");
+        _ExceptionFolder = new Folder(Path.GetTempPath()).SubFolder("AspenlaubExceptions").SubFolder(nameof(SimpleLogger));
         _ExceptionFolder.CreateIfNecessary();
     }
 
@@ -48,7 +48,8 @@ public class SimpleLogger : ISimpleLogger {
         if (!Enabled) { return; }
 
         if (_StackOfScopes.Count == 0) {
-            throw new Exception(Properties.Resources.AttemptToLogWithoutScope);
+            WriteErrorToExceptionFolder(Properties.Resources.AttemptToLogWithoutScope);
+            return;
         }
 
         const string noMessage = "(empty)";
@@ -56,14 +57,17 @@ public class SimpleLogger : ISimpleLogger {
         var message = state.ToString() ?? noMessage;
         try {
             if (message == noMessage) {
-                throw new JsonException($"Could not deserialize {message}");
+                WriteErrorToExceptionFolder($"Could not deserialize {message}");
+                return;
             }
             logMessageWithCallStack = JsonSerializer.Deserialize<LogMessageWithCallStack>(message);
             if (logMessageWithCallStack == null) {
-                throw new JsonException($"Could not deserialize {message}");
+                WriteErrorToExceptionFolder($"Could not deserialize {message}");
+                return;
             }
         } catch {
-            throw new JsonException($"Could not deserialize {message}");
+            WriteErrorToExceptionFolder($"Could not deserialize {message}");
+            return;
         }
 
         var reducesStackOfScopes = ReduceStackAccordingToCallStack(_StackOfScopes, logMessageWithCallStack.MethodNamesInCallStack);

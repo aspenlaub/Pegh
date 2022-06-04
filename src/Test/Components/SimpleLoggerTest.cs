@@ -14,8 +14,8 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components;
 
 [TestClass]
 public class SimpleLoggerTest {
-    private readonly string _NotAMessage = "This is not a message";
-    private readonly int _NumberOfLogEntries = 1000;
+    private const string NotAMessage = "This is not a message";
+    private const int NumberOfLogEntries = 1000;
 
     private readonly IMethodNamesFromStackFramesExtractor _MethodNamesFromStackFramesExtractor = new MethodNamesFromStackFramesExtractor();
 
@@ -31,30 +31,24 @@ public class SimpleLoggerTest {
         return new LogConfiguration(pseudoApplicationName);
     }
 
-    [TestMethod, ExpectedException(typeof(Exception), "Attempt to create a log entry without a scope. Use BeginScope<>, and on the same thread")]
-    public void Constructor_WithoutScope_ThrowsException() {
-        _Sut = new SimpleLogger(CreateLogConfiguration(nameof(Constructor_WithoutScope_ThrowsException)), _Flusher, _MethodNamesFromStackFramesExtractor);
-        _Sut.Log(LogLevel.Information, new EventId(0), "", null, (_, _) => _NotAMessage);
-    }
-
     [TestMethod]
     public void Log_CalledManyTimes_IsWorking() {
         _Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_CalledManyTimes_IsWorking)), _Flusher, _MethodNamesFromStackFramesExtractor);
         using (_Sut.BeginScope(new SimpleLoggingScopeId { ClassOrMethod =  "Scope", Id = "A" })) {
             using (_Sut.BeginScope(new SimpleLoggingScopeId { ClassOrMethod = "Scope", Id = "B" })) {
-                for (var i = 0; i < _NumberOfLogEntries; i++) {
-                    _Sut.LogInformationWithCallStack(_NotAMessage, _MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames());
+                for (var i = 0; i < NumberOfLogEntries; i++) {
+                    _Sut.LogInformationWithCallStack(NotAMessage, _MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames());
                 }
             }
         }
 
         var logEntries = _Sut.FindLogEntries(_ => true);
-        Assert.AreEqual(_NumberOfLogEntries, logEntries.Count);
+        Assert.AreEqual(NumberOfLogEntries, logEntries.Count);
         Assert.AreEqual(LogLevel.Information, logEntries[0].LogLevel);
         Assert.AreEqual(2, logEntries[0].Stack.Count);
         Assert.AreEqual("Scope(A)", logEntries[0].Stack[0]);
         Assert.AreEqual("Scope(B)", logEntries[0].Stack[1]);
-        Assert.AreEqual(_NotAMessage, logEntries[0].Message);
+        Assert.AreEqual(NotAMessage, logEntries[0].Message);
 
         var fileNames = _Flusher.FileNames;
         Assert.AreEqual(1, fileNames.Count);
@@ -75,8 +69,8 @@ public class SimpleLoggerTest {
         _Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_CalledManyTimes_IsWorking)), _Flusher, _MethodNamesFromStackFramesExtractor);
         using (_Sut.BeginScope(SimpleLoggingScopeId.Create("Scope"))) {
             using (_Sut.BeginScope(SimpleLoggingScopeId.Create("Scope"))) {
-                for (var i = 0; i < _NumberOfLogEntries; i++) {
-                    _Sut.LogInformationWithCallStack(_NotAMessage, _MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames());
+                for (var i = 0; i < NumberOfLogEntries; i++) {
+                    _Sut.LogInformationWithCallStack(NotAMessage, _MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames());
                 }
             }
         }
