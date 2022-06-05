@@ -11,7 +11,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 
 public class SimpleLogFlusher : ISimpleLogFlusher {
     private static readonly object LockObject = new();
-    private static DateTime CleanupTime = DateTime.Now;
+    private static Dictionary<string, DateTime> FolderToCleanupTime = new();
     public HashSet<string> FileNames { get; } = new();
 
     public void Flush(ISimpleLogger logger, string subFolder) {
@@ -34,15 +34,21 @@ public class SimpleLogFlusher : ISimpleLogFlusher {
             }
         }
 
-        if (DateTime.Now < CleanupTime) { return; }
+        lock (LockObject) {
+            if (FolderToCleanupTime.ContainsKey(folder.FullName) && DateTime.Now < FolderToCleanupTime[folder.FullName]) { return; }
 
-        var minWriteTime = DateTime.Now.AddDays(-1);
-        var files = Directory.GetFiles(folder.FullName, "*.log", SearchOption.TopDirectoryOnly).Where(f => File.GetLastWriteTime(f) < minWriteTime).ToList();
-        foreach (var file in files) {
-            File.Delete(file);
+            var minWriteTime = DateTime.Now.AddDays(-1);
+            var files = Directory.GetFiles(folder.FullName, "*.log", SearchOption.TopDirectoryOnly).Where(f => File.GetLastWriteTime(f) < minWriteTime).ToList();
+            foreach (var file in files) {
+                try {
+                    File.Delete(file);
+                    // ReSharper disable once EmptyGeneralCatchClause
+                } catch {
+                }
+            }
         }
 
-        CleanupTime = DateTime.Now.AddHours(2);
+        FolderToCleanupTime[folder.FullName] = DateTime.Now.AddHours(2);
     }
 
     private static string Format(ISimpleLogEntry entry) {
@@ -58,6 +64,8 @@ public class SimpleLogFlusher : ISimpleLogFlusher {
     }
 
     internal static void ResetCleanupTime() {
-        CleanupTime = DateTime.Now;
+        lock (LockObject) {
+            FolderToCleanupTime = new();
+        }
     }
 }
