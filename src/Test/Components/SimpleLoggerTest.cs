@@ -66,7 +66,7 @@ public class SimpleLoggerTest {
 
     [TestMethod]
     public void Log_CalledManyTimesWithRandomId_IsWorking() {
-        _Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_CalledManyTimes_IsWorking)), _Flusher, _MethodNamesFromStackFramesExtractor);
+        _Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_CalledManyTimesWithRandomId_IsWorking)), _Flusher, _MethodNamesFromStackFramesExtractor);
         using (_Sut.BeginScope(SimpleLoggingScopeId.Create("Scope"))) {
             using (_Sut.BeginScope(SimpleLoggingScopeId.Create("Scope"))) {
                 for (var i = 0; i < NumberOfLogEntries; i++) {

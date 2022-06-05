@@ -22,8 +22,6 @@ public class SimpleLogReaderTest {
     private IFolder _LogFolder;
     private DateTime _StartOfTestTime;
 
-    private const string MethodName = "WorkAsync";
-    private const string CallingMethodName = "Call_WorkAsync";
     private const string Id1 = "1";
     private const string Id2 = "2";
 
@@ -53,32 +51,36 @@ public class SimpleLogReaderTest {
 
     [TestMethod]
     public void ReadLogFile_WithSingleLogEntryOfStackDepth1InFile_ReturnsListWithSingleLogEntry() {
-        CreateLogEntries(MethodName, Id1, 1);
+        const string methodName = nameof(ReadLogFile_WithSingleLogEntryOfStackDepth1InFile_ReturnsListWithSingleLogEntry);
+        CreateLogEntries(methodName, Id1, 1);
         var fileName = FindLogFile();
         var readLogEntries = _Sut.ReadLogFile(fileName);
         Assert.AreEqual(1, readLogEntries.Count);
-        VerifyLogEntry(readLogEntries[0], LogLevel.Error, "Log message #1", new List<string> { MethodName + "(" + Id1 + ")" });
+        VerifyLogEntry(readLogEntries[0], LogLevel.Error, "Log message #1", new List<string> { methodName + "(" + Id1 + ")" });
     }
 
     [TestMethod]
     public void ReadLogFile_WithSingleLogEntryOfStackDepth2InFile_ReturnsListWithSingleLogEntry() {
-        using (_Logger.BeginScope(new SimpleLoggingScopeId { ClassOrMethod = CallingMethodName, Id = Id2 })) {
-            CreateLogEntries(MethodName, Id1, 1);
+        const string methodName = nameof(ReadLogFile_WithSingleLogEntryOfStackDepth2InFile_ReturnsListWithSingleLogEntry);
+        const string callingMethodName = methodName + "_Caller";
+        using (_Logger.BeginScope(new SimpleLoggingScopeId { ClassOrMethod = callingMethodName, Id = Id2 })) {
+            CreateLogEntries(methodName, Id1, 1);
             var fileName = FindLogFile();
             var readLogEntries = _Sut.ReadLogFile(fileName);
             Assert.AreEqual(1, readLogEntries.Count);
-            VerifyLogEntry(readLogEntries[0], LogLevel.Error, "Log message #1", new List<string> { CallingMethodName + "(" + Id2 + ")", MethodName + "(" + Id1 + ")" });
+            VerifyLogEntry(readLogEntries[0], LogLevel.Error, "Log message #1", new List<string> { callingMethodName + "(" + Id2 + ")", methodName + "(" + Id1 + ")" });
         }
     }
 
     [TestMethod]
     public void ReadLogFile_WithTwoLogEntriesOfStackDepth1InFile_ReturnsListWithSingleLogEntry() {
-        CreateLogEntries(MethodName, Id1, 2);
+        const string methodName = nameof(ReadLogFile_WithTwoLogEntriesOfStackDepth1InFile_ReturnsListWithSingleLogEntry);
+        CreateLogEntries(methodName, Id1, 2);
         var fileName = FindLogFile();
         var readLogEntries = _Sut.ReadLogFile(fileName);
         Assert.AreEqual(2, readLogEntries.Count);
-        VerifyLogEntry(readLogEntries[0], LogLevel.Information, "Log message #1", new List<string> { MethodName + "(" + Id1 + ")" });
-        VerifyLogEntry(readLogEntries[1], LogLevel.Error, "Log message #2", new List<string> { MethodName + "(" + Id1 + ")" });
+        VerifyLogEntry(readLogEntries[0], LogLevel.Information, "Log message #1", new List<string> { methodName + "(" + Id1 + ")" });
+        VerifyLogEntry(readLogEntries[1], LogLevel.Error, "Log message #2", new List<string> { methodName + "(" + Id1 + ")" });
     }
 
     private void VerifyLogEntry(ISimpleLogEntry logEntry, LogLevel logLevel, string message, IList<string> stack) {
