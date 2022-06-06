@@ -33,6 +33,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
             var fileNames = Directory.GetFiles(folder.FullName, "*.log").ToList();
             Assert.AreEqual(1, fileNames.Count);
             Assert.AreEqual(folder.FullName + '\\' + nameof(SimpleLogFlusherTest) + '(' + Environment.ProcessId + ").log", fileNames[0]);
+            Assert.IsTrue(File.ReadAllText(fileNames[0]).Contains(logEntries[0].Message));
         }
     }
 }
