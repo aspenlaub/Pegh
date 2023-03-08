@@ -105,7 +105,15 @@ public class SimpleLogReaderTest {
         }, TimeSpan.FromMilliseconds(500));
         VerifyNoExceptionWasLogged();
         VerifyLogWasFlushed();
-        Assert.IsTrue(fileNames.Count > 0, "No files found");
+        if (fileNames.Count == 0) {
+            Wait.Until(() =>
+            {
+                fileNames = Directory.GetFiles(_LogFolder.FullName, "*.log").Where(f => File.GetLastWriteTime(f) >= _StartOfTestTime).ToList();
+                return fileNames.Any();
+            }, TimeSpan.FromSeconds(10));
+            Assert.IsTrue(fileNames.Count == 0, "Files found but only after waiting for a longer time");
+            Assert.IsTrue(fileNames.Count > 0, "No files found");
+        }
         return fileNames[0];
     }
 
