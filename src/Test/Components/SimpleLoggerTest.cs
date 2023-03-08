@@ -21,10 +21,15 @@ public class SimpleLoggerTest {
 
     private SimpleLogFlusher _Flusher;
     private ISimpleLogger _Sut;
+    private DateTime _StartOfTestTime;
+    private IFolder _ExceptionFolder;
 
     [TestInitialize]
     public void Initialize() {
         _Flusher = new SimpleLogFlusher();
+        SimpleLogFlusher.ResetCleanupTime();
+        _StartOfTestTime = DateTime.Now;
+        _ExceptionFolder = new Folder(Path.GetTempPath()).SubFolder("AspenlaubExceptions").SubFolder(nameof(SimpleLogger));
     }
 
     private ILogConfiguration CreateLogConfiguration(string pseudoApplicationName) {
@@ -41,6 +46,8 @@ public class SimpleLoggerTest {
                 }
             }
         }
+
+        VerifyNoExceptionWasLogged();
 
         var logEntries = _Sut.FindLogEntries(_ => true);
         Assert.AreEqual(NumberOfLogEntries, logEntries.Count);
@@ -107,5 +114,11 @@ public class SimpleLoggerTest {
     public void Constructor_WithLogConfiguration_ProducesLoggerWithConfiguredSubFolder() {
         ISimpleLogger sut = new SimpleLogger(new LogConfiguration(nameof(Constructor_WithLogConfiguration_ProducesLoggerWithConfiguredSubFolder)), new SimpleLogFlusher(), new MethodNamesFromStackFramesExtractor());
         Assert.AreEqual(@"AspenlaubLogs\" + nameof(Constructor_WithLogConfiguration_ProducesLoggerWithConfiguredSubFolder), sut.LogSubFolder);
+    }
+
+    private void VerifyNoExceptionWasLogged() {
+        var exceptionFileNames = Directory.GetFiles(_ExceptionFolder.FullName, "*.*").Where(f => File.GetLastWriteTime(f) >= _StartOfTestTime).ToList();
+        var exceptionFileName = exceptionFileNames.FirstOrDefault() ?? "\\";
+        Assert.IsTrue(exceptionFileName.Length <= 1, $"An exception was logged {exceptionFileName.Substring(exceptionFileName.LastIndexOf('\\'))}");
     }
 }

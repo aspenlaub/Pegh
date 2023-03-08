@@ -13,6 +13,11 @@ using Moq;
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components {
     [TestClass]
     public class SimpleLogFlusherTest {
+        [TestInitialize]
+        public void Initialize() {
+            SimpleLogFlusher.ResetCleanupTime();
+        }
+
         [TestMethod]
         public void Flush_WithRandomScope_ProducesFileWithoutRandomComponent() {
             var sut = new SimpleLogFlusher();
