@@ -22,14 +22,13 @@ public class SimpleLoggerTest {
     private SimpleLogFlusher _Flusher;
     private ISimpleLogger _Sut;
     private DateTime _StartOfTestTime;
-    private IFolder _ExceptionFolder;
+    private readonly IExceptionFolderProvider _ExceptionFolderProvider = new FakeExceptionFolderProvider();
 
     [TestInitialize]
     public void Initialize() {
         _Flusher = new SimpleLogFlusher();
         SimpleLogFlusher.ResetCleanupTime();
         _StartOfTestTime = DateTime.Now;
-        _ExceptionFolder = new Folder(Path.GetTempPath()).SubFolder("AspenlaubExceptions").SubFolder(nameof(SimpleLogger));
     }
 
     private ILogConfiguration CreateLogConfiguration(string pseudoApplicationName) {
@@ -38,7 +37,8 @@ public class SimpleLoggerTest {
 
     [TestMethod]
     public void Log_CalledManyTimes_IsWorking() {
-        _Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_CalledManyTimes_IsWorking)), _Flusher, _MethodNamesFromStackFramesExtractor);
+        _Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_CalledManyTimes_IsWorking)), _Flusher,
+            _MethodNamesFromStackFramesExtractor, _ExceptionFolderProvider);
         using (_Sut.BeginScope(new SimpleLoggingScopeId { ClassOrMethod =  "Scope", Id = "A" })) {
             using (_Sut.BeginScope(new SimpleLoggingScopeId { ClassOrMethod = "Scope", Id = "B" })) {
                 for (var i = 0; i < NumberOfLogEntries; i++) {
@@ -73,7 +73,8 @@ public class SimpleLoggerTest {
 
     [TestMethod]
     public void Log_CalledManyTimesWithRandomId_IsWorking() {
-        _Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_CalledManyTimesWithRandomId_IsWorking)), _Flusher, _MethodNamesFromStackFramesExtractor);
+        _Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_CalledManyTimesWithRandomId_IsWorking)), _Flusher,
+            _MethodNamesFromStackFramesExtractor, _ExceptionFolderProvider);
         using (_Sut.BeginScope(SimpleLoggingScopeId.Create("Scope"))) {
             using (_Sut.BeginScope(SimpleLoggingScopeId.Create("Scope"))) {
                 for (var i = 0; i < NumberOfLogEntries; i++) {
@@ -85,7 +86,8 @@ public class SimpleLoggerTest {
 
     [TestMethod]
     public async Task Log_WithinParallelDifferentTasks_IsWorking() {
-        _Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_WithinParallelDifferentTasks_IsWorking)), _Flusher, _MethodNamesFromStackFramesExtractor);
+        _Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_WithinParallelDifferentTasks_IsWorking)), _Flusher,
+                                _MethodNamesFromStackFramesExtractor, _ExceptionFolderProvider);
         var tasks = new List<Task> {
             new ImLogging(TimeSpan.FromMilliseconds(77), DateTime.Now.AddSeconds(4), _Sut, _MethodNamesFromStackFramesExtractor).ImLoggingWorkAsync(),
             new ImLoggingToo(TimeSpan.FromMilliseconds(222), DateTime.Now.AddSeconds(7), _Sut, _MethodNamesFromStackFramesExtractor).ImLoggingWorkTooAsync()
@@ -95,7 +97,8 @@ public class SimpleLoggerTest {
 
     [TestMethod]
     public async Task Log_WithinParallelSimilarTasks_IsWorking() {
-        _Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_WithinParallelSimilarTasks_IsWorking)), _Flusher, _MethodNamesFromStackFramesExtractor);
+        _Sut = new SimpleLogger(CreateLogConfiguration(nameof(Log_WithinParallelSimilarTasks_IsWorking)), _Flusher,
+                                _MethodNamesFromStackFramesExtractor, _ExceptionFolderProvider);
         var tasks = new List<Task> {
             new ImLogging(TimeSpan.FromMilliseconds(77), DateTime.Now.AddSeconds(4), _Sut, _MethodNamesFromStackFramesExtractor).ImLoggingWorkAsync(),
             new ImLogging(TimeSpan.FromMilliseconds(222), DateTime.Now.AddSeconds(7), _Sut, _MethodNamesFromStackFramesExtractor).ImLoggingWorkAsync()
@@ -106,18 +109,20 @@ public class SimpleLoggerTest {
     [TestMethod]
     public void Constructor_WithLogConfiguration_ProducesLoggerWithConfiguredLogId() {
         var logConfiguration = CreateLogConfiguration(nameof(Constructor_WithLogConfiguration_ProducesLoggerWithConfiguredLogId));
-        _Sut = new SimpleLogger(logConfiguration, _Flusher, _MethodNamesFromStackFramesExtractor);
+        _Sut = new SimpleLogger(logConfiguration, _Flusher,
+            _MethodNamesFromStackFramesExtractor, _ExceptionFolderProvider);
         Assert.AreEqual(logConfiguration.LogId, _Sut.LogId);
     }
 
     [TestMethod]
     public void Constructor_WithLogConfiguration_ProducesLoggerWithConfiguredSubFolder() {
-        ISimpleLogger sut = new SimpleLogger(new LogConfiguration(nameof(Constructor_WithLogConfiguration_ProducesLoggerWithConfiguredSubFolder)), new SimpleLogFlusher(), new MethodNamesFromStackFramesExtractor());
+        ISimpleLogger sut = new SimpleLogger(new LogConfiguration(nameof(Constructor_WithLogConfiguration_ProducesLoggerWithConfiguredSubFolder)),
+            new SimpleLogFlusher(), new MethodNamesFromStackFramesExtractor(), _ExceptionFolderProvider);
         Assert.AreEqual(@"AspenlaubLogs\" + nameof(Constructor_WithLogConfiguration_ProducesLoggerWithConfiguredSubFolder), sut.LogSubFolder);
     }
 
     private void VerifyNoExceptionWasLogged() {
-        var exceptionFileNames = Directory.GetFiles(_ExceptionFolder.FullName, "*.*").Where(f => File.GetLastWriteTime(f) >= _StartOfTestTime).ToList();
+        var exceptionFileNames = Directory.GetFiles(_ExceptionFolderProvider.ExceptionFolder().FullName, "*.*").Where(f => File.GetLastWriteTime(f) >= _StartOfTestTime).ToList();
         var exceptionFileName = exceptionFileNames.FirstOrDefault() ?? "\\";
         Assert.IsTrue(exceptionFileName.Length <= 1, $"An exception was logged {exceptionFileName.Substring(exceptionFileName.LastIndexOf('\\'))}");
     }

@@ -31,7 +31,8 @@ public class SimpleLogger : ISimpleLogger {
 
     private readonly IFolder _ExceptionFolder;
 
-    public SimpleLogger(ILogConfiguration logConfiguration, ISimpleLogFlusher simpleLogFlusher, IMethodNamesFromStackFramesExtractor methodNamesFromStackFramesExtractor) {
+    public SimpleLogger(ILogConfiguration logConfiguration, ISimpleLogFlusher simpleLogFlusher,
+            IMethodNamesFromStackFramesExtractor methodNamesFromStackFramesExtractor, IExceptionFolderProvider exceptionFolderProvider) {
         LogSubFolder = logConfiguration.LogSubFolder;
         LogId = logConfiguration.LogId;
         _LogEntries = new List<ISimpleLogEntry>();
@@ -40,8 +41,7 @@ public class SimpleLogger : ISimpleLogger {
         _MethodNamesFromStackFramesExtractor = methodNamesFromStackFramesExtractor;
         Enabled = true;
         _ScopeToCreatorMethodMapping = new Dictionary<string, string>();
-        _ExceptionFolder = new Folder(Path.GetTempPath()).SubFolder("AspenlaubExceptions").SubFolder(nameof(SimpleLogger));
-        _ExceptionFolder.CreateIfNecessary();
+        _ExceptionFolder = exceptionFolderProvider.ExceptionFolder();
     }
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter) {

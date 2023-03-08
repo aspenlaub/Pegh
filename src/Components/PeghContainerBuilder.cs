@@ -16,6 +16,7 @@ public static class PeghContainerBuilder {
         builder.RegisterInstance(csArgumentPrompter).As<ICsArgumentPrompter>();
         builder.RegisterType<CsLambdaCompiler>().As<ICsLambdaCompiler>();
         builder.RegisterType<Disguiser>().As<IDisguiser>();
+        builder.RegisterType<ExceptionFolderProvider>().As<IExceptionFolderProvider>();
         builder.RegisterType<FolderDeleter>().As<IFolderDeleter>();
         builder.RegisterType<FolderResolver>().As<IFolderResolver>();
         builder.RegisterType<MethodNamesFromStackFramesExtractor>().As<IMethodNamesFromStackFramesExtractor>();
@@ -30,7 +31,7 @@ public static class PeghContainerBuilder {
         builder.RegisterType<XmlSchemer>().As<IXmlSchemer>();
         LogConfiguration ??= new LogConfiguration(applicationName);
         builder.RegisterInstance(LogConfiguration);
-        SimpleLogger ??= new SimpleLogger(LogConfiguration, new SimpleLogFlusher(), new MethodNamesFromStackFramesExtractor());
+        SimpleLogger ??= new SimpleLogger(LogConfiguration, new SimpleLogFlusher(), new MethodNamesFromStackFramesExtractor(), new ExceptionFolderProvider());
         builder.RegisterInstance(SimpleLogger);
         builder.RegisterInstance<ILogger>(SimpleLogger);
 
@@ -41,6 +42,7 @@ public static class PeghContainerBuilder {
         services.AddSingleton(csArgumentPrompter);
         services.AddTransient<ICsLambdaCompiler, CsLambdaCompiler>();
         services.AddTransient<IDisguiser, Disguiser>();
+        services.AddTransient<IExceptionFolderProvider, ExceptionFolderProvider>();
         services.AddTransient<IFolderDeleter, FolderDeleter>();
         services.AddTransient<IFolderResolver, FolderResolver>();
         services.AddTransient<IMethodNamesFromStackFramesExtractor, MethodNamesFromStackFramesExtractor>();
@@ -55,7 +57,7 @@ public static class PeghContainerBuilder {
         services.AddTransient<IXmlSchemer, XmlSchemer>();
         LogConfiguration ??= new LogConfiguration(applicationName);
         services.AddSingleton(LogConfiguration);
-        SimpleLogger ??= new SimpleLogger(LogConfiguration, new SimpleLogFlusher(), new MethodNamesFromStackFramesExtractor());
+        SimpleLogger ??= new SimpleLogger(LogConfiguration, new SimpleLogFlusher(), new MethodNamesFromStackFramesExtractor(), new ExceptionFolderProvider());
         services.AddSingleton(SimpleLogger);
 
         return services;

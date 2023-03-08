@@ -21,7 +21,7 @@ public class SimpleLogReaderTest {
     private ISimpleLogFlusher _Flusher;
     private IFolder _LogFolder;
     private DateTime _StartOfTestTime;
-    private IFolder _ExceptionFolder;
+    private IExceptionFolderProvider _ExceptionFolderProvider = new FakeExceptionFolderProvider();
 
     private const string Id1 = "1";
     private const string Id2 = "2";
@@ -33,7 +33,8 @@ public class SimpleLogReaderTest {
         var logConfiguration = new LogConfiguration(nameof(SimpleLogReaderTest));
         _Flusher = new SimpleLogFlusher();
         SimpleLogFlusher.ResetCleanupTime();
-        _Logger = new SimpleLogger(logConfiguration, _Flusher, _MethodNamesFromStackFramesExtractor);
+        _ExceptionFolderProvider = new FakeExceptionFolderProvider();
+        _Logger = new SimpleLogger(logConfiguration, _Flusher, _MethodNamesFromStackFramesExtractor, _ExceptionFolderProvider);
         _LogFolder = new Folder(Path.GetTempPath()).SubFolder(_Logger.LogSubFolder);
         _LogFolder.CreateIfNecessary();
         foreach (var fileName in Directory.GetFiles(_LogFolder.FullName, "*.log")) {
@@ -41,7 +42,6 @@ public class SimpleLogReaderTest {
         }
         _StartOfTestTime = DateTime.Now;
         _Sut = new SimpleLogReader();
-        _ExceptionFolder = new Folder(Path.GetTempPath()).SubFolder("AspenlaubExceptions").SubFolder(nameof(SimpleLogger));
     }
 
     [TestMethod]
@@ -129,7 +129,8 @@ public class SimpleLogReaderTest {
     }
 
     private void VerifyNoExceptionWasLogged() {
-        var exceptionFileNames = Directory.GetFiles(_ExceptionFolder.FullName, "*.*").Where(f => File.GetLastWriteTime(f) >= _StartOfTestTime).ToList();
+        var exceptionFileNames = Directory.GetFiles(_ExceptionFolderProvider.ExceptionFolder().FullName, "*.*")
+            .Where(f => File.GetLastWriteTime(f) >= _StartOfTestTime).ToList();
         var exceptionFileName = exceptionFileNames.FirstOrDefault() ?? "\\";
         Assert.IsTrue(exceptionFileName.Length <= 1, $"An exception was logged {exceptionFileName.Substring(exceptionFileName.LastIndexOf('\\'))}");
     }
