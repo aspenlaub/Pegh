@@ -1,2 +1,2 @@
-dotnet cake build.cake --Target=RunTestsOnDebugArtifacts
+dotnet cake build.cake --Target=BuildAndTestDebugAndRelease
 pause
