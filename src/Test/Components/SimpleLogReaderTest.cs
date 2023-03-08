@@ -42,6 +42,7 @@ public class SimpleLogReaderTest {
         }
         _StartOfTestTime = DateTime.Now;
         _Sut = new SimpleLogReader();
+        VerifyLogWasFlushed();
     }
 
     [TestMethod]
@@ -138,6 +139,8 @@ public class SimpleLogReaderTest {
                         _Logger.LogInformationWithCallStack(message, methodNamesInStack);
                     break;
                 }
+                Assert.IsTrue(_Flusher.FileNames.Any(), "Flusher has not registered any file names");
+                VerifyLogWasFlushed();
             }
         }
     }
