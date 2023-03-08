@@ -26,7 +26,7 @@ public class SimpleLoggerTest {
 
     [TestInitialize]
     public void Initialize() {
-        _Flusher = new SimpleLogFlusher();
+        _Flusher = new SimpleLogFlusher(_ExceptionFolderProvider);
         SimpleLogFlusher.ResetCleanupTime();
         _StartOfTestTime = DateTime.Now;
     }
@@ -43,11 +43,13 @@ public class SimpleLoggerTest {
             using (_Sut.BeginScope(new SimpleLoggingScopeId { ClassOrMethod = "Scope", Id = "B" })) {
                 for (var i = 0; i < NumberOfLogEntries; i++) {
                     _Sut.LogInformationWithCallStack(NotAMessage, _MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames());
+                    SimpleLogFlusher.ResetCleanupTime();
                 }
             }
         }
 
         VerifyNoExceptionWasLogged();
+        VerifyLogWasFlushedOrNot(false);
 
         var logEntries = _Sut.FindLogEntries(_ => true);
         Assert.AreEqual(NumberOfLogEntries, logEntries.Count);
@@ -67,6 +69,7 @@ public class SimpleLoggerTest {
         File.SetLastWriteTime(fileName, DateTime.Now.AddHours(-25));
         SimpleLogFlusher.ResetCleanupTime();
         _Flusher.Flush(_Sut, _Sut.LogSubFolder);
+        VerifyLogWasFlushedOrNot(false);
         Assert.IsFalse(File.Exists(fileName));
     }
 
@@ -117,7 +120,7 @@ public class SimpleLoggerTest {
     [TestMethod]
     public void Constructor_WithLogConfiguration_ProducesLoggerWithConfiguredSubFolder() {
         ISimpleLogger sut = new SimpleLogger(new LogConfiguration(nameof(Constructor_WithLogConfiguration_ProducesLoggerWithConfiguredSubFolder)),
-            new SimpleLogFlusher(), new MethodNamesFromStackFramesExtractor(), _ExceptionFolderProvider);
+            new SimpleLogFlusher(_ExceptionFolderProvider), new MethodNamesFromStackFramesExtractor(), _ExceptionFolderProvider);
         Assert.AreEqual(@"AspenlaubLogs\" + nameof(Constructor_WithLogConfiguration_ProducesLoggerWithConfiguredSubFolder), sut.LogSubFolder);
     }
 
@@ -125,5 +128,9 @@ public class SimpleLoggerTest {
         var exceptionFileNames = Directory.GetFiles(_ExceptionFolderProvider.ExceptionFolder().FullName, "*.*").Where(f => File.GetLastWriteTime(f) >= _StartOfTestTime).ToList();
         var exceptionFileName = exceptionFileNames.FirstOrDefault() ?? "\\";
         Assert.IsTrue(exceptionFileName.Length <= 1, $"An exception was logged {exceptionFileName.Substring(exceptionFileName.LastIndexOf('\\'))}");
+    }
+
+    private void VerifyLogWasFlushedOrNot(bool was) {
+        Assert.AreEqual(was, _Flusher.FlushIsRequired);
     }
 }

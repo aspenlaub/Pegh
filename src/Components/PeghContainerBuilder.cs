@@ -31,7 +31,8 @@ public static class PeghContainerBuilder {
         builder.RegisterType<XmlSchemer>().As<IXmlSchemer>();
         LogConfiguration ??= new LogConfiguration(applicationName);
         builder.RegisterInstance(LogConfiguration);
-        SimpleLogger ??= new SimpleLogger(LogConfiguration, new SimpleLogFlusher(), new MethodNamesFromStackFramesExtractor(), new ExceptionFolderProvider());
+        var exceptionFolderProvider = new ExceptionFolderProvider();
+        SimpleLogger ??= new SimpleLogger(LogConfiguration, new SimpleLogFlusher(exceptionFolderProvider), new MethodNamesFromStackFramesExtractor(), exceptionFolderProvider);
         builder.RegisterInstance(SimpleLogger);
         builder.RegisterInstance<ILogger>(SimpleLogger);
 
@@ -57,7 +58,8 @@ public static class PeghContainerBuilder {
         services.AddTransient<IXmlSchemer, XmlSchemer>();
         LogConfiguration ??= new LogConfiguration(applicationName);
         services.AddSingleton(LogConfiguration);
-        SimpleLogger ??= new SimpleLogger(LogConfiguration, new SimpleLogFlusher(), new MethodNamesFromStackFramesExtractor(), new ExceptionFolderProvider());
+        var exceptionFolderProvider = new ExceptionFolderProvider();
+        SimpleLogger ??= new SimpleLogger(LogConfiguration, new SimpleLogFlusher(exceptionFolderProvider), new MethodNamesFromStackFramesExtractor(), exceptionFolderProvider);
         services.AddSingleton(SimpleLogger);
 
         return services;

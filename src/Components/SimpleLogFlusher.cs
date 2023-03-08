@@ -13,6 +13,12 @@ public class SimpleLogFlusher : ISimpleLogFlusher {
     private static readonly object LockObject = new();
     private static Dictionary<string, DateTime> FolderToCleanupTime = new();
     public HashSet<string> FileNames { get; } = new();
+    public bool FlushIsRequired { get; set; }
+    private readonly IExceptionFolderProvider _ExceptionFolderProvider;
+
+    public SimpleLogFlusher(IExceptionFolderProvider exceptionFolderProvider) {
+        _ExceptionFolderProvider = exceptionFolderProvider;
+    }
 
     public void Flush(ISimpleLogger logger, string subFolder) {
         var folder = new Folder(Path.GetTempPath()).SubFolder(subFolder);
@@ -26,7 +32,8 @@ public class SimpleLogFlusher : ISimpleLogFlusher {
                 var entries = logEntries.Where(e => !e.Flushed && e.Stack[0] == id).ToList();
                 try {
                     File.AppendAllLines(fileName, entries.Select(Format));
-                } catch {
+                } catch (Exception e) {
+                    WriteErrorToExceptionFolder($"Could not flush log entries {e.Message}");
                     return;
                 }
                 logger.OnEntriesFlushed(entries);
@@ -49,6 +56,7 @@ public class SimpleLogFlusher : ISimpleLogFlusher {
         }
 
         FolderToCleanupTime[folder.FullName] = DateTime.Now.AddHours(2);
+        FlushIsRequired = false;
     }
 
     private static string Format(ISimpleLogEntry entry) {
@@ -75,5 +83,11 @@ public class SimpleLogFlusher : ISimpleLogFlusher {
         lock (LockObject) {
             FolderToCleanupTime = new();
         }
+    }
+
+    private void WriteErrorToExceptionFolder(string errorMessage) {
+        var fileName = _ExceptionFolderProvider.ExceptionFolder().FullName + "\\" + nameof(SimpleLogFlusher) + "-Error-" + Guid.NewGuid().ToString().Replace("-", "") + ".log";
+        var contents = errorMessage + "\r\n\r\n" + Environment.StackTrace;
+        File.WriteAllText(fileName, contents);
     }
 }

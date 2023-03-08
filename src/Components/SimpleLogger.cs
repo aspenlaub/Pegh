@@ -45,6 +45,8 @@ public class SimpleLogger : ISimpleLogger {
     }
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter) {
+        _SimpleLogFlusher.FlushIsRequired = true;
+
         if (!Enabled) { return; }
 
         if (_StackOfScopes.Count == 0) {

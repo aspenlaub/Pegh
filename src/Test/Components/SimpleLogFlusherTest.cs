@@ -23,7 +23,7 @@ public class SimpleLogFlusherTest {
 
     [TestMethod]
     public void Flush_WithRandomScope_ProducesFileWithoutRandomComponent() {
-        var sut = new SimpleLogFlusher();
+        var sut = new SimpleLogFlusher(_ExceptionFolderProvider);
         var loggerMock = new Mock<ISimpleLogger>();
         var logEntries = new List<ISimpleLogEntry> {
             new SimpleLogEntry {

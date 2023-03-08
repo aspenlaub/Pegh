@@ -8,4 +8,5 @@ public interface ISimpleLogFlusher {
     HashSet<string> FileNames { get; }
 
     void Flush(ISimpleLogger logger, string subFolder);
+    bool FlushIsRequired { get; set; }
 }

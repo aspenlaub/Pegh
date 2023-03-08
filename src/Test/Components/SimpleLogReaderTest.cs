@@ -31,7 +31,7 @@ public class SimpleLogReaderTest {
         var container = new ContainerBuilder().UsePegh("Pegh", new DummyCsArgumentPrompter()).Build();
         _MethodNamesFromStackFramesExtractor = container.Resolve<IMethodNamesFromStackFramesExtractor>();
         var logConfiguration = new LogConfiguration(nameof(SimpleLogReaderTest));
-        _Flusher = new SimpleLogFlusher();
+        _Flusher = new SimpleLogFlusher(_ExceptionFolderProvider);
         SimpleLogFlusher.ResetCleanupTime();
         _ExceptionFolderProvider = new FakeExceptionFolderProvider();
         _Logger = new SimpleLogger(logConfiguration, _Flusher, _MethodNamesFromStackFramesExtractor, _ExceptionFolderProvider);
@@ -104,6 +104,7 @@ public class SimpleLogReaderTest {
             return fileNames.Any();
         }, TimeSpan.FromMilliseconds(500));
         VerifyNoExceptionWasLogged();
+        VerifyLogWasFlushed();
         Assert.IsTrue(fileNames.Count > 0, "No files found");
         return fileNames[0];
     }
@@ -124,6 +125,7 @@ public class SimpleLogReaderTest {
                         _Logger.LogInformationWithCallStack(message, methodNamesInStack);
                     break;
                 }
+                SimpleLogFlusher.ResetCleanupTime();
             }
         }
     }
@@ -133,5 +135,9 @@ public class SimpleLogReaderTest {
             .Where(f => File.GetLastWriteTime(f) >= _StartOfTestTime).ToList();
         var exceptionFileName = exceptionFileNames.FirstOrDefault() ?? "\\";
         Assert.IsTrue(exceptionFileName.Length <= 1, $"An exception was logged {exceptionFileName.Substring(exceptionFileName.LastIndexOf('\\'))}");
+    }
+
+    private void VerifyLogWasFlushed() {
+        Assert.IsFalse(_Flusher.FlushIsRequired);
     }
 }
