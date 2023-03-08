@@ -41,8 +41,17 @@ public class SimpleLogFlusher : ISimpleLogFlusher {
             }
         }
 
+        CleanUpFolderIfNecessary(folder);
+
+        FolderToCleanupTime[folder.FullName] = DateTime.Now.AddHours(2);
+        FlushIsRequired = false;
+    }
+
+    private static void CleanUpFolderIfNecessary(IFolder folder) {
         lock (LockObject) {
-            if (FolderToCleanupTime.ContainsKey(folder.FullName) && DateTime.Now < FolderToCleanupTime[folder.FullName]) { return; }
+            if (FolderToCleanupTime.ContainsKey(folder.FullName) && DateTime.Now < FolderToCleanupTime[folder.FullName]) {
+                return;
+            }
 
             var minWriteTime = DateTime.Now.AddDays(-1);
             var files = Directory.GetFiles(folder.FullName, "*.log", SearchOption.TopDirectoryOnly).Where(f => File.GetLastWriteTime(f) < minWriteTime).ToList();
@@ -50,13 +59,9 @@ public class SimpleLogFlusher : ISimpleLogFlusher {
                 try {
                     File.Delete(file);
                     // ReSharper disable once EmptyGeneralCatchClause
-                } catch {
-                }
+                } catch { }
             }
         }
-
-        FolderToCleanupTime[folder.FullName] = DateTime.Now.AddHours(2);
-        FlushIsRequired = false;
     }
 
     private static string Format(ISimpleLogEntry entry) {

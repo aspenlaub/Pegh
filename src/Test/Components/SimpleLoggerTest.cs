@@ -43,7 +43,6 @@ public class SimpleLoggerTest {
             using (_Sut.BeginScope(new SimpleLoggingScopeId { ClassOrMethod = "Scope", Id = "B" })) {
                 for (var i = 0; i < NumberOfLogEntries; i++) {
                     _Sut.LogInformationWithCallStack(NotAMessage, _MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames());
-                    SimpleLogFlusher.ResetCleanupTime();
                 }
             }
         }

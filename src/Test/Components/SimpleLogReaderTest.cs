@@ -138,7 +138,6 @@ public class SimpleLogReaderTest {
                         _Logger.LogInformationWithCallStack(message, methodNamesInStack);
                     break;
                 }
-                SimpleLogFlusher.ResetCleanupTime();
             }
         }
     }

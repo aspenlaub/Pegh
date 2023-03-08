@@ -10,11 +10,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components; 
+namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components;
 
 [TestClass]
 public class SimpleLogFlusherTest {
-    private IExceptionFolderProvider _ExceptionFolderProvider = new FakeExceptionFolderProvider();
+    private readonly IExceptionFolderProvider _ExceptionFolderProvider = new FakeExceptionFolderProvider();
 
     [TestInitialize]
     public void Initialize() {
