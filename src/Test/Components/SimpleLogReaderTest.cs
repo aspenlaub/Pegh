@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
@@ -40,7 +41,7 @@ public class SimpleLogReaderTest {
         foreach (var fileName in Directory.GetFiles(_LogFolder.FullName, "*.log")) {
             File.Delete(fileName);
         }
-        _StartOfTestTime = DateTime.Now;
+        _StartOfTestTime = DateTime.Now.AddMilliseconds(-1); // Tolerance due to file timestamp precision
         _Sut = new SimpleLogReader();
         VerifyLogWasFlushed();
     }
@@ -118,6 +119,9 @@ public class SimpleLogReaderTest {
         Assert.IsTrue(fileNames.Count == 0, "Files found but only after waiting for a longer time");
 
         fileNames = Directory.GetFiles(_LogFolder.FullName, "*.*").ToList();
+        var modifiedAfter = fileNames.Select(f => File.GetLastWriteTime(f).Subtract(_StartOfTestTime)).ToList();
+        Assert.IsTrue(modifiedAfter.All(m => m.TotalMilliseconds > 0),
+            $"File/-s seem/-s to have been modified before or at start-of-test time ({- modifiedAfter.Min(m => m.TotalMilliseconds)} ms)");
         Assert.IsTrue(fileNames.Count == 0, "No files found, not even other files");
         Assert.IsFalse(fileNames.Count == 0, $"No log files found in log folder but {string.Join("\r\n", fileNames)}");
         return "";
