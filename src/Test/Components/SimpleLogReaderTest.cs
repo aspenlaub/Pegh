@@ -40,7 +40,7 @@ public class SimpleLogReaderTest {
         foreach (var fileName in Directory.GetFiles(_LogFolder.FullName, "*.log")) {
             File.Delete(fileName);
         }
-        _StartOfTestTime = DateTime.Now.AddMilliseconds(-1); // Tolerance due to file timestamp precision
+        _StartOfTestTime = DateTime.Now.AddMilliseconds(-20); // Tolerance due to file timestamp precision
         _Sut = new SimpleLogReader();
         VerifyLogWasFlushed();
     }
