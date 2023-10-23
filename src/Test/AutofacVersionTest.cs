@@ -4,7 +4,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test;
 
 [TestClass]
 public class AutofacVersionTest {
-    private const string ExpectedVersion = "6.1.0.0";
+    private const string ExpectedVersion = "7.0.1.0";
 
     [TestMethod]
     public void PeghUsesRightAutofacPackageVersion() {
