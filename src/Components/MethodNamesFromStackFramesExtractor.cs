@@ -39,7 +39,7 @@ public class MethodNamesFromStackFramesExtractor : IMethodNamesFromStackFramesEx
     private readonly List<string> _UnwantedMethods = new() {
         "BackgroundJobProcessor",
         "Dispatch",
-        "Invoke", "InvokeMethod", "InvokeAsSynchronousTask",
+        "Invoke", "InvokeMethod", "InvokeAsSynchronousTask", "InterpretedInvoke_Method", "InvokeWithNoArgs",
         "InnerInvoke", "InvokeExecutor",
         "Execute", "ExecuteEntryUnsafe", "ExecuteTestsInSource", "ExecuteWithThreadLocal", "ExecuteFromThreadPool",
         "ExecuteInternal", "ExecuteWithAbortSafety", "ExecuteTest", "ExecuteTests", "ExecuteTestsWithTestRunner",
