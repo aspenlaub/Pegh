@@ -8,4 +8,8 @@ public class LogicalFolder {
 
     [XmlAttribute("folder")]
     public string Folder { get; set; }
+
+    public override string ToString() {
+        return $"{Name}:{Folder}";
+    }
 }

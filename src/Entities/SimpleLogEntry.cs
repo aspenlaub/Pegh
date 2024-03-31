@@ -28,4 +28,8 @@ public class SimpleLogEntry : ISimpleLogEntry {
         entry.Stack.AddRange(stack);
         return entry;
     }
+
+    public override string ToString() {
+        return Message;
+    }
 }
