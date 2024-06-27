@@ -4,47 +4,34 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
+using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 
-public class SimpleLogger : ISimpleLogger {
+public class SimpleLogger(ILogConfiguration logConfiguration, ISimpleLogFlusher simpleLogFlusher,
+            IMethodNamesFromStackFramesExtractor methodNamesFromStackFramesExtractor,
+            IExceptionFolderProvider exceptionFolderProvider) : ISimpleLogger {
     private const int MaxLogEntries = 10000;
     private const string CouldNotBeDetermined = nameof(CouldNotBeDetermined);
 
     private static readonly object LockObject = new();
 
-    private readonly List<ISimpleLogEntry> _LogEntries;
-    private readonly IList<string> _StackOfScopes;
+    private readonly List<ISimpleLogEntry> _LogEntries = new();
+    private readonly IList<string> _StackOfScopes = new List<string>();
 
-    private readonly ISimpleLogFlusher _SimpleLogFlusher;
-    private readonly IMethodNamesFromStackFramesExtractor _MethodNamesFromStackFramesExtractor;
+    private readonly IDictionary<string, string> _ScopeToCreatorMethodMapping = new Dictionary<string, string>();
 
-    private readonly IDictionary<string, string> _ScopeToCreatorMethodMapping;
+    public string LogSubFolder { get; } = logConfiguration.LogSubFolder;
+    public string LogId { get; } = logConfiguration.LogId;
 
-    public string LogSubFolder { get; }
-    public string LogId { get; }
+    public bool Enabled => true;
 
-    public bool Enabled { get; }
-
-    private readonly IFolder _ExceptionFolder;
-
-    public SimpleLogger(ILogConfiguration logConfiguration, ISimpleLogFlusher simpleLogFlusher,
-            IMethodNamesFromStackFramesExtractor methodNamesFromStackFramesExtractor, IExceptionFolderProvider exceptionFolderProvider) {
-        LogSubFolder = logConfiguration.LogSubFolder;
-        LogId = logConfiguration.LogId;
-        _LogEntries = new List<ISimpleLogEntry>();
-        _StackOfScopes = new List<string>();
-        _SimpleLogFlusher = simpleLogFlusher;
-        _MethodNamesFromStackFramesExtractor = methodNamesFromStackFramesExtractor;
-        Enabled = true;
-        _ScopeToCreatorMethodMapping = new Dictionary<string, string>();
-        _ExceptionFolder = exceptionFolderProvider.ExceptionFolder();
-    }
+    private readonly IFolder _ExceptionFolder = exceptionFolderProvider.ExceptionFolder();
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter) {
-        _SimpleLogFlusher.FlushIsRequired = true;
+        simpleLogFlusher.FlushIsRequired = true;
 
         if (!Enabled) { return; }
 
@@ -80,7 +67,7 @@ public class SimpleLogger : ISimpleLogger {
         lock (LockObject) {
             _LogEntries.Add(SimpleLogEntry.Create(logLevel, reducesStackOfScopes.Count == 0 ? _StackOfScopes : reducesStackOfScopes, logMessageWithCallStack.Message));
         }
-        _SimpleLogFlusher.Flush(this, LogSubFolder);
+        simpleLogFlusher.Flush(this, LogSubFolder);
     }
 
     private IList<string> ReduceStackAccordingToCallStack(IEnumerable<string> stackOfScopes, IEnumerable<string> methodNamesFromCallStack) {
@@ -99,7 +86,7 @@ public class SimpleLogger : ISimpleLogger {
         }
 
         var scope = $"{loggingScope.ClassOrMethod}({loggingScope.Id})";
-        var callStackMethodNames = _MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames();
+        var callStackMethodNames = methodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames();
         string errorMessage = null;
         lock (LockObject) {
             if (_StackOfScopes.Contains(scope)) {
@@ -123,6 +110,7 @@ public class SimpleLogger : ISimpleLogger {
     private void WriteErrorToExceptionFolder(string errorMessage) {
         var fileName = _ExceptionFolder.FullName + "\\" + nameof(SimpleLogger) + "-Error-" + Guid.NewGuid().ToString().Replace("-", "") + ".log";
         var contents = errorMessage + "\r\n\r\n" + Environment.StackTrace;
+        _ExceptionFolder.CreateIfNecessary();
         File.WriteAllText(fileName, contents);
     }
 

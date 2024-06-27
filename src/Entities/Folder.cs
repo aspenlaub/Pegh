@@ -15,6 +15,6 @@ public class Folder : IFolder {
     }
 
     public override string ToString() {
-        throw new NotSupportedException();
+        return FullName;
     }
 }
