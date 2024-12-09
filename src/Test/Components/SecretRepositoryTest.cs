@@ -9,7 +9,6 @@ using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities;
 using Autofac;
-using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
@@ -98,8 +97,8 @@ public class SecretRepositoryTest {
         Assert.IsNotNull(sut);
 
         var secret = new SecretCrewMember();
-        sut.Reset(secret, false);
-        Assert.IsFalse(sut.Exists(secret, false));
+        sut.Reset(secret);
+        Assert.IsFalse(sut.Exists(secret));
     }
 
     [TestMethod]
@@ -113,7 +112,7 @@ public class SecretRepositoryTest {
 
         var secret = new SecretCrewMember();
         sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName };
-        sut.Reset(secret, false);
+        sut.Reset(secret);
         Assert.IsNull(GetSecretCrewMember(sut, secret));
         var crewMember = await sut.GetAsync(secret, errorsAndInfos);
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
@@ -127,13 +126,13 @@ public class SecretRepositoryTest {
         Assert.IsNotNull(sut);
 
         var secret = new SecretCrewMember();
-        sut.Reset(secret, false);
+        sut.Reset(secret);
         var errorsAndInfos = new ErrorsAndInfos();
         await sut.SetAsync(secret, errorsAndInfos);
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
-        Assert.IsTrue(sut.Exists(secret, false));
-        sut.Reset(secret, false);
-        Assert.IsFalse(sut.Exists(secret, false));
+        Assert.IsTrue(sut.Exists(secret));
+        sut.Reset(secret);
+        Assert.IsFalse(sut.Exists(secret));
         CleanUpSecretRepository(false);
     }
 
@@ -143,7 +142,7 @@ public class SecretRepositoryTest {
         Assert.IsNotNull(sut);
 
         var secret = new SecretCrewMember();
-        sut.Reset(secret, false);
+        sut.Reset(secret);
         sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName, SurName = SomeSurName, Rank = SomeRank };
         var errorsAndInfos = new ErrorsAndInfos();
         await sut.SetAsync(secret, errorsAndInfos);
@@ -168,7 +167,7 @@ public class SecretRepositoryTest {
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
         var secret = new SecretStringFunction();
-        sut.Reset(secret, false);
+        sut.Reset(secret);
         const string s = "This is not a string";
         var r = (await sut.CompileCsLambdaAsync<string, string>(await sut.GetAsync(secret, errorsAndInfos)))(s);
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
@@ -177,7 +176,7 @@ public class SecretRepositoryTest {
     }
 
     private void CleanUpSecretRepository(bool alternative) {
-        var secrets = new List<IGuid> { new SecretCrewMember(), new SecretStringFunction(), new EncryptedSecretCrewMember(), new SecretListOfElements() };
+        var secrets = new List<IGuid> { new SecretCrewMember(), new SecretStringFunction(), new SecretListOfElements() };
         foreach (var files in new[] { false, true }.Select(sample => SecretRepositoryFolder(sample, alternative)).SelectMany(folder => secrets.Select(secret => Directory.GetFiles(folder, secret.Guid + "*.*").ToList()))) {
             Assert.IsTrue(files.Count < 3);
             files.ForEach(File.Delete);
@@ -202,10 +201,10 @@ public class SecretRepositoryTest {
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
         var secret = new SecretCrewMember();
-        sut.Reset(secret, false);
+        sut.Reset(secret);
         await sut.GetAsync(secret, errorsAndInfos);
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
-        Assert.IsTrue(sut.Exists(secret, false));
+        Assert.IsTrue(sut.Exists(secret));
         CleanUpSecretRepository(false);
     }
 
@@ -219,10 +218,10 @@ public class SecretRepositoryTest {
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
         var secret = new SecretCrewMember();
-        sut.Reset(secret, false);
+        sut.Reset(secret);
         await sut.GetAsync(secret, errorsAndInfos);
         Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase)), errorsAndInfos.ErrorsToString());
-        Assert.IsFalse(sut.Exists(secret, false));
+        Assert.IsFalse(sut.Exists(secret));
         CleanUpSecretRepository(false);
     }
 
@@ -236,7 +235,7 @@ public class SecretRepositoryTest {
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
         var secret = new SecretCrewMember();
-        sut.Reset(secret, false);
+        sut.Reset(secret);
         Assert.IsNull(await sut.GetAsync(secret, errorsAndInfos));
         Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase)), errorsAndInfos.ErrorsToString());
         CleanUpSecretRepository(false);
@@ -252,7 +251,7 @@ public class SecretRepositoryTest {
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
         var secret = new SecretCrewMember();
-        sut.Reset(secret, false);
+        sut.Reset(secret);
         await sut.GetAsync(secret, errorsAndInfos);
         Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase)), errorsAndInfos.ErrorsToString());
         Assert.IsFalse(sut.Values.ContainsKey(secret.Guid));
@@ -287,10 +286,10 @@ public class SecretRepositoryTest {
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
         var secret = new SecretStringFunction();
-        sut.Reset(secret, false);
+        sut.Reset(secret);
         await sut.GetAsync(secret, errorsAndInfos);
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
-        Assert.IsTrue(sut.Exists(secret, false));
+        Assert.IsTrue(sut.Exists(secret));
         CleanUpSecretRepository(false);
     }
 
@@ -304,10 +303,10 @@ public class SecretRepositoryTest {
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
         var secret = new SecretStringFunction();
-        sut.Reset(secret, false);
+        sut.Reset(secret);
         await sut.GetAsync(secret, errorsAndInfos);
         Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase)), errorsAndInfos.ErrorsToString());
-        Assert.IsFalse(sut.Exists(secret, false));
+        Assert.IsFalse(sut.Exists(secret));
         CleanUpSecretRepository(false);
     }
 
@@ -321,7 +320,7 @@ public class SecretRepositoryTest {
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
         var secret = new SecretStringFunction();
-        sut.Reset(secret, false);
+        sut.Reset(secret);
         Assert.IsNull(await sut.GetAsync(secret, errorsAndInfos));
         Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase)), errorsAndInfos.ErrorsToString());
         CleanUpSecretRepository(false);
@@ -337,7 +336,7 @@ public class SecretRepositoryTest {
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
         var secret = new SecretStringFunction();
-        sut.Reset(secret, false);
+        sut.Reset(secret);
         await sut.GetAsync(secret, errorsAndInfos);
         Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase)), errorsAndInfos.ErrorsToString());
         Assert.IsFalse(sut.Values.ContainsKey(secret.Guid));
@@ -354,7 +353,7 @@ public class SecretRepositoryTest {
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
         var secret = new SecretStringFunction();
-        sut.Reset(secret, false);
+        sut.Reset(secret);
         var script = await sut.GetAsync(secret, errorsAndInfos);
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
         const string addedString = "/* This script has been altered */";
@@ -428,132 +427,18 @@ public class SecretRepositoryTest {
     }
 
     [TestMethod]
-    public async Task CanGetDefaultForEncryptedSecret() {
-        var sut = Container.Resolve<ISecretRepository>() as SecretRepository;
-        Assert.IsNotNull(sut);
-
-        var errorsAndInfos = new ErrorsAndInfos();
-        await SetShouldDefaultSecretsBeStored(sut, true, errorsAndInfos);
-        Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
-
-        var secret = new EncryptedSecretCrewMember();
-        sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName };
-        sut.Reset(secret,  true);
-        Assert.IsNull(GetSecretCrewMember(sut, secret));
-        Assert.IsFalse(sut.Exists(secret, true));
-        var crewMember = await sut.GetAsync(secret, errorsAndInfos);
-        Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
-        Assert.IsTrue(sut.Exists(secret, true));
-        Assert.AreEqual(EncryptedSecretCrewMember.DefaultFirstName, crewMember.FirstName);
-        CleanUpSecretRepository(false);
-    }
-
-    [TestMethod]
-    public async Task CanGetEncryptedSecretAfterSetting() {
-        var sut = Container.Resolve<ISecretRepository>() as SecretRepository;
-        Assert.IsNotNull(sut);
-
-        var secret = new EncryptedSecretCrewMember();
-        sut.Reset(secret, true);
-        sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName, SurName = SomeSurName, Rank = SomeRank };
-        var errorsAndInfos = new ErrorsAndInfos();
-        await sut.SetAsync(secret, errorsAndInfos);
-        Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
-        sut.Values.Remove(secret.Guid);
-        Assert.IsNull(GetSecretCrewMember(sut, secret));
-        await sut.GetAsync(secret, errorsAndInfos);
-        Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
-        Assert.AreEqual(SomeFirstName, GetSecretCrewMember(sut, secret).FirstName);
-        Assert.AreEqual(SomeSurName, GetSecretCrewMember(sut, secret).SurName);
-        Assert.AreEqual(SomeRank, GetSecretCrewMember(sut, secret).Rank);
-        CleanUpSecretRepository(false);
-    }
-
-    [TestMethod]
-    public async Task CanGetDefaultForEncryptedSecretWithEmptyPassphraseButItIsNotSaved() {
-        var sut = ContainerWithMockedDisguiser.Resolve<ISecretRepository>() as SecretRepository;
-        Assert.IsNotNull(sut);
-
-        var errorsAndInfos = new ErrorsAndInfos();
-        await SetShouldDefaultSecretsBeStored(sut, true, errorsAndInfos);
-        Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
-
-        var secret = new EncryptedSecretCrewMember();
-        sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName };
-        sut.Reset(secret, true);
-        Assert.IsNull(GetSecretCrewMember(sut, secret));
-        Assert.IsFalse(sut.Exists(secret, true));
-        var crewMember = await sut.GetAsync(secret, errorsAndInfos);
-        Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
-        Assert.IsFalse(sut.Exists(secret, true));
-        Assert.AreEqual(EncryptedSecretCrewMember.DefaultFirstName, crewMember.FirstName);
-        CleanUpSecretRepository(false);
-    }
-
-    [TestMethod]
-    public async Task CannotGetEncryptedSecretAfterSettingIfDisguiserFails() {
-        var sut = Container.Resolve<ISecretRepository>() as SecretRepository;
-        Assert.IsNotNull(sut);
-
-        var secret = new EncryptedSecretCrewMember();
-        sut.Reset(secret, true);
-        sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName, SurName = SomeSurName, Rank = SomeRank };
-        var errorsAndInfos = new ErrorsAndInfos();
-        await sut.SetAsync(secret, errorsAndInfos);
-        Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
-
-        sut = ContainerWithMockedDisguiser.Resolve<ISecretRepository>() as SecretRepository;
-        Assert.IsNotNull(sut);
-
-        Assert.IsNull(GetSecretCrewMember(sut, secret));
-        await sut.GetAsync(secret, errorsAndInfos);
-        Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
-        Assert.IsNull(GetSecretCrewMember(sut, secret));
-        CleanUpSecretRepository(false);
-    }
-
-    [TestMethod]
-    public async Task CannotGetEncryptedSecretAfterSettingIfPassphraseIsWrong() {
-        var sut = Container.Resolve<ISecretRepository>() as SecretRepository;
-        Assert.IsNotNull(sut);
-
-        var secret = new EncryptedSecretCrewMember();
-        sut.Reset(secret, true);
-        sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName, SurName = SomeSurName, Rank = SomeRank };
-        var errorsAndInfos = new ErrorsAndInfos();
-        await sut.SetAsync(secret, errorsAndInfos);
-        Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
-
-        sut = Container.Resolve<ISecretRepository>() as SecretRepository;
-        Assert.IsNotNull(sut);
-
-        CsArgumentPrompterMock.Setup(p => p.PromptForArgument(It.IsAny<string>(), It.IsAny<string>())).Returns(() => "Wrong-Password");
-        Assert.IsNull(GetSecretCrewMember(sut, secret));
-        try {
-            await sut.GetAsync(secret, errorsAndInfos);
-            throw new Exception("ZipException expected");
-        } catch (ZipException e) {
-            Assert.IsTrue(e.Message.Contains("Invalid password", StringComparison.InvariantCultureIgnoreCase));
-        }
-
-        Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
-        Assert.IsNull(GetSecretCrewMember(sut, secret));
-        CleanUpSecretRepository(false);
-    }
-
-    [TestMethod]
     public async Task DoesNotExistAfterTryingToSaveInvalidXml() {
         var sut = Container.Resolve<ISecretRepository>() as SecretRepository;
         Assert.IsNotNull(sut);
 
         var secret = new SecretCrewMember();
-        sut.Reset(secret, false);
+        sut.Reset(secret);
         var valueOrDefault = secret.DefaultValue;
         var xml = Container.Resolve<IXmlSerializer>().Serialize(valueOrDefault).Replace("Crew", "Curfew");
         var errorsAndInfos = new ErrorsAndInfos();
-        await sut.WriteToFileAsync(secret, xml, false, false, errorsAndInfos);
+        await sut.WriteToFileAsync(secret, xml, false, errorsAndInfos);
         Assert.IsTrue(errorsAndInfos.Errors.All(e => e.Contains("The \'http://www.aspenlaub.net:CurfewMember\' element is not declared")), errorsAndInfos.ErrorsToString());
-        Assert.IsFalse(sut.Exists(secret, false));
+        Assert.IsFalse(sut.Exists(secret));
         CleanUpSecretRepository(false);
     }
 
@@ -563,7 +448,7 @@ public class SecretRepositoryTest {
         Assert.IsNotNull(sut);
 
         var secret = new SecretListOfElements();
-        sut.Reset(secret, false);
+        sut.Reset(secret);
         var listOfElements = new ListOfElements { new() { Value = "One" }, new() { Value = "Two" }};
         sut.Values[secret.Guid] = listOfElements;
         var errorsAndInfos = new ErrorsAndInfos();
@@ -586,14 +471,14 @@ public class SecretRepositoryTest {
         Assert.IsNotNull(alternativeSut);
 
         var secret = new SecretCrewMember();
-        sut.Reset(secret, false);
+        sut.Reset(secret);
         sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName, SurName = SomeSurName, Rank = SomeRank };
         var errorsAndInfos = new ErrorsAndInfos();
         await sut.SetAsync(secret, errorsAndInfos);
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
         secret = new SecretCrewMember();
-        alternativeSut.Reset(secret, false);
+        alternativeSut.Reset(secret);
         alternativeSut.Values[secret.Guid] = new CrewMember { FirstName = "ALT " + SomeFirstName, SurName = "ALT" + SomeSurName, Rank = "ALT" + SomeRank };
         errorsAndInfos = new ErrorsAndInfos();
         await alternativeSut.SetAsync(secret, errorsAndInfos);
