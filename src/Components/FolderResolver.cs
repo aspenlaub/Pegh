@@ -8,16 +8,10 @@ using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 
-public class FolderResolver : IFolderResolver {
-    protected readonly IDictionary<string, string> Replacements;
+public class FolderResolver(ISecretRepository secretRepository) : IFolderResolver {
+    protected readonly IDictionary<string, string> Replacements = new Dictionary<string, string>();
 
-    protected readonly ISecretRepository SecretRepository;
-
-    public FolderResolver(ISecretRepository secretRepository) {
-        SecretRepository = secretRepository;
-
-        Replacements = new Dictionary<string, string>();
-    }
+    protected readonly ISecretRepository SecretRepository = secretRepository;
 
     private async Task FindReplacementsIfNecessaryAsync() {
         if (Replacements.Any()) { return; }
@@ -46,19 +40,17 @@ public class FolderResolver : IFolderResolver {
     private void AddReplacement(MachineDrive machineDrive) {
         var key = "$(" + machineDrive.Name + ")";
         var value = (machineDrive.Drive.ToUpper() + "C")[0] + ":";
-        if (Replacements.ContainsKey(key)) {
+        if (!Replacements.TryAdd(key, value)) {
             throw new Exception($"Machine drive {key} is already mapped");
         }
-        Replacements.Add(key, value);
     }
 
     private void AddReplacement(LogicalFolder logicalFolder) {
         var key = "$(" + logicalFolder.Name + ")";
         var value = logicalFolder.Folder;
-        if (Replacements.ContainsKey(key)) {
+        if (!Replacements.TryAdd(key, value)) {
             throw new Exception($"Logical folder {key} is already mapped");
         }
-        Replacements.Add(key, value);
     }
 
     private IFolder ResolveIterative(string folderToResolve) {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
@@ -13,13 +14,13 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 public class SimpleLogger(ILogConfiguration logConfiguration, ISimpleLogFlusher simpleLogFlusher,
             IMethodNamesFromStackFramesExtractor methodNamesFromStackFramesExtractor,
             IExceptionFolderProvider exceptionFolderProvider) : ISimpleLogger {
-    private const int MaxLogEntries = 10000;
-    private const string CouldNotBeDetermined = nameof(CouldNotBeDetermined);
+    private const int _maxLogEntries = 10000;
+    private const string _couldNotBeDetermined = nameof(_couldNotBeDetermined);
 
-    private static readonly object LockObject = new();
+    private static readonly Lock _lockObject = new();
 
-    private readonly List<ISimpleLogEntry> _LogEntries = new();
-    private readonly IList<string> _StackOfScopes = new List<string>();
+    private readonly List<ISimpleLogEntry> _LogEntries = [];
+    private readonly IList<string> _StackOfScopes = [];
 
     private readonly IDictionary<string, string> _ScopeToCreatorMethodMapping = new Dictionary<string, string>();
 
@@ -42,7 +43,7 @@ public class SimpleLogger(ILogConfiguration logConfiguration, ISimpleLogFlusher 
 
         const string noMessage = "(empty)";
         LogMessageWithCallStack logMessageWithCallStack;
-        var message = state.ToString() ?? noMessage;
+        string message = state.ToString() ?? noMessage;
         try {
             if (message == noMessage) {
                 WriteErrorToExceptionFolder($"Could not deserialize {message}");
@@ -58,13 +59,13 @@ public class SimpleLogger(ILogConfiguration logConfiguration, ISimpleLogFlusher 
             return;
         }
 
-        var reducesStackOfScopes = ReduceStackAccordingToCallStack(_StackOfScopes, logMessageWithCallStack.MethodNamesInCallStack);
+        IList<string> reducesStackOfScopes = ReduceStackAccordingToCallStack(_StackOfScopes, logMessageWithCallStack.MethodNamesInCallStack);
         if (reducesStackOfScopes.Count == 0) {
             WriteErrorToExceptionFolder(string.Format(Properties.Resources.ScopeExistsButOutsideCallStack, string.Join(";", _StackOfScopes)));
             reducesStackOfScopes = _StackOfScopes;
         }
 
-        lock (LockObject) {
+        lock (_lockObject) {
             _LogEntries.Add(SimpleLogEntry.Create(logLevel, reducesStackOfScopes.Count == 0 ? _StackOfScopes : reducesStackOfScopes, logMessageWithCallStack.Message));
         }
         simpleLogFlusher.Flush(this, LogSubFolder);
@@ -85,17 +86,17 @@ public class SimpleLogger(ILogConfiguration logConfiguration, ISimpleLogFlusher 
             return new LoggingScope(() => { });
         }
 
-        var scope = $"{loggingScope.ClassOrMethod}({loggingScope.Id})";
-        var callStackMethodNames = methodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames();
+        string scope = $"{loggingScope.ClassOrMethod}({loggingScope.Id})";
+        IList<string> callStackMethodNames = methodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames();
         string errorMessage = null;
-        lock (LockObject) {
+        lock (_lockObject) {
             if (_StackOfScopes.Contains(scope)) {
                 errorMessage = string.Format(Properties.Resources.ScopeAlreadyBegan, scope);
             }
             _StackOfScopes.Add(scope);
             if (callStackMethodNames.Count < 2) {
                 errorMessage ??= string.Format(Properties.Resources.CallStackTooSmallToFindCreatorMethodName, scope);
-                _ScopeToCreatorMethodMapping[scope] = CouldNotBeDetermined;
+                _ScopeToCreatorMethodMapping[scope] = _couldNotBeDetermined;
             } else {
                 _ScopeToCreatorMethodMapping[scope] = callStackMethodNames[1];
             }
@@ -108,20 +109,20 @@ public class SimpleLogger(ILogConfiguration logConfiguration, ISimpleLogFlusher 
     }
 
     private void WriteErrorToExceptionFolder(string errorMessage) {
-        var fileName = _ExceptionFolder.FullName + "\\" + nameof(SimpleLogger) + "-Error-" + Guid.NewGuid().ToString().Replace("-", "") + ".log";
-        var contents = errorMessage + "\r\n\r\n" + Environment.StackTrace;
+        string fileName = _ExceptionFolder.FullName + "\\" + nameof(SimpleLogger) + "-Error-" + Guid.NewGuid().ToString().Replace("-", "") + ".log";
+        string contents = errorMessage + "\r\n\r\n" + Environment.StackTrace;
         _ExceptionFolder.CreateIfNecessary();
         File.WriteAllText(fileName, contents);
     }
 
     private void OnLoggingScopeDisposing(string scope) {
-       lock (LockObject) {
+       lock (_lockObject) {
            _StackOfScopes.Remove(scope);
        }
     }
 
     public IList<ISimpleLogEntry> FindLogEntries(Func<ISimpleLogEntry, bool> condition) {
-        lock (LockObject) {
+        lock (_lockObject) {
             var logEntries = new List<ISimpleLogEntry>();
             logEntries.AddRange(_LogEntries.Where(condition));
             return logEntries;
@@ -129,15 +130,15 @@ public class SimpleLogger(ILogConfiguration logConfiguration, ISimpleLogFlusher 
     }
 
     public void OnEntriesFlushed(IList<ISimpleLogEntry> entries) {
-        lock (LockObject) {
-            foreach (var entry in entries) {
+        lock (_lockObject) {
+            foreach (ISimpleLogEntry entry in entries) {
                 entry.Flushed = true;
             }
 
-            if (_LogEntries.Count < MaxLogEntries) { return; }
+            if (_LogEntries.Count < _maxLogEntries) { return; }
 
             int i;
-            for (i = 0; _LogEntries[i].Flushed && i < MaxLogEntries / 2; i++) {
+            for (i = 0; _LogEntries[i].Flushed && i < _maxLogEntries / 2; i++) {
             }
             _LogEntries.RemoveRange(0, i);
         }

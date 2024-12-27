@@ -27,7 +27,7 @@ public class SimpleLogFlusherTest {
         var loggerMock = new Mock<ISimpleLogger>();
         var logEntries = new List<ISimpleLogEntry> {
             new SimpleLogEntry {
-                LogLevel = LogLevel.Information, Message = nameof(SimpleLogFlusherTest), Stack = new List<string> { nameof(SimpleLogFlusherTest) + "(AE34C4AB53B9)BE40" }
+                LogLevel = LogLevel.Information, Message = nameof(SimpleLogFlusherTest), Stack = [nameof(SimpleLogFlusherTest) + "(AE34C4AB53B9)BE40"]
             }
         };
         loggerMock.Setup(l => l.FindLogEntries(It.IsAny<Func<ISimpleLogEntry, bool>>())).Returns(logEntries);

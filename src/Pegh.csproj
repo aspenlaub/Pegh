@@ -23,13 +23,10 @@
     <NuspecFile>Pegh.nuspec</NuspecFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="SpecFlow\**" />
     <Compile Remove="temp\**" />
     <Compile Remove="Test\**" />
-    <EmbeddedResource Remove="SpecFlow\**" />
     <EmbeddedResource Remove="temp\**" />
     <EmbeddedResource Remove="Test\**" />
-    <None Remove="SpecFlow\**" />
     <None Remove="temp\**" />
     <None Remove="Test\**" />
   </ItemGroup>

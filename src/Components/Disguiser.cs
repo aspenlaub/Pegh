@@ -7,13 +7,9 @@ using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 
-public class Disguiser : IDisguiser {
-    protected readonly IPrimeNumberGenerator PrimeNumberGenerator;
+public class Disguiser(IPrimeNumberGenerator primeNumberGenerator) : IDisguiser {
+    protected readonly IPrimeNumberGenerator PrimeNumberGenerator = primeNumberGenerator;
     protected IList<int> PrimeNumbers;
-
-    public Disguiser(IPrimeNumberGenerator primeNumberGenerator) {
-        PrimeNumberGenerator = primeNumberGenerator;
-    }
 
     public async Task<string> Disguise(ISecretRepository secretRepository, string s, IErrorsAndInfos errorsAndInfos) {
         var bytes = Encoding.UTF8.GetBytes(s);

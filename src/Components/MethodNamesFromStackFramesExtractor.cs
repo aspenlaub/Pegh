@@ -36,23 +36,34 @@ public class MethodNamesFromStackFramesExtractor : IMethodNamesFromStackFramesEx
         return ExtractMethodName(isAsyncStateMachine ? declaringType.FullName : method.Name);
     }
 
-    private readonly List<string> _UnwantedMethods = new() {
+    private readonly List<string> _UnwantedMethods = [
         "BackgroundJobProcessor",
         "Dispatch",
-        "Invoke", "InvokeMethod", "InvokeAsSynchronousTask", "InterpretedInvoke_Method", "InvokeWithNoArgs",
+        "Invoke",
+        "InvokeMethod", "InvokeAsSynchronousTask", "InterpretedInvoke_Method",
+        "InvokeWithNoArgs",
         "InnerInvoke", "InvokeExecutor",
-        "Execute", "ExecuteEntryUnsafe", "ExecuteTestsInSource", "ExecuteWithThreadLocal", "ExecuteFromThreadPool",
-        "ExecuteInternal", "ExecuteWithAbortSafety", "ExecuteTest", "ExecuteTests", "ExecuteTestsWithTestRunner",
+
+        "Execute", "ExecuteEntryUnsafe", "ExecuteTestsInSource",
+        "ExecuteWithThreadLocal", "ExecuteFromThreadPool",
+        "ExecuteInternal",
+        "ExecuteWithAbortSafety", "ExecuteTest", "ExecuteTests",
+        "ExecuteTestsWithTestRunner",
         "OnMessageReceived",
-        "RunTestMethod", "RunSingleTest", "RunTests", "RunFromThreadPoolDispatchLoop",
+        "RunTestMethod",
+        "RunSingleTest", "RunTests", "RunFromThreadPoolDispatchLoop",
+
         "RunInternal", "RunTestInternalWithExecutors",
-        "RunTestsFromRightContext", "RunTestsInternal",
+        "RunTestsFromRightContext",
+        "RunTestsInternal",
         "Start", "StartTestRun",
+
         "SafeProcessJob", "StartCallback",
         "WorkerThreadStart",
+
         ".ctor", ".cctor",
         nameof(ExtractMethodNamesFromStackFrames)
-    };
+    ];
 
     private string ExtractMethodName(string stringContainingMethodName) {
         stringContainingMethodName = stringContainingMethodName.Replace('+', '.');

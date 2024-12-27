@@ -6,15 +6,11 @@ using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 
-public class StringCrypter : IStringCrypter {
+public class StringCrypter(ISecretRepository secretRepository) : IStringCrypter {
     protected Func<string, string> SecretEncrypterFunction;
     protected Func<string, string> SecretDecrypterFunction;
 
-    protected readonly ISecretRepository SecretRepository;
-
-    public StringCrypter(ISecretRepository secretRepository) {
-        SecretRepository = secretRepository;
-    }
+    protected readonly ISecretRepository SecretRepository = secretRepository;
 
     protected async Task LoadSecretsIfNecessaryAsync() {
         if (SecretEncrypterFunction != null) { return; }

@@ -2,14 +2,8 @@
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 
-public class LoggingScope : IDisposable {
-    private readonly Action _DoDispose;
-
-    public LoggingScope(Action doDispose) {
-        _DoDispose = doDispose;
-    }
-
+public class LoggingScope(Action doDispose) : IDisposable {
     public void Dispose() {
-        _DoDispose();
+        doDispose();
     }
 }

@@ -21,7 +21,7 @@ public class SimpleLogEntry : ISimpleLogEntry {
         var entry = new SimpleLogEntry {
             LogTime = DateTime.Now,
             LogLevel = logLevel,
-            Stack = new List<string>(),
+            Stack = [],
             Message = message,
             Flushed = false
         };

@@ -14,8 +14,8 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components;
 
 [TestClass]
 public class SimpleLoggerTest {
-    private const string NotAMessage = "This is not a message";
-    private const int NumberOfLogEntries = 1000;
+    private const string _notAMessage = "This is not a message";
+    private const int _numberOfLogEntries = 1000;
 
     private readonly IMethodNamesFromStackFramesExtractor _MethodNamesFromStackFramesExtractor = new MethodNamesFromStackFramesExtractor();
 
@@ -41,8 +41,8 @@ public class SimpleLoggerTest {
             _MethodNamesFromStackFramesExtractor, _ExceptionFolderProvider);
         using (_Sut.BeginScope(new SimpleLoggingScopeId { ClassOrMethod =  "Scope", Id = "A" })) {
             using (_Sut.BeginScope(new SimpleLoggingScopeId { ClassOrMethod = "Scope", Id = "B" })) {
-                for (var i = 0; i < NumberOfLogEntries; i++) {
-                    _Sut.LogInformationWithCallStack(NotAMessage, _MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames());
+                for (var i = 0; i < _numberOfLogEntries; i++) {
+                    _Sut.LogInformationWithCallStack(_notAMessage, _MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames());
                 }
             }
         }
@@ -51,12 +51,12 @@ public class SimpleLoggerTest {
         VerifyLogWasFlushedOrNot(false);
 
         var logEntries = _Sut.FindLogEntries(_ => true);
-        Assert.AreEqual(NumberOfLogEntries, logEntries.Count);
+        Assert.AreEqual(_numberOfLogEntries, logEntries.Count);
         Assert.AreEqual(LogLevel.Information, logEntries[0].LogLevel);
         Assert.AreEqual(2, logEntries[0].Stack.Count);
         Assert.AreEqual("Scope(A)", logEntries[0].Stack[0]);
         Assert.AreEqual("Scope(B)", logEntries[0].Stack[1]);
-        Assert.AreEqual(NotAMessage, logEntries[0].Message);
+        Assert.AreEqual(_notAMessage, logEntries[0].Message);
 
         var fileNames = _Flusher.FileNames;
         Assert.AreEqual(1, fileNames.Count);
@@ -79,8 +79,8 @@ public class SimpleLoggerTest {
             _MethodNamesFromStackFramesExtractor, _ExceptionFolderProvider);
         using (_Sut.BeginScope(SimpleLoggingScopeId.Create("Scope"))) {
             using (_Sut.BeginScope(SimpleLoggingScopeId.Create("Scope"))) {
-                for (var i = 0; i < NumberOfLogEntries; i++) {
-                    _Sut.LogInformationWithCallStack(NotAMessage, _MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames());
+                for (var i = 0; i < _numberOfLogEntries; i++) {
+                    _Sut.LogInformationWithCallStack(_notAMessage, _MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames());
                 }
             }
         }

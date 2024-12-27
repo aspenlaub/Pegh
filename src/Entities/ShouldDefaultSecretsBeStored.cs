@@ -6,14 +6,10 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 [XmlRoot("ShouldDefaultSecretsBeStored")]
 public class ShouldDefaultSecretsBeStored : IGuid, ISecretResult<ShouldDefaultSecretsBeStored> {
     [XmlAttribute("guid")]
-    public string Guid { get; set; }
+    public string Guid { get; set; } = System.Guid.NewGuid().ToString();
 
     [XmlElement("autosavedefault")]
     public bool AutomaticallySaveDefaultSecretIfAbsent { get; set; }
-
-    public ShouldDefaultSecretsBeStored() {
-        Guid = System.Guid.NewGuid().ToString();
-    }
 
     public ShouldDefaultSecretsBeStored Clone() {
         var clone = (ShouldDefaultSecretsBeStored)MemberwiseClone();

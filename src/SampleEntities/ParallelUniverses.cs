@@ -6,9 +6,5 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities;
 [XmlRoot("StarFleets", Namespace = "http://www.aspenlaub.net")]
 public class ParallelUniverses {
     [XmlElement("StarFleet")]
-    public List<StarFleet> StarFleets { get; set; }
-
-    public ParallelUniverses() {
-        StarFleets = new List<StarFleet>();
-    }
+    public List<StarFleet> StarFleets { get; set; } = [];
 }

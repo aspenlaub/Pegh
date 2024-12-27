@@ -19,8 +19,8 @@ public class XmlSerializationTest {
     protected CrewMember[] CrewMemberArray;
     protected int FleetPropertyChangedDuringInitialization;
 
-    private const string Ncc1701C = "CEAEBF2E-DE0A-8882-672B-E1CA71728587";
-    private const string UssEnterpriseNcc1701C = "USS Enterprise NCC-1701C";
+    private const string _ncc1701C = "CEAEBF2E-DE0A-8882-672B-E1CA71728587";
+    private const string _ussEnterpriseNcc1701C = "USS Enterprise NCC-1701C";
 
     private static Autofac.IContainer Container { get; set; }
 
@@ -36,7 +36,7 @@ public class XmlSerializationTest {
         ((INotifyPropertyChanged)Fleet.StarShips).PropertyChanged += FleetPropertyChanged;
         Assert.AreEqual(0, Fleet.StarShips.Count);
         Assert.AreEqual(0, Fleet.StarBases.Count);
-        EnterpriseC = new StarShip { Guid = Ncc1701C, Name = UssEnterpriseNcc1701C };
+        EnterpriseC = new StarShip { Guid = _ncc1701C, Name = _ussEnterpriseNcc1701C };
         Garrett = new CrewMember { Rank = "Captain", FirstName = "Rachel", SurName = "Garrett" };
         EnterpriseC.CrewMembers.Add(Garrett);
         Castillo = new CrewMember { Rank = "Lieutenant", FirstName = "Richard", SurName = "Castillo" };
@@ -102,7 +102,7 @@ public class XmlSerializationTest {
         VerifyExpected(unverifiedResultFileContents, "<StarFleets xmlns:xs");
         Assert.IsFalse(unverifiedResultFileContents.Contains("<StarFleets>"));
         Assert.IsFalse(unverifiedResultFileContents.Contains("<StarShips>"));
-        VerifyExpected(unverifiedResultFileContents, $"<StarShip guid=\"{Ncc1701C}\" name=\"{UssEnterpriseNcc1701C}\"");
+        VerifyExpected(unverifiedResultFileContents, $"<StarShip guid=\"{_ncc1701C}\" name=\"{_ussEnterpriseNcc1701C}\"");
         Assert.IsFalse(unverifiedResultFileContents.Contains("<StarShip>"));
         VerifyExpected(unverifiedResultFileContents, "Jean-Luc");
         Assert.IsFalse(unverifiedResultFileContents.Contains("xmlns=\"\""));

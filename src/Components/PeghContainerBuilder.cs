@@ -9,8 +9,8 @@ using Microsoft.Extensions.Logging;
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 
 public static class PeghContainerBuilder {
-    private static ISimpleLogger SimpleLogger;
-    private static ILogConfiguration LogConfiguration;
+    private static ISimpleLogger _simpleLogger;
+    private static ILogConfiguration _logConfiguration;
 
     public static ContainerBuilder UsePegh(this ContainerBuilder builder, string applicationName, ICsArgumentPrompter csArgumentPrompter) {
         builder.RegisterInstance(csArgumentPrompter).As<ICsArgumentPrompter>();
@@ -29,12 +29,12 @@ public static class PeghContainerBuilder {
         builder.RegisterType<XmlDeserializer>().As<IXmlDeserializer>();
         builder.RegisterType<XmlSerializer>().As<IXmlSerializer>();
         builder.RegisterType<XmlSchemer>().As<IXmlSchemer>();
-        LogConfiguration ??= new LogConfiguration(applicationName);
-        builder.RegisterInstance(LogConfiguration);
+        _logConfiguration ??= new LogConfiguration(applicationName);
+        builder.RegisterInstance(_logConfiguration);
         var exceptionFolderProvider = new ExceptionFolderProvider();
-        SimpleLogger ??= new SimpleLogger(LogConfiguration, new SimpleLogFlusher(exceptionFolderProvider), new MethodNamesFromStackFramesExtractor(), exceptionFolderProvider);
-        builder.RegisterInstance(SimpleLogger);
-        builder.RegisterInstance<ILogger>(SimpleLogger);
+        _simpleLogger ??= new SimpleLogger(_logConfiguration, new SimpleLogFlusher(exceptionFolderProvider), new MethodNamesFromStackFramesExtractor(), exceptionFolderProvider);
+        builder.RegisterInstance(_simpleLogger);
+        builder.RegisterInstance<ILogger>(_simpleLogger);
 
         return builder;
     }
@@ -56,11 +56,11 @@ public static class PeghContainerBuilder {
         services.AddTransient<IXmlDeserializer, XmlDeserializer>();
         services.AddTransient<IXmlSerializer, XmlSerializer>();
         services.AddTransient<IXmlSchemer, XmlSchemer>();
-        LogConfiguration ??= new LogConfiguration(applicationName);
-        services.AddSingleton(LogConfiguration);
+        _logConfiguration ??= new LogConfiguration(applicationName);
+        services.AddSingleton(_logConfiguration);
         var exceptionFolderProvider = new ExceptionFolderProvider();
-        SimpleLogger ??= new SimpleLogger(LogConfiguration, new SimpleLogFlusher(exceptionFolderProvider), new MethodNamesFromStackFramesExtractor(), exceptionFolderProvider);
-        services.AddSingleton(SimpleLogger);
+        _simpleLogger ??= new SimpleLogger(_logConfiguration, new SimpleLogFlusher(exceptionFolderProvider), new MethodNamesFromStackFramesExtractor(), exceptionFolderProvider);
+        services.AddSingleton(_simpleLogger);
 
         return services;
     }

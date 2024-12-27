@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
@@ -9,22 +10,17 @@ using Microsoft.Extensions.Logging;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 
-public class SimpleLogFlusher : ISimpleLogFlusher {
-    private static readonly object LockObject = new();
-    private static Dictionary<string, DateTime> FolderToCleanupTime = new();
-    public HashSet<string> FileNames { get; } = new();
+public class SimpleLogFlusher(IExceptionFolderProvider exceptionFolderProvider) : ISimpleLogFlusher {
+    private static readonly Lock _lockObject = new();
+    private static Dictionary<string, DateTime> _folderToCleanupTime = new();
+    public HashSet<string> FileNames { get; } = [];
     public bool FlushIsRequired { get; set; }
-    private readonly IExceptionFolderProvider _ExceptionFolderProvider;
-
-    public SimpleLogFlusher(IExceptionFolderProvider exceptionFolderProvider) {
-        _ExceptionFolderProvider = exceptionFolderProvider;
-    }
 
     public void Flush(ISimpleLogger logger, string subFolder) {
         var folder = new Folder(Path.GetTempPath()).SubFolder(subFolder);
         folder.CreateIfNecessary();
 
-        lock (LockObject) {
+        lock (_lockObject) {
             var logEntries = logger.FindLogEntries(e => !e.Flushed);
             var ids = logEntries.Select(GetTopOfStack).Distinct().ToList();
             foreach (var id in ids) {
@@ -43,13 +39,13 @@ public class SimpleLogFlusher : ISimpleLogFlusher {
 
         CleanUpFolderIfNecessary(folder);
 
-        FolderToCleanupTime[folder.FullName] = DateTime.Now.AddHours(2);
+        _folderToCleanupTime[folder.FullName] = DateTime.Now.AddHours(2);
         FlushIsRequired = false;
     }
 
     private static void CleanUpFolderIfNecessary(IFolder folder) {
-        lock (LockObject) {
-            if (FolderToCleanupTime.ContainsKey(folder.FullName) && DateTime.Now < FolderToCleanupTime[folder.FullName]) {
+        lock (_lockObject) {
+            if (_folderToCleanupTime.ContainsKey(folder.FullName) && DateTime.Now < _folderToCleanupTime[folder.FullName]) {
                 return;
             }
 
@@ -85,13 +81,13 @@ public class SimpleLogFlusher : ISimpleLogFlusher {
     }
 
     internal static void ResetCleanupTime() {
-        lock (LockObject) {
-            FolderToCleanupTime = new();
+        lock (_lockObject) {
+            _folderToCleanupTime = new();
         }
     }
 
     private void WriteErrorToExceptionFolder(string errorMessage) {
-        var fileName = _ExceptionFolderProvider.ExceptionFolder().FullName + "\\" + nameof(SimpleLogFlusher) + "-Error-" + Guid.NewGuid().ToString().Replace("-", "") + ".log";
+        var fileName = exceptionFolderProvider.ExceptionFolder().FullName + "\\" + nameof(SimpleLogFlusher) + "-Error-" + Guid.NewGuid().ToString().Replace("-", "") + ".log";
         var contents = errorMessage + "\r\n\r\n" + Environment.StackTrace;
         File.WriteAllText(fileName, contents);
     }

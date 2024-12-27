@@ -7,27 +7,23 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities;
 public class StarFleet : IGuid, INotifyPropertyChanged {
 
     [XmlAttribute("guid")]
-    public string Guid { get; set; }
+    public string Guid { get; set; } = System.Guid.NewGuid().ToString();
 
     [XmlElement("StarShip")]
     public StarShips StarShips {
-        get => _StarShips;
+        get { return _StarShips; }
         set { _StarShips = value; OnPropertyChanged(nameof(StarShips)); }
     }
-    private StarShips _StarShips;
+
+    private StarShips _StarShips = [];
 
     [XmlElement("StarBase")]
     public StarBases StarBases {
-        get => _StarBases;
+        get { return _StarBases; }
         set { _StarBases = value; OnPropertyChanged(nameof(StarBases)); }
     }
-    private StarBases _StarBases;
 
-    public StarFleet() {
-        Guid = System.Guid.NewGuid().ToString();
-        _StarShips = new StarShips();
-        _StarBases = new StarBases();
-    }
+    private StarBases _StarBases = [];
 
     public event PropertyChangedEventHandler PropertyChanged;
 

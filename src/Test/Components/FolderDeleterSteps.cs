@@ -4,7 +4,8 @@ using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TechTalk.SpecFlow;
+using Reqnroll;
+
 // ReSharper disable UnusedMember.Global
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components;
@@ -12,14 +13,10 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components;
 [Binding]
 public class FolderDeleterSteps {
     protected IFolder Folder, SubFolder;
-    protected readonly IFolderDeleter Sut;
+    protected readonly IFolderDeleter Sut = new FolderDeleter {
+        IgnoreUserTempFolder = true
+    };
     protected bool CanDeleteFolder, DoubleCheckOkay;
-
-    public FolderDeleterSteps() {
-        Sut = new FolderDeleter {
-            IgnoreUserTempFolder = true
-        };
-    }
 
     [AfterScenario("FolderDeleter")]
     public void CleanUp() {

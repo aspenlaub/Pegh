@@ -84,11 +84,11 @@ public class SecretRepositoryTest {
     }
 
     protected static CrewMember GetSecretCrewMember(SecretRepository sut, IGuid secret) {
-        return sut.Values.ContainsKey(secret.Guid) ? sut.Values[secret.Guid] as CrewMember : null;
+        return sut.Values.TryGetValue(secret.Guid, out object crewMember) ? crewMember as CrewMember : null;
     }
 
     protected static ListOfElements GetSecretListOfElements(SecretRepository sut, IGuid secret) {
-        return sut.Values.ContainsKey(secret.Guid) ? sut.Values[secret.Guid] as ListOfElements : null;
+        return sut.Values.TryGetValue(secret.Guid, out object secretList) ? secretList as ListOfElements : null;
     }
 
     [TestMethod]
