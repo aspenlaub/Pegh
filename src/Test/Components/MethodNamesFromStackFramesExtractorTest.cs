@@ -13,6 +13,7 @@ public class MethodNamesFromStackFramesExtractorTest {
     [TestMethod]
     public void ExtractMethodNamesFromStackFrames_WithinMethodCall_ReturnsCallerAndCallee() {
         var methodNames = MethodReturningMethodNamesFromStackFramesWhenCalled().ToList();
+        RemoveTestFrameworkMethodNames(methodNames);
         Assert.IsTrue(methodNames.Contains(nameof(MethodReturningMethodNamesFromStackFramesWhenCalled)));
         Assert.IsTrue(methodNames.Contains(nameof(ExtractMethodNamesFromStackFrames_WithinMethodCall_ReturnsCallerAndCallee)));
         Assert.AreEqual(2, methodNames.Count);
@@ -21,9 +22,13 @@ public class MethodNamesFromStackFramesExtractorTest {
     [TestMethod]
     public async Task ExtractMethodNamesFromStackFrames_WithinAsyncMethodCall_ReturnsCallerAndCallee() {
         var methodNames = (await MethodReturningMethodNamesFromStackFramesWhenCalledAsync()).ToList();
+        RemoveTestFrameworkMethodNames(methodNames);
         Assert.IsTrue(methodNames.Contains(nameof(MethodReturningMethodNamesFromStackFramesWhenCalledAsync)));
         Assert.IsTrue(methodNames.Contains(nameof(ExtractMethodNamesFromStackFrames_WithinAsyncMethodCall_ReturnsCallerAndCallee)));
-        Assert.AreEqual(2, methodNames.Count);
+        string methodName = "InvokeStub_"
+            + nameof(MethodNamesFromStackFramesExtractorTest) + '.'
+            + nameof(ExtractMethodNamesFromStackFrames_WithinAsyncMethodCall_ReturnsCallerAndCallee);
+        Assert.AreEqual(methodNames.Contains(methodName) ? 3 : 2, methodNames.Count);
 
         await Task.WhenAll(new List<Task> {
             Task.Run(async () => methodNames = (await MethodReturningMethodNamesFromStackFramesWhenCalledAsync()).ToList())
@@ -31,6 +36,19 @@ public class MethodNamesFromStackFramesExtractorTest {
         Assert.IsTrue(methodNames.Contains(nameof(MethodReturningMethodNamesFromStackFramesWhenCalledAsync)));
         Assert.IsTrue(methodNames.Contains(nameof(ExtractMethodNamesFromStackFrames_WithinAsyncMethodCall_ReturnsCallerAndCallee)));
         Assert.AreEqual(2, methodNames.Count);
+    }
+
+    private readonly string[] _TestFrameworkMethodNames = [
+        "RunTestsAsync", "RunTestsFromRightContextAsync", "ExecuteTestsAsync",
+        "ExecuteTestsInSourceAsync", "RunSingleTestAsync", "ExecuteTestsWithTestRunnerAsync"
+    ];
+
+    private void RemoveTestFrameworkMethodNames(IList<string> methodNames) {
+        if (!methodNames.Contains("RunTestsAsync")) { return; }
+
+        for (int i = methodNames.Count - 1; i > 0 && _TestFrameworkMethodNames.Contains(methodNames[i]); i--) {
+            methodNames.RemoveAt(i);
+        }
     }
 
     protected IEnumerable<string> MethodReturningMethodNamesFromStackFramesWhenCalled() {
