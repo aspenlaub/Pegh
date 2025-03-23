@@ -72,7 +72,8 @@ public class SimpleLogger(ILogConfiguration logConfiguration, ISimpleLogFlusher 
     }
 
     private IList<string> ReduceStackAccordingToCallStack(IEnumerable<string> stackOfScopes, IEnumerable<string> methodNamesFromCallStack) {
-        return stackOfScopes
+        var stackOfScopesAsList = stackOfScopes.ToList();
+        return stackOfScopesAsList
                .Where(x => _ScopeToCreatorMethodMapping.ContainsKey(x) && methodNamesFromCallStack.Contains(_ScopeToCreatorMethodMapping[x]))
                .ToList();
     }
