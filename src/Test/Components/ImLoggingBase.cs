@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
@@ -22,7 +23,7 @@ public class ImLoggingBase {
     }
 
     protected async Task WorkAsync() {
-        var methodNamesFromStack = MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames();
+        IList<string> methodNamesFromStack = MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames();
         Assert.IsTrue(methodNamesFromStack.Contains(nameof(WorkAsync)));
         SimpleLogger.LogWarningWithCallStack($"{WorkerId} is working hard", methodNamesFromStack);
         SimpleLogger.LogInformationWithCallStack($"{WorkerId} starts working", methodNamesFromStack);

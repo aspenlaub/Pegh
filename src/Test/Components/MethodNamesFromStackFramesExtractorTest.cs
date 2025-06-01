@@ -16,7 +16,7 @@ public class MethodNamesFromStackFramesExtractorTest {
         RemoveTestFrameworkMethodNames(methodNames);
         Assert.IsTrue(methodNames.Contains(nameof(MethodReturningMethodNamesFromStackFramesWhenCalled)));
         Assert.IsTrue(methodNames.Contains(nameof(ExtractMethodNamesFromStackFrames_WithinMethodCall_ReturnsCallerAndCallee)));
-        Assert.AreEqual(2, methodNames.Count);
+        Assert.AreEqual(3, methodNames.Count, string.Join('/', methodNames));
     }
 
     [TestMethod]
@@ -25,10 +25,7 @@ public class MethodNamesFromStackFramesExtractorTest {
         RemoveTestFrameworkMethodNames(methodNames);
         Assert.IsTrue(methodNames.Contains(nameof(MethodReturningMethodNamesFromStackFramesWhenCalledAsync)));
         Assert.IsTrue(methodNames.Contains(nameof(ExtractMethodNamesFromStackFrames_WithinAsyncMethodCall_ReturnsCallerAndCallee)));
-        string methodName = "InvokeStub_"
-            + nameof(MethodNamesFromStackFramesExtractorTest) + '.'
-            + nameof(ExtractMethodNamesFromStackFrames_WithinAsyncMethodCall_ReturnsCallerAndCallee);
-        Assert.AreEqual(methodNames.Contains(methodName) ? 3 : 2, methodNames.Count);
+        Assert.AreEqual(4, methodNames.Count, string.Join('/', methodNames));
 
         await Task.WhenAll(new List<Task> {
             Task.Run(async () => methodNames = (await MethodReturningMethodNamesFromStackFramesWhenCalledAsync()).ToList())

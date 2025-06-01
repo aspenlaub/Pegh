@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test;
 
@@ -8,7 +9,7 @@ public class AutofacVersionTest {
 
     [TestMethod]
     public void PeghUsesRightAutofacPackageVersion() {
-        var version = typeof(Autofac.ContainerBuilder).Assembly.GetName().Version;
+        Version version = typeof(Autofac.ContainerBuilder).Assembly.GetName().Version;
         Assert.IsNotNull(version);
         Assert.IsTrue(version.ToString().StartsWith(_expectedVersion), $"Expected version {_expectedVersion} is needed for Shatilaya to work, cannot use {version}");
     }
