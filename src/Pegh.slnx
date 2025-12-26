@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Pegh.csproj" />
+  <Project Path="Test/Pegh.Test.csproj" />
+</Solution>
