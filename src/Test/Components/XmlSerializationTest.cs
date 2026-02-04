@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -25,7 +26,7 @@ public class XmlSerializationTest {
     private static Autofac.IContainer Container { get; set; }
 
     public XmlSerializationTest() {
-        var builder = new ContainerBuilder().UseForPeghTest();
+        ContainerBuilder builder = new ContainerBuilder().UseForPeghTest();
         Container = builder.Build();
     }
 
@@ -85,7 +86,7 @@ public class XmlSerializationTest {
         Assert.IsTrue(EnterpriseD.CrewMembers.Contains(Yar));
         Assert.IsFalse(EnterpriseD.CrewMembers.Contains(Ro));
         Assert.IsFalse(EnterpriseD.CrewMembers.Contains(Pulaski));
-        foreach (var member in EnterpriseC.CrewMembers.Where(member => member.SurName == "Castillo")) {
+        foreach (CrewMember member in EnterpriseC.CrewMembers.Where(member => member.SurName == "Castillo")) {
             member.Rank = "Captain";
         }
 
@@ -97,7 +98,7 @@ public class XmlSerializationTest {
 
     [TestMethod]
     public void CanSerializeFleet() {
-        RegenerateUnverifiedResultFile(out var unverifiedResultFileName, out var unverifiedResultFileContents, out var verifiedResultFileName);
+        RegenerateUnverifiedResultFile(out string unverifiedResultFileName, out string unverifiedResultFileContents, out string verifiedResultFileName);
         VerifyExpected(unverifiedResultFileContents, "encoding=\"utf-8\"");
         VerifyExpected(unverifiedResultFileContents, "<StarFleets xmlns:xs");
         Assert.IsFalse(unverifiedResultFileContents.Contains("<StarFleets>"));
@@ -110,7 +111,7 @@ public class XmlSerializationTest {
     }
 
     private void RegenerateUnverifiedResultFile(out string unverifiedResultFileName, out string unverifiedResultFileContents, out string verifiedResultFileName) {
-        var serializer = Container.Resolve<IXmlSerializer>();
+        IXmlSerializer serializer = Container.Resolve<IXmlSerializer>();
         unverifiedResultFileContents = serializer.Serialize(Universes);
         unverifiedResultFileName = XmlResultsPath() + "fleet_unverified.xml";
         verifiedResultFileName = XmlResultsPath() + "fleet_verified.xml";
@@ -125,22 +126,22 @@ public class XmlSerializationTest {
         Assert.IsNotNull(expected);
         if (result.Contains(expected)) { return; }
 
-        Assert.IsTrue(false, expected + " expected in " + result);
+        throw new Exception(expected + " expected in " + result);
     }
 
     [TestMethod]
     public void CanDeserializeFleet() {
-        RegenerateUnverifiedResultFile(out var unverifiedResultFileName, out _, out var verifiedResultFileName);
+        RegenerateUnverifiedResultFile(out string unverifiedResultFileName, out _, out string verifiedResultFileName);
         File.Copy(unverifiedResultFileName, verifiedResultFileName);
-        var deserializer = Container.Resolve<IXmlDeserializer>();
-        var fleets = deserializer.Deserialize<ParallelUniverses>(File.ReadAllText(verifiedResultFileName, Encoding.UTF8));
+        IXmlDeserializer deserializer = Container.Resolve<IXmlDeserializer>();
+        ParallelUniverses fleets = deserializer.Deserialize<ParallelUniverses>(File.ReadAllText(verifiedResultFileName, Encoding.UTF8));
         Assert.AreEqual(1, fleets.StarFleets.Count);
-        var fleet = fleets.StarFleets[0];
+        StarFleet fleet = fleets.StarFleets[0];
         Assert.AreEqual(2, fleet.StarShips.Count);
     }
 
     protected string XmlResultsPath() {
-        var path = Path.GetDirectoryName(GetType().Assembly.Location) + @"\Results";
+        string path = Path.GetDirectoryName(GetType().Assembly.Location) + @"\Results";
         if (Directory.Exists(path)) { return path + @"\"; }
 
         Directory.CreateDirectory(path);
