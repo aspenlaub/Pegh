@@ -17,7 +17,7 @@ public class StringCrypter(ISecretRepository secretRepository) : IStringCrypter 
 
         var encrypterSecret = new SecretStringEncrypterFunction();
         var errorsAndInfos = new ErrorsAndInfos();
-        var csLambda = await SecretRepository.GetAsync(encrypterSecret, errorsAndInfos);
+        CsLambda csLambda = await SecretRepository.GetAsync(encrypterSecret, errorsAndInfos);
         SecretEncrypterFunction = await SecretRepository.CompileCsLambdaAsync<string, string>(csLambda);
 
         var decrypterSecret = new SecretStringDecrypterFunction();

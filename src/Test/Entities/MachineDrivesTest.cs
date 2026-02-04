@@ -25,8 +25,8 @@ public class MachineDrivesTest {
         var errorsAndInfos = new ErrorsAndInfos();
         var machineDrives = await secretRepository.GetAsync(machineDrivesSecret, errorsAndInfos);
         Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
-        Assert.IsTrue(machineDrives.Any(m => m.Name == "CSharpDrive"));
+        Assert.Contains(m => m.Name == "CSharpDrive", machineDrives);
         var drivesOnThisMachine = machineDrives.DrivesOnThisMachine();
-        Assert.AreEqual(1, drivesOnThisMachine.Count(m => m.Name == "CSharpDrive"));
+        Assert.ContainsSingle(m => m.Name == "CSharpDrive", drivesOnThisMachine);
     }
 }

@@ -42,7 +42,7 @@ public class FolderExtensionsTest {
     [TestMethod]
     public void FolderIsCreatedIfNecessary() {
         var folder = new Folder(Path.GetTempPath()).SubFolder("AspenlaubTemp").SubFolder("Folder").SubFolder("Helper").SubFolder("Test");
-        Assert.IsTrue(folder.FullName.Contains("Temp"));
+        Assert.Contains("Temp", folder.FullName);
         if (folder.Exists()) {
             Directory.Delete(folder.FullName, true);
         }

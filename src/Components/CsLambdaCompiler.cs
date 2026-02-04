@@ -10,7 +10,7 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 
 public class CsLambdaCompiler : ICsLambdaCompiler {
     public async Task<Func<TArgument, TResult>> CompileCsLambdaAsync<TArgument, TResult>(ICsLambda csLambda) {
-        var options = ScriptOptions.Default;
+        ScriptOptions options = ScriptOptions.Default;
         if (csLambda.Namespaces.Any()) {
             options = options.AddImports(csLambda.Namespaces);
         }
@@ -24,7 +24,7 @@ public class CsLambdaCompiler : ICsLambdaCompiler {
     }
 
     public static Assembly Type2Assembly(string type) {
-        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
         return assemblies.FirstOrDefault(a => a.GetType(type, false) != null);
     }
 }

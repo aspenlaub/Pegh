@@ -25,6 +25,6 @@ public class LogicalFoldersTest {
         var errorsAndInfos = new ErrorsAndInfos();
         var logicalFolders = await secretRepository.GetAsync(logicalFoldersSecret, errorsAndInfos);
         Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
-        Assert.IsTrue(logicalFolders.Any(m => m.Name == "MainUserFolder"));
+        Assert.Contains(m => m.Name == "MainUserFolder", logicalFolders);
     }
 }

@@ -16,9 +16,9 @@ public class XmlSchemerTest {
     public void CanCreateXmlSchema() {
         var sut = new XmlSchemer();
         var xsd = sut.Create(typeof(StarFleet));
-        Assert.IsTrue(xsd.Length > 100);
-        Assert.IsTrue(xsd.Contains("utf-8"));
-        Assert.IsTrue(xsd.Contains(nameof(CrewMember)));
+        Assert.IsGreaterThan(100, xsd.Length);
+        Assert.Contains("utf-8", xsd);
+        Assert.Contains(nameof(CrewMember), xsd);
     }
 
     [TestMethod]
@@ -31,10 +31,10 @@ public class XmlSchemerTest {
         Assert.IsTrue(sut.Valid(CrewMemberSecretGuid, xml, typeof(CrewMember), errorsAndInfos));
         Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
         Assert.IsFalse(sut.Valid(StarShipSecretGuid, xml, typeof(StarShip), errorsAndInfos));
-        Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("The \'http://www.aspenlaub.net:CrewMember\' element is not declared")));
+        Assert.Contains(e => e.Contains("The \'http://www.aspenlaub.net:CrewMember\' element is not declared"), errorsAndInfos.Errors);
         var xsd = sut.Create(typeof(CrewMember)).Replace("firstname", "worstname");
         errorsAndInfos = new ErrorsAndInfos();
         Assert.IsFalse(XmlSchemer.Valid(CrewMemberSecretGuid, xml, xsd, errorsAndInfos));
-        Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("The \'firstname\' attribute is not declared")));
+        Assert.Contains(e => e.Contains("The \'firstname\' attribute is not declared"), errorsAndInfos.Errors);
     }
 }

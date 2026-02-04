@@ -32,14 +32,14 @@ public class DisguiserTest {
         var errorsAndInfos = new ErrorsAndInfos();
         var disguised = await sut.Disguise(secretRepository, s, errorsAndInfos);
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
-        Assert.IsTrue(disguised.Length >= 3 * s.Length);
-        Assert.IsFalse(disguised.Contains(s));
+        Assert.IsGreaterThanOrEqualTo(3 * s.Length, disguised.Length);
+        Assert.DoesNotContain(s, disguised);
         Assert.AreEqual("./*56.D34CD3456/*E./*56.456./*FG7BCD78HBCD456*EF345BCDD342BC/*E", disguised);
 
         s = "Short string";
         disguised = await sut.Disguise(secretRepository, s, errorsAndInfos);
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
-        Assert.IsTrue(disguised.Length >= 3 * s.Length);
-        Assert.IsFalse(disguised.Contains(s));
+        Assert.IsGreaterThanOrEqualTo(3 * s.Length, disguised.Length);
+        Assert.DoesNotContain(s, disguised);
     }
 }

@@ -24,7 +24,7 @@ public class ImLoggingBase {
 
     protected async Task WorkAsync() {
         IList<string> methodNamesFromStack = MethodNamesFromStackFramesExtractor.ExtractMethodNamesFromStackFrames();
-        Assert.IsTrue(methodNamesFromStack.Contains(nameof(WorkAsync)));
+        Assert.Contains(nameof(WorkAsync), methodNamesFromStack);
         SimpleLogger.LogWarningWithCallStack($"{WorkerId} is working hard", methodNamesFromStack);
         SimpleLogger.LogInformationWithCallStack($"{WorkerId} starts working", methodNamesFromStack);
         while (DateTime.Now < EndOfWork) {

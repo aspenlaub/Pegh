@@ -171,14 +171,14 @@ public class SecretRepositoryTest {
         const string s = "This is not a string";
         var r = (await sut.CompileCsLambdaAsync<string, string>(await sut.GetAsync(secret, errorsAndInfos)))(s);
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
-        Assert.IsTrue(r.StartsWith(s));
-        Assert.IsTrue(r.Contains("with greetings from a csx"));
+        Assert.StartsWith(s, r);
+        Assert.Contains("with greetings from a csx", r);
     }
 
     private void CleanUpSecretRepository(bool alternative) {
         var secrets = new List<IGuid> { new SecretCrewMember(), new SecretStringFunction(), new SecretListOfElements() };
         foreach (var files in new[] { false, true }.Select(sample => SecretRepositoryFolder(sample, alternative)).SelectMany(folder => secrets.Select(secret => Directory.GetFiles(folder, secret.Guid + "*.*").ToList()))) {
-            Assert.IsTrue(files.Count < 3);
+            Assert.IsLessThan(3, files.Count);
             files.ForEach(File.Delete);
         }
     }
@@ -220,7 +220,7 @@ public class SecretRepositoryTest {
         var secret = new SecretCrewMember();
         sut.Reset(secret);
         await sut.GetAsync(secret, errorsAndInfos);
-        Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase)), errorsAndInfos.ErrorsToString());
+        Assert.Contains(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase), errorsAndInfos.Errors, errorsAndInfos.ErrorsToString());
         Assert.IsFalse(sut.Exists(secret));
         CleanUpSecretRepository(false);
     }
@@ -237,7 +237,7 @@ public class SecretRepositoryTest {
         var secret = new SecretCrewMember();
         sut.Reset(secret);
         Assert.IsNull(await sut.GetAsync(secret, errorsAndInfos));
-        Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase)), errorsAndInfos.ErrorsToString());
+        Assert.Contains(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase), errorsAndInfos.Errors, errorsAndInfos.ErrorsToString());
         CleanUpSecretRepository(false);
     }
 
@@ -253,7 +253,7 @@ public class SecretRepositoryTest {
         var secret = new SecretCrewMember();
         sut.Reset(secret);
         await sut.GetAsync(secret, errorsAndInfos);
-        Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase)), errorsAndInfos.ErrorsToString());
+        Assert.Contains(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase), errorsAndInfos.Errors, errorsAndInfos.ErrorsToString());
         Assert.IsFalse(sut.Values.ContainsKey(secret.Guid));
         CleanUpSecretRepository(false);
     }
@@ -305,7 +305,7 @@ public class SecretRepositoryTest {
         var secret = new SecretStringFunction();
         sut.Reset(secret);
         await sut.GetAsync(secret, errorsAndInfos);
-        Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase)), errorsAndInfos.ErrorsToString());
+        Assert.Contains(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase), errorsAndInfos.Errors, errorsAndInfos.ErrorsToString());
         Assert.IsFalse(sut.Exists(secret));
         CleanUpSecretRepository(false);
     }
@@ -322,7 +322,7 @@ public class SecretRepositoryTest {
         var secret = new SecretStringFunction();
         sut.Reset(secret);
         Assert.IsNull(await sut.GetAsync(secret, errorsAndInfos));
-        Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase)), errorsAndInfos.ErrorsToString());
+        Assert.Contains(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase), errorsAndInfos.Errors, errorsAndInfos.ErrorsToString());
         CleanUpSecretRepository(false);
     }
 
@@ -338,7 +338,7 @@ public class SecretRepositoryTest {
         var secret = new SecretStringFunction();
         sut.Reset(secret);
         await sut.GetAsync(secret, errorsAndInfos);
-        Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase)), errorsAndInfos.ErrorsToString());
+        Assert.Contains(e => e.Contains("Secret has not been defined", StringComparison.InvariantCultureIgnoreCase), errorsAndInfos.Errors, errorsAndInfos.ErrorsToString());
         Assert.IsFalse(sut.Values.ContainsKey(secret.Guid));
         CleanUpSecretRepository(false);
     }
@@ -357,7 +357,7 @@ public class SecretRepositoryTest {
         var script = await sut.GetAsync(secret, errorsAndInfos);
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
         const string addedString = "/* This script has been altered */";
-        Assert.IsFalse(script.LambdaExpression.Contains(addedString));
+        Assert.DoesNotContain(addedString, script.LambdaExpression);
         script.LambdaExpression = addedString + "\r\n" + script.LambdaExpression;
         await sut.SetAsync(secret, errorsAndInfos);
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
@@ -365,7 +365,7 @@ public class SecretRepositoryTest {
         await sut.ValueOrDefaultAsync(secret, errorsAndInfos);
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
         script = (CsLambda)sut.Values[secret.Guid];
-        Assert.IsTrue(script.LambdaExpression.StartsWith(addedString));
+        Assert.StartsWith(addedString, script.LambdaExpression);
         CleanUpSecretRepository(false);
     }
 
@@ -381,10 +381,10 @@ public class SecretRepositoryTest {
 
         var secret = new SecretCrewMember();
         var folder = SecretRepositoryFolder(true, false);
-        Assert.AreEqual(0, Directory.GetFiles(folder, secret.Guid + "*.*").Length);
+        Assert.IsEmpty(Directory.GetFiles(folder, secret.Guid + "*.*"));
         sut.SaveSample(secret, false);
-        Assert.AreEqual(1, Directory.GetFiles(folder, secret.Guid + "*.xml").Length);
-        Assert.AreEqual(1, Directory.GetFiles(folder, secret.Guid + "*.xsd").Length);
+        Assert.HasCount(1, Directory.GetFiles(folder, secret.Guid + "*.xml"));
+        Assert.HasCount(1, Directory.GetFiles(folder, secret.Guid + "*.xsd"));
         CleanUpSecretRepository(false);
     }
 
@@ -400,10 +400,10 @@ public class SecretRepositoryTest {
 
         var secret = new SecretCrewMember();
         var folder = SecretRepositoryFolder(true, false);
-        Assert.AreEqual(0, Directory.GetFiles(folder, secret.Guid + "*.*").Length);
+        Assert.IsEmpty(Directory.GetFiles(folder, secret.Guid + "*.*"));
         sut.SaveSample(secret, false);
-        Assert.AreEqual(1, Directory.GetFiles(folder, secret.Guid + "*.xml").Length);
-        Assert.AreEqual(1, Directory.GetFiles(folder, secret.Guid + "*.xsd").Length);
+        Assert.HasCount(1, Directory.GetFiles(folder, secret.Guid + "*.xml"));
+        Assert.HasCount(1, Directory.GetFiles(folder, secret.Guid + "*.xsd"));
         CleanUpSecretRepository(false);
     }
 
@@ -458,7 +458,7 @@ public class SecretRepositoryTest {
         await sut.GetAsync(secret, errorsAndInfos);
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
         listOfElements = GetSecretListOfElements(sut, secret);
-        Assert.AreEqual(2, listOfElements.Count);
+        Assert.HasCount(2, listOfElements);
         Assert.AreEqual("Two", listOfElements[1].Value);
         CleanUpSecretRepository(false);
     }

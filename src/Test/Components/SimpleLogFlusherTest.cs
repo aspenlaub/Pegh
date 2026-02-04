@@ -39,8 +39,8 @@ public class SimpleLogFlusherTest {
         }
         sut.Flush(loggerMock.Object, subFolder);
         var fileNames = Directory.GetFiles(folder.FullName, "*.log").ToList();
-        Assert.AreEqual(1, fileNames.Count);
+        Assert.HasCount(1, fileNames);
         Assert.AreEqual(folder.FullName + '\\' + nameof(SimpleLogFlusherTest) + '(' + Environment.ProcessId + ").log", fileNames[0]);
-        Assert.IsTrue(File.ReadAllText(fileNames[0]).Contains(logEntries[0].Message));
+        Assert.Contains(logEntries[0].Message, File.ReadAllText(fileNames[0]));
     }
 }

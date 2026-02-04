@@ -35,8 +35,8 @@ public class XmlSerializationTest {
         FleetPropertyChangedDuringInitialization = 0;
         Fleet = new StarFleet();
         ((INotifyPropertyChanged)Fleet.StarShips).PropertyChanged += FleetPropertyChanged;
-        Assert.AreEqual(0, Fleet.StarShips.Count);
-        Assert.AreEqual(0, Fleet.StarBases.Count);
+        Assert.IsEmpty(Fleet.StarShips);
+        Assert.IsEmpty(Fleet.StarBases);
         EnterpriseC = new StarShip { Guid = _ncc1701C, Name = _ussEnterpriseNcc1701C };
         Garrett = new CrewMember { Rank = "Captain", FirstName = "Rachel", SurName = "Garrett" };
         EnterpriseC.CrewMembers.Add(Garrett);
@@ -77,15 +77,15 @@ public class XmlSerializationTest {
 
     [TestMethod]
     public void CanAssembleFleet() {
-        Assert.AreEqual(2, Fleet.StarShips.Count);
+        Assert.HasCount(2, Fleet.StarShips);
         Assert.AreSame(EnterpriseC, Fleet.StarShips[0]);
         Assert.AreSame(EnterpriseD, Fleet.StarShips[1]);
-        Assert.AreEqual(3, EnterpriseC.CrewMembers.Count);
-        Assert.AreEqual(3, EnterpriseD.CrewMembers.Count);
+        Assert.HasCount(3, EnterpriseC.CrewMembers);
+        Assert.HasCount(3, EnterpriseD.CrewMembers);
         Assert.AreEqual(1, EnterpriseD.CrewMembers.IndexOf(WilliamRiker));
-        Assert.IsTrue(EnterpriseD.CrewMembers.Contains(Yar));
-        Assert.IsFalse(EnterpriseD.CrewMembers.Contains(Ro));
-        Assert.IsFalse(EnterpriseD.CrewMembers.Contains(Pulaski));
+        Assert.Contains(Yar, EnterpriseD.CrewMembers);
+        Assert.DoesNotContain(Ro, EnterpriseD.CrewMembers);
+        Assert.DoesNotContain(Pulaski, EnterpriseD.CrewMembers);
         foreach (CrewMember member in EnterpriseC.CrewMembers.Where(member => member.SurName == "Castillo")) {
             member.Rank = "Captain";
         }
@@ -101,12 +101,12 @@ public class XmlSerializationTest {
         RegenerateUnverifiedResultFile(out string unverifiedResultFileName, out string unverifiedResultFileContents, out string verifiedResultFileName);
         VerifyExpected(unverifiedResultFileContents, "encoding=\"utf-8\"");
         VerifyExpected(unverifiedResultFileContents, "<StarFleets xmlns:xs");
-        Assert.IsFalse(unverifiedResultFileContents.Contains("<StarFleets>"));
-        Assert.IsFalse(unverifiedResultFileContents.Contains("<StarShips>"));
+        Assert.DoesNotContain("<StarFleets>", unverifiedResultFileContents);
+        Assert.DoesNotContain("<StarShips>", unverifiedResultFileContents);
         VerifyExpected(unverifiedResultFileContents, $"<StarShip guid=\"{_ncc1701C}\" name=\"{_ussEnterpriseNcc1701C}\"");
-        Assert.IsFalse(unverifiedResultFileContents.Contains("<StarShip>"));
+        Assert.DoesNotContain("<StarShip>", unverifiedResultFileContents);
         VerifyExpected(unverifiedResultFileContents, "Jean-Luc");
-        Assert.IsFalse(unverifiedResultFileContents.Contains("xmlns=\"\""));
+        Assert.DoesNotContain("xmlns=\"\"", unverifiedResultFileContents);
         File.Copy(unverifiedResultFileName, verifiedResultFileName);
     }
 
@@ -135,9 +135,9 @@ public class XmlSerializationTest {
         File.Copy(unverifiedResultFileName, verifiedResultFileName);
         IXmlDeserializer deserializer = Container.Resolve<IXmlDeserializer>();
         ParallelUniverses fleets = deserializer.Deserialize<ParallelUniverses>(File.ReadAllText(verifiedResultFileName, Encoding.UTF8));
-        Assert.AreEqual(1, fleets.StarFleets.Count);
+        Assert.HasCount(1, fleets.StarFleets);
         StarFleet fleet = fleets.StarFleets[0];
-        Assert.AreEqual(2, fleet.StarShips.Count);
+        Assert.HasCount(2, fleet.StarShips);
     }
 
     protected string XmlResultsPath() {

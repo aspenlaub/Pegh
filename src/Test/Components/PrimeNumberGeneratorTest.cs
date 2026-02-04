@@ -11,7 +11,7 @@ public class PrimeNumberGeneratorTest {
         var sut = new PrimeNumberGenerator();
         var primeNumbers = sut.Generate(5).ToList();
         var expectedPrimeNumbers = new[] {2, 3, 5, 7, 11};
-        Assert.AreEqual(expectedPrimeNumbers.Length, primeNumbers.Count);
+        Assert.HasCount(expectedPrimeNumbers.Length, primeNumbers);
         for (var i = 0; i < primeNumbers.Count; i++) {
             Assert.AreEqual(expectedPrimeNumbers[i], primeNumbers[i]);
         }

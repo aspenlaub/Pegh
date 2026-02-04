@@ -10,12 +10,12 @@ namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components;
 public class PeghContainerBuilderTest {
     [TestMethod]
     public void Resolve_WithILogger_ReturnsSimpleLogger() {
-        var sut = new ContainerBuilder().UsePegh("Pegh", new DummyCsArgumentPrompter()).Build();
-        var logger = sut.Resolve<ILogger>();
+        IContainer sut = new ContainerBuilder().UsePegh("Pegh", true, new DummyCsArgumentPrompter()).Build();
+        ILogger logger = sut.Resolve<ILogger>();
         Assert.IsNotNull(logger);
         Assert.IsTrue(logger is SimpleLogger);
 
-        var simpleLogger = sut.Resolve<ISimpleLogger>();
+        ISimpleLogger simpleLogger = sut.Resolve<ISimpleLogger>();
         Assert.IsNotNull(simpleLogger);
     }
 }

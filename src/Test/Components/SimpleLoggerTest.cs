@@ -51,18 +51,18 @@ public class SimpleLoggerTest {
         VerifyLogWasFlushedOrNot(false);
 
         var logEntries = _Sut.FindLogEntries(_ => true);
-        Assert.AreEqual(_numberOfLogEntries, logEntries.Count);
+        Assert.HasCount(_numberOfLogEntries, logEntries);
         Assert.AreEqual(LogLevel.Information, logEntries[0].LogLevel);
-        Assert.AreEqual(2, logEntries[0].Stack.Count);
+        Assert.HasCount(2, logEntries[0].Stack);
         Assert.AreEqual("Scope(A)", logEntries[0].Stack[0]);
         Assert.AreEqual("Scope(B)", logEntries[0].Stack[1]);
         Assert.AreEqual(_notAMessage, logEntries[0].Message);
 
         var fileNames = _Flusher.FileNames;
-        Assert.AreEqual(1, fileNames.Count);
+        Assert.HasCount(1, fileNames);
         var fileName = fileNames.First();
         Assert.IsTrue(File.Exists(fileName));
-        Assert.IsTrue(fileName.EndsWith(@"\Scope(A).log"));
+        Assert.EndsWith(@"\Scope(A).log", fileName);
         Assert.AreEqual(0, logEntries.Count(e => !e.Flushed));
 
         File.SetLastWriteTime(fileName, DateTime.Now.AddHours(-25));
@@ -126,7 +126,7 @@ public class SimpleLoggerTest {
     private void VerifyNoExceptionWasLogged() {
         var exceptionFileNames = Directory.GetFiles(_ExceptionFolderProvider.ExceptionFolder().FullName, "*.*").Where(f => File.GetLastWriteTime(f) >= _StartOfTestTime).ToList();
         var exceptionFileName = exceptionFileNames.FirstOrDefault() ?? "\\";
-        Assert.IsTrue(exceptionFileName.Length <= 1, $"An exception was logged {exceptionFileName.Substring(exceptionFileName.LastIndexOf('\\'))}");
+        Assert.IsLessThanOrEqualTo(1, exceptionFileName.Length, $"An exception was logged {exceptionFileName.Substring(exceptionFileName.LastIndexOf('\\'))}");
     }
 
     private void VerifyLogWasFlushedOrNot(bool was) {

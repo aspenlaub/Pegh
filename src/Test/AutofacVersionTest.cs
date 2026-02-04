@@ -11,6 +11,6 @@ public class AutofacVersionTest {
     public void PeghUsesRightAutofacPackageVersion() {
         Version version = typeof(Autofac.ContainerBuilder).Assembly.GetName().Version;
         Assert.IsNotNull(version);
-        Assert.IsTrue(version.ToString().StartsWith(_expectedVersion), $"Expected version {_expectedVersion} is needed for Shatilaya to work, cannot use {version}");
+        Assert.StartsWith(_expectedVersion, version.ToString(), $"Expected version {_expectedVersion} is needed for Shatilaya to work, cannot use {version}");
     }
 }

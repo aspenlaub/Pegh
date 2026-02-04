@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
@@ -32,7 +33,7 @@ public class SecretRepository : ISecretRepository {
         XmlSchemer = xmlSchemer;
         XmlSerializer = xmlSerializer;
         Values = new Dictionary<string, object>();
-        var folder = PeghEnvironment.RootWorkFolder + @"\SecretSamples\";
+        string folder = PeghEnvironment.RootWorkFolder + @"\SecretSamples\";
         if (!Directory.Exists(folder)) {
             Directory.CreateDirectory(folder);
         }
@@ -43,24 +44,24 @@ public class SecretRepository : ISecretRepository {
     }
 
     public async Task SetAsync<TResult>(ISecret<TResult> secret, IErrorsAndInfos errorsAndInfos) where TResult : class, ISecretResult<TResult>, new() {
-        var valueOrDefault = await ValueOrDefaultAsync(secret, errorsAndInfos);
-        var xml = XmlSerializer.Serialize(valueOrDefault);
+        TResult valueOrDefault = await ValueOrDefaultAsync(secret, errorsAndInfos);
+        string xml = XmlSerializer.Serialize(valueOrDefault);
         await WriteToFileAsync(secret, xml, false, errorsAndInfos);
         Values[secret.Guid] = valueOrDefault;
     }
 
     internal async Task<TResult> ValueOrDefaultAsync<TResult>(ISecret<TResult> secret, IErrorsAndInfos errorsAndInfos) where TResult : class, ISecretResult<TResult>, new() {
-        if (Values.TryGetValue(secret.Guid, out var value)) {
+        if (Values.TryGetValue(secret.Guid, out object value)) {
             return value as TResult;
         }
 
         if (File.Exists(FileName(secret, false))) {
-            var xml = await ReadFromFileAsync(secret, false, errorsAndInfos);
+            string xml = await ReadFromFileAsync(secret, false, errorsAndInfos);
             Values[secret.Guid] = XmlDeserializer.Deserialize<TResult>(xml);
             return (TResult) Values[secret.Guid];
         }
 
-        var clone = secret.DefaultValue.Clone();
+        TResult clone = secret.DefaultValue.Clone();
         Values[secret.Guid] = clone;
         return clone;
     }
@@ -70,16 +71,16 @@ public class SecretRepository : ISecretRepository {
 
         SaveSample(secret, false);
 
-        var fileName = FileName(secret, false);
+        string fileName = FileName(secret, false);
         if (!File.Exists(fileName)) {
             if (SecretShouldDefaultSecretsBeStored == null) {
                 SecretShouldDefaultSecretsBeStored = new SecretShouldDefaultSecretsBeStored();
                 await GetAsync(SecretShouldDefaultSecretsBeStored, errorsAndInfos);
             }
-            var shouldDefaultSecretsBeStored = await ValueOrDefaultAsync(SecretShouldDefaultSecretsBeStored, errorsAndInfos);
+            ShouldDefaultSecretsBeStored shouldDefaultSecretsBeStored = await ValueOrDefaultAsync(SecretShouldDefaultSecretsBeStored, errorsAndInfos);
             if (!shouldDefaultSecretsBeStored.AutomaticallySaveDefaultSecretIfAbsent) {
                 SaveSample(secret, true);
-                var defaultFileName = FileName(secret, true);
+                string defaultFileName = FileName(secret, true);
                 errorsAndInfos.Errors.Add(string.Format(Properties.Resources.PleaseLoadSecretSampleAdjustAndThenSaveAs, defaultFileName, fileName));
                 return null;
             }
@@ -93,14 +94,14 @@ public class SecretRepository : ISecretRepository {
             return valueOrDefault;
         }
 
-        var xml = await ReadFromFileAsync(secret, false, errorsAndInfos);
+        string xml = await ReadFromFileAsync(secret, false, errorsAndInfos);
         if (string.IsNullOrEmpty(xml)) { return null; }
 
         valueOrDefault = XmlDeserializer.Deserialize<TResult>(xml);
         if (!IsGenericType(valueOrDefault.GetType())) {
-            foreach (var property in valueOrDefault.GetType().GetProperties().Where(p => p.GetValue(valueOrDefault) == null)) {
+            foreach (PropertyInfo property in valueOrDefault.GetType().GetProperties().Where(p => p.GetValue(valueOrDefault) == null)) {
                 SaveSample(secret, true);
-                var defaultFileName = FileName(secret, true);
+                string defaultFileName = FileName(secret, true);
                 errorsAndInfos.Errors.Add(string.Format(Properties.Resources.AddedPropertyNotFoundInLoadedSecret, property.Name, fileName, defaultFileName));
             }
         }
@@ -128,7 +129,7 @@ public class SecretRepository : ISecretRepository {
             Values.Remove(secret.Guid);
         }
 
-        var fileName = FileName(secret, false);
+        string fileName = FileName(secret, false);
         if (!File.Exists(fileName)) { return; }
 
         File.Delete(fileName);
@@ -139,13 +140,13 @@ public class SecretRepository : ISecretRepository {
     }
 
     internal void SaveSample<TResult>(ISecret<TResult> secret, bool update) where TResult : class, ISecretResult<TResult>, new() {
-        var fileName = FileName(secret, true);
+        string fileName = FileName(secret, true);
         if (fileName == null) {
             throw new NullReferenceException(nameof(fileName));
         }
         if (File.Exists(fileName) && !update) { return; }
 
-        var xml = XmlSerializer.Serialize(secret.DefaultValue);
+        string xml = XmlSerializer.Serialize(secret.DefaultValue);
         if (File.Exists(fileName) && File.ReadAllText(fileName) == xml) { return; }
 
         File.WriteAllText(fileName, xml);
@@ -158,7 +159,7 @@ public class SecretRepository : ISecretRepository {
                 where TResult : class, ISecretResult<TResult>, new() {
         if (!XmlSchemer.Valid(secret.Guid, xml, typeof(TResult), errorsAndInfos)) { return; }
 
-        var fileName = FileName(secret, sample);
+        string fileName = FileName(secret, sample);
         await File.WriteAllTextAsync(fileName, xml);
         await File.WriteAllTextAsync(fileName.Replace(".xml", ".xsd"), XmlSchemer.Create(typeof(TResult)));
     }
@@ -167,8 +168,8 @@ public class SecretRepository : ISecretRepository {
     private async Task<string> ReadFromFileAsync<TResult>(ISecret<TResult> secret, bool sample,
             IErrorsAndInfos errorsAndInfos)
                 where TResult : class, ISecretResult<TResult>, new() {
-        var fileName = FileName(secret, sample);
-        var xml = await File.ReadAllTextAsync(fileName);
+        string fileName = FileName(secret, sample);
+        string xml = await File.ReadAllTextAsync(fileName);
         return XmlSchemer.Valid(secret.Guid, xml, typeof(TResult), errorsAndInfos) ? xml : "";
     }
 

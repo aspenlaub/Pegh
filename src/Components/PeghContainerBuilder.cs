@@ -12,9 +12,14 @@ public static class PeghContainerBuilder {
     private static ISimpleLogger _simpleLogger;
     private static ILogConfiguration _logConfiguration;
 
-    public static ContainerBuilder UsePegh(this ContainerBuilder builder, string applicationName, ICsArgumentPrompter csArgumentPrompter) {
+    public static ContainerBuilder UsePegh(this ContainerBuilder builder, string applicationName, bool useDummyCsLambdaCompiler,
+            ICsArgumentPrompter csArgumentPrompter) {
         builder.RegisterInstance(csArgumentPrompter).As<ICsArgumentPrompter>();
-        builder.RegisterType<CsLambdaCompiler>().As<ICsLambdaCompiler>();
+        if (useDummyCsLambdaCompiler) {
+            builder.RegisterType<DummyCsLambdaCompiler>().As<ICsLambdaCompiler>();
+        } else {
+            builder.RegisterType<CsLambdaCompiler>().As<ICsLambdaCompiler>();
+        }
         builder.RegisterType<Disguiser>().As<IDisguiser>();
         builder.RegisterType<ExceptionFolderProvider>().As<IExceptionFolderProvider>();
         builder.RegisterType<FolderDeleter>().As<IFolderDeleter>();
@@ -39,9 +44,14 @@ public static class PeghContainerBuilder {
         return builder;
     }
 
-    public static IServiceCollection UsePegh(this IServiceCollection services, string applicationName, ICsArgumentPrompter csArgumentPrompter) {
+    public static IServiceCollection UsePegh(this IServiceCollection services, string applicationName, bool useDummyCsLambdaCompiler,
+            ICsArgumentPrompter csArgumentPrompter) {
         services.AddSingleton(csArgumentPrompter);
-        services.AddTransient<ICsLambdaCompiler, CsLambdaCompiler>();
+        if (useDummyCsLambdaCompiler) {
+            services.AddTransient<ICsLambdaCompiler, DummyCsLambdaCompiler>();
+        } else {
+            services.AddTransient<ICsLambdaCompiler, CsLambdaCompiler>();
+        }
         services.AddTransient<IDisguiser, Disguiser>();
         services.AddTransient<IExceptionFolderProvider, ExceptionFolderProvider>();
         services.AddTransient<IFolderDeleter, FolderDeleter>();

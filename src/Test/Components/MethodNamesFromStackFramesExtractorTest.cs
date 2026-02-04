@@ -13,24 +13,24 @@ public class MethodNamesFromStackFramesExtractorTest {
     [TestMethod]
     public void ExtractMethodNamesFromStackFrames_WithinMethodCall_ReturnsCallerAndCallee() {
         var methodNames = MethodReturningMethodNamesFromStackFramesWhenCalled().ToList();
-        Assert.IsTrue(methodNames.Contains(nameof(MethodReturningMethodNamesFromStackFramesWhenCalled)));
-        Assert.IsTrue(methodNames.Contains(nameof(ExtractMethodNamesFromStackFrames_WithinMethodCall_ReturnsCallerAndCallee)));
-        Assert.IsTrue(methodNames.Count <= 4, string.Join('/', methodNames));
+        Assert.Contains(nameof(MethodReturningMethodNamesFromStackFramesWhenCalled), methodNames);
+        Assert.Contains(nameof(ExtractMethodNamesFromStackFrames_WithinMethodCall_ReturnsCallerAndCallee), methodNames);
+        Assert.IsLessThanOrEqualTo(4, methodNames.Count, string.Join('/', methodNames));
     }
 
     [TestMethod]
     public async Task ExtractMethodNamesFromStackFrames_WithinAsyncMethodCall_ReturnsCallerAndCallee() {
         var methodNames = (await MethodReturningMethodNamesFromStackFramesWhenCalledAsync()).ToList();
-        Assert.IsTrue(methodNames.Contains(nameof(MethodReturningMethodNamesFromStackFramesWhenCalledAsync)));
-        Assert.IsTrue(methodNames.Contains(nameof(ExtractMethodNamesFromStackFrames_WithinAsyncMethodCall_ReturnsCallerAndCallee)));
-        Assert.IsTrue(methodNames.Count <= 4, string.Join('/', methodNames));
+        Assert.Contains(nameof(MethodReturningMethodNamesFromStackFramesWhenCalledAsync), methodNames);
+        Assert.Contains(nameof(ExtractMethodNamesFromStackFrames_WithinAsyncMethodCall_ReturnsCallerAndCallee), methodNames);
+        Assert.IsLessThanOrEqualTo(4, methodNames.Count, string.Join('/', methodNames));
 
         await Task.WhenAll(new List<Task> {
             Task.Run(async () => methodNames = (await MethodReturningMethodNamesFromStackFramesWhenCalledAsync()).ToList())
         });
-        Assert.IsTrue(methodNames.Contains(nameof(MethodReturningMethodNamesFromStackFramesWhenCalledAsync)));
-        Assert.IsTrue(methodNames.Contains(nameof(ExtractMethodNamesFromStackFrames_WithinAsyncMethodCall_ReturnsCallerAndCallee)));
-        Assert.AreEqual(2, methodNames.Count);
+        Assert.Contains(nameof(MethodReturningMethodNamesFromStackFramesWhenCalledAsync), methodNames);
+        Assert.Contains(nameof(ExtractMethodNamesFromStackFrames_WithinAsyncMethodCall_ReturnsCallerAndCallee), methodNames);
+        Assert.HasCount(2, methodNames);
     }
 
     protected IEnumerable<string> MethodReturningMethodNamesFromStackFramesWhenCalled() {

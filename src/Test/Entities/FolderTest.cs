@@ -9,7 +9,7 @@ public class FolderTest {
     [TestMethod]
     public void TrailingBackslashIsStrippedOff() {
         var tempFolder = Path.GetTempPath();
-        Assert.IsTrue(tempFolder.EndsWith("\\"));
+        Assert.EndsWith("\\", tempFolder);
         var sut = new Folder(tempFolder);
         Assert.AreEqual(tempFolder[..^1], sut.FullName);
         tempFolder = sut.FullName;

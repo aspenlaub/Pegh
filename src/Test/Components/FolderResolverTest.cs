@@ -9,6 +9,8 @@ using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
+#pragma warning disable CA1859
+
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components;
 
 [TestClass]
@@ -31,10 +33,10 @@ public class FolderResolverTest {
         secretRepositoryMock.Setup(s => s.GetAsync(It.IsAny<MachineDrivesSecret>(), It.IsAny<IErrorsAndInfos>())).Returns(Task.FromResult(machineDrives));
         secretRepositoryMock.Setup(s => s.GetAsync(It.IsAny<LogicalFoldersSecret>(), It.IsAny<IErrorsAndInfos>())).Returns(Task.FromResult(logicalFolders));
 
-        var builder = new ContainerBuilder().UseForPeghTest(secretRepositoryMock.Object);
+        ContainerBuilder builder = new ContainerBuilder().UseForPeghTest(secretRepositoryMock.Object);
         Container = builder.Build();
 
-        builder = new ContainerBuilder().UsePegh("Pegh", new DummyCsArgumentPrompter());
+        builder = new ContainerBuilder().UsePegh("Pegh", true, new DummyCsArgumentPrompter());
         ProductionContainer = builder.Build();
 
         _Sut = Container.Resolve<IFolderResolver>();
@@ -60,9 +62,9 @@ public class FolderResolverTest {
 
     [TestMethod]
     public async Task CanUseRealResolver() {
-        var sut = ProductionContainer.Resolve<IFolderResolver>();
+        IFolderResolver sut = ProductionContainer.Resolve<IFolderResolver>();
         var errorsAndInfos = new ErrorsAndInfos();
-        var folder = await sut.ResolveAsync("$(MainUserFolder)", errorsAndInfos);
+        IFolder folder = await sut.ResolveAsync("$(MainUserFolder)", errorsAndInfos);
         Assert.IsTrue(folder.SubFolder("CSharp").Exists());
         Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
         Assert.IsTrue(folder.SubFolder("GitHub").Exists());
@@ -71,10 +73,10 @@ public class FolderResolverTest {
 
     [TestMethod]
     public async Task ProperErrorMessagesAreReturnedIfPlaceholderIsNotDefined() {
-        var sut = ProductionContainer.Resolve<IFolderResolver>();
+        IFolderResolver sut = ProductionContainer.Resolve<IFolderResolver>();
         var errorsAndInfos = new ErrorsAndInfos();
         await sut.ResolveAsync("$(CSharpDrive)/$(OopsNotExisting)/$(OopsNotExistingEither)", errorsAndInfos);
-        Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("$(OopsNotExisting)")));
-        Assert.IsTrue(errorsAndInfos.Errors.Any(e => e.Contains("$(OopsNotExistingEither)")));
+        Assert.Contains(e => e.Contains("$(OopsNotExisting)"), errorsAndInfos.Errors);
+        Assert.Contains(e => e.Contains("$(OopsNotExistingEither)"), errorsAndInfos.Errors);
     }
 }
