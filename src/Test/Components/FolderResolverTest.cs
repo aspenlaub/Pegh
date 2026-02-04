@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
@@ -36,7 +35,7 @@ public class FolderResolverTest {
         ContainerBuilder builder = new ContainerBuilder().UseForPeghTest(secretRepositoryMock.Object);
         Container = builder.Build();
 
-        builder = new ContainerBuilder().UsePegh("Pegh", true, new DummyCsArgumentPrompter());
+        builder = new ContainerBuilder().UsePeghWithoutCsLambdaCompiler("Pegh");
         ProductionContainer = builder.Build();
 
         _Sut = Container.Resolve<IFolderResolver>();

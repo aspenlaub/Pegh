@@ -11,27 +11,21 @@ public class StarBase : IGuid, INotifyPropertyChanged {
 
     [XmlAttribute("name")]
     public string Name {
-        get { return _Name; }
-        set { _Name = value; OnPropertyChanged(nameof(Name)); }
+        get;
+        set { field = value; OnPropertyChanged(nameof(Name)); }
     }
-
-    private string _Name;
 
     [XmlElement("CrewMember")]
     public CrewMembers Personnel {
-        get { return _Personnel; }
-        set { _Personnel = value; OnPropertyChanged(nameof(Personnel)); }
-    }
-
-    private CrewMembers _Personnel = [];
+        get;
+        set { field = value; OnPropertyChanged(nameof(Personnel)); }
+    } = [];
 
     [XmlElement("StarShip")]
     public StarShips DockedShips {
-        get { return _DockedShips; }
-        set { _DockedShips = value; OnPropertyChanged(nameof(DockedShips)); }
-    }
-
-    private StarShips _DockedShips = [];
+        get;
+        set { field = value; OnPropertyChanged(nameof(DockedShips)); }
+    } = [];
 
     public event PropertyChangedEventHandler PropertyChanged;
 

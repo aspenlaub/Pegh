@@ -30,7 +30,7 @@ public class SimpleLogReaderTest {
 
     [TestInitialize]
     public void Initialize() {
-        IContainer container = new ContainerBuilder().UsePegh("Pegh", true, new DummyCsArgumentPrompter()).Build();
+        IContainer container = new ContainerBuilder().UsePeghWithoutCsLambdaCompiler("Pegh").Build();
         _MethodNamesFromStackFramesExtractor = container.Resolve<IMethodNamesFromStackFramesExtractor>();
         var logConfiguration = new LogConfiguration(nameof(SimpleLogReaderTest));
         _Flusher = new SimpleLogFlusher(_ExceptionFolderProvider);

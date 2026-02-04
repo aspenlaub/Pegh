@@ -23,8 +23,6 @@ public class SecretRepositoryTest {
     protected IFolder AppDataSpecialFolder { get; }
 
     protected const string SomeFirstName = "Some First Name", SomeSurName = "Some Surname", SomeRank = "Some Rank";
-    protected const string Passphrase = "DbDy38Dk973-5DeC9-4A.10-A7$45-DB§66C15!!05B80";
-    protected Mock<ICsArgumentPrompter> CsArgumentPrompterMock, AlternativeCsArgumentPrompterMock;
 
     public SecretRepositoryTest() {
         AppDataSpecialFolder = new Folder(Path.GetTempPath()).SubFolder("AspenlaubTemp").SubFolder("NoSecrets");
@@ -37,25 +35,20 @@ public class SecretRepositoryTest {
 
     [TestInitialize]
     public void Initialize() {
-        CsArgumentPrompterMock = new Mock<ICsArgumentPrompter>();
-        CsArgumentPrompterMock.Setup(p => p.PromptForArgument(It.IsAny<string>(), It.IsAny<string>())).Returns(Passphrase);
 
-        var builder = new ContainerBuilder().UseForPeghTest(CsArgumentPrompterMock.Object);
+        ContainerBuilder builder = new ContainerBuilder().UseForPeghTest();
         Container = builder.Build();
 
-        AlternativeCsArgumentPrompterMock = new Mock<ICsArgumentPrompter>();
-        AlternativeCsArgumentPrompterMock.Setup(p => p.PromptForArgument(It.IsAny<string>(), It.IsAny<string>())).Returns(Passphrase);
-
         var peghEnvironment = new PeghEnvironment(AppDataSpecialFolder);
-        builder = new ContainerBuilder().UseForPeghTest(peghEnvironment, AlternativeCsArgumentPrompterMock.Object);
+        builder = new ContainerBuilder().UseForPeghTest(peghEnvironment);
         AlternativeContainer = builder.Build();
 
         var disguiserMock = new Mock<IDisguiser>();
         disguiserMock.Setup(d => d.Disguise(It.IsAny<ISecretRepository>(), It.IsAny<string>(), It.IsAny<IErrorsAndInfos>())).Returns(Task.FromResult(""));
-        builder = new ContainerBuilder().UseForPeghTest(disguiserMock.Object, CsArgumentPrompterMock.Object);
+        builder = new ContainerBuilder().UseForPeghTest(disguiserMock.Object);
         ContainerWithMockedDisguiser = builder.Build();
 
-        builder = new ContainerBuilder().UseForPeghTest(disguiserMock.Object, AlternativeCsArgumentPrompterMock.Object);
+        builder = new ContainerBuilder().UseForPeghTest(disguiserMock.Object);
         builder.Build();
 
         SecretRepositoryFolder(false, false);
@@ -66,7 +59,7 @@ public class SecretRepositoryTest {
 
     [ClassCleanup]
     public static void ClassCleanup() {
-        var folder = new Folder(Path.GetTempPath()).SubFolder("AspenlaubTemp").SubFolder("NoSecrets");
+        IFolder folder = new Folder(Path.GetTempPath()).SubFolder("AspenlaubTemp").SubFolder("NoSecrets");
         if (!folder.Exists()) { return; }
 
 
@@ -75,8 +68,8 @@ public class SecretRepositoryTest {
     }
 
     private string SecretRepositoryFolder(bool sample, bool alternative) {
-        var container = alternative ? AlternativeContainer : Container;
-        var folder = container.Resolve<IPeghEnvironment>().RootWorkFolder + (sample ? @"\SecretSamples" : @"\SecretRepository");
+        IContainer container = alternative ? AlternativeContainer : Container;
+        string folder = container.Resolve<IPeghEnvironment>().RootWorkFolder + (sample ? @"\SecretSamples" : @"\SecretRepository");
         if (!Directory.Exists(folder)) {
             Directory.CreateDirectory(folder);
         }
@@ -114,7 +107,7 @@ public class SecretRepositoryTest {
         sut.Values[secret.Guid] = new CrewMember { FirstName = SomeFirstName };
         sut.Reset(secret);
         Assert.IsNull(GetSecretCrewMember(sut, secret));
-        var crewMember = await sut.GetAsync(secret, errorsAndInfos);
+        CrewMember crewMember = await sut.GetAsync(secret, errorsAndInfos);
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
         Assert.AreEqual(SecretCrewMember.DefaultFirstName, crewMember.FirstName);
         CleanUpSecretRepository(false);
@@ -169,7 +162,7 @@ public class SecretRepositoryTest {
         var secret = new SecretStringFunction();
         sut.Reset(secret);
         const string s = "This is not a string";
-        var r = (await sut.CompileCsLambdaAsync<string, string>(await sut.GetAsync(secret, errorsAndInfos)))(s);
+        string r = (await sut.CompileCsLambdaAsync<string, string>(await sut.GetAsync(secret, errorsAndInfos)))(s);
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
         Assert.StartsWith(s, r);
         Assert.Contains("with greetings from a csx", r);
@@ -177,7 +170,7 @@ public class SecretRepositoryTest {
 
     private void CleanUpSecretRepository(bool alternative) {
         var secrets = new List<IGuid> { new SecretCrewMember(), new SecretStringFunction(), new SecretListOfElements() };
-        foreach (var files in new[] { false, true }.Select(sample => SecretRepositoryFolder(sample, alternative)).SelectMany(folder => secrets.Select(secret => Directory.GetFiles(folder, secret.Guid + "*.*").ToList()))) {
+        foreach (List<string> files in new[] { false, true }.Select(sample => SecretRepositoryFolder(sample, alternative)).SelectMany(folder => secrets.Select(secret => Directory.GetFiles(folder, secret.Guid + "*.*").ToList()))) {
             Assert.IsLessThan(3, files.Count);
             files.ForEach(File.Delete);
         }
@@ -186,7 +179,7 @@ public class SecretRepositoryTest {
     [TestMethod]
     public void DefaultSecretsAreStoredByDefault() {
         var secret = new SecretShouldDefaultSecretsBeStored();
-        var shouldDefaultSecretsBeStored = secret.DefaultValue;
+        ShouldDefaultSecretsBeStored shouldDefaultSecretsBeStored = secret.DefaultValue;
         Assert.IsNotNull(shouldDefaultSecretsBeStored);
         Assert.IsTrue(shouldDefaultSecretsBeStored.AutomaticallySaveDefaultSecretIfAbsent);
     }
@@ -259,7 +252,7 @@ public class SecretRepositoryTest {
     }
 
     private static async Task SetShouldDefaultSecretsBeStored(ISecretRepository sut, bool shouldThey, IErrorsAndInfos errorsAndInfos) {
-        var shouldDefaultSecretsBeStored = await ShouldDefaultSecretsBeStoredAsync(sut, errorsAndInfos);
+        ShouldDefaultSecretsBeStored shouldDefaultSecretsBeStored = await ShouldDefaultSecretsBeStoredAsync(sut, errorsAndInfos);
         if (shouldThey == shouldDefaultSecretsBeStored.AutomaticallySaveDefaultSecretIfAbsent) {
             return;
         }
@@ -271,7 +264,7 @@ public class SecretRepositoryTest {
 
     private static async Task<ShouldDefaultSecretsBeStored> ShouldDefaultSecretsBeStoredAsync(ISecretRepository sut, IErrorsAndInfos errorsAndInfos) {
         var secret = new SecretShouldDefaultSecretsBeStored();
-        var shouldDefaultSecretsBeStored = await sut.GetAsync(secret, errorsAndInfos);
+        ShouldDefaultSecretsBeStored shouldDefaultSecretsBeStored = await sut.GetAsync(secret, errorsAndInfos);
         Assert.IsNotNull(shouldDefaultSecretsBeStored);
         return shouldDefaultSecretsBeStored;
     }
@@ -354,7 +347,7 @@ public class SecretRepositoryTest {
 
         var secret = new SecretStringFunction();
         sut.Reset(secret);
-        var script = await sut.GetAsync(secret, errorsAndInfos);
+        CsLambda script = await sut.GetAsync(secret, errorsAndInfos);
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
         const string addedString = "/* This script has been altered */";
         Assert.DoesNotContain(addedString, script.LambdaExpression);
@@ -380,7 +373,7 @@ public class SecretRepositoryTest {
         CleanUpSecretRepository(false);
 
         var secret = new SecretCrewMember();
-        var folder = SecretRepositoryFolder(true, false);
+        string folder = SecretRepositoryFolder(true, false);
         Assert.IsEmpty(Directory.GetFiles(folder, secret.Guid + "*.*"));
         sut.SaveSample(secret, false);
         Assert.HasCount(1, Directory.GetFiles(folder, secret.Guid + "*.xml"));
@@ -399,7 +392,7 @@ public class SecretRepositoryTest {
         CleanUpSecretRepository(false);
 
         var secret = new SecretCrewMember();
-        var folder = SecretRepositoryFolder(true, false);
+        string folder = SecretRepositoryFolder(true, false);
         Assert.IsEmpty(Directory.GetFiles(folder, secret.Guid + "*.*"));
         sut.SaveSample(secret, false);
         Assert.HasCount(1, Directory.GetFiles(folder, secret.Guid + "*.xml"));
@@ -417,7 +410,7 @@ public class SecretRepositoryTest {
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
 
         var secret = new LongSecretString();
-        var longSecretString = await sut.GetAsync(secret, errorsAndInfos);
+        LongString longSecretString = await sut.GetAsync(secret, errorsAndInfos);
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
         Assert.AreEqual(128, longSecretString.TheLongString.Length);
 
@@ -433,8 +426,8 @@ public class SecretRepositoryTest {
 
         var secret = new SecretCrewMember();
         sut.Reset(secret);
-        var valueOrDefault = secret.DefaultValue;
-        var xml = Container.Resolve<IXmlSerializer>().Serialize(valueOrDefault).Replace("Crew", "Curfew");
+        CrewMember valueOrDefault = secret.DefaultValue;
+        string xml = Container.Resolve<IXmlSerializer>().Serialize(valueOrDefault).Replace("Crew", "Curfew");
         var errorsAndInfos = new ErrorsAndInfos();
         await sut.WriteToFileAsync(secret, xml, false, errorsAndInfos);
         Assert.IsTrue(errorsAndInfos.Errors.All(e => e.Contains("The \'http://www.aspenlaub.net:CurfewMember\' element is not declared")), errorsAndInfos.ErrorsToString());
@@ -454,7 +447,6 @@ public class SecretRepositoryTest {
         var errorsAndInfos = new ErrorsAndInfos();
         await sut.SetAsync(secret, errorsAndInfos);
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
-        CsArgumentPrompterMock.Setup(p => p.PromptForArgument(It.IsAny<string>(), It.IsAny<string>())).Returns(Passphrase + Passphrase);
         await sut.GetAsync(secret, errorsAndInfos);
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
         listOfElements = GetSecretListOfElements(sut, secret);

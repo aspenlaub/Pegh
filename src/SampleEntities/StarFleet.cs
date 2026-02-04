@@ -11,19 +11,15 @@ public class StarFleet : IGuid, INotifyPropertyChanged {
 
     [XmlElement("StarShip")]
     public StarShips StarShips {
-        get { return _StarShips; }
-        set { _StarShips = value; OnPropertyChanged(nameof(StarShips)); }
-    }
-
-    private StarShips _StarShips = [];
+        get;
+        set { field = value; OnPropertyChanged(nameof(StarShips)); }
+    } = [];
 
     [XmlElement("StarBase")]
     public StarBases StarBases {
-        get { return _StarBases; }
-        set { _StarBases = value; OnPropertyChanged(nameof(StarBases)); }
-    }
-
-    private StarBases _StarBases = [];
+        get;
+        set { field = value; OnPropertyChanged(nameof(StarBases)); }
+    } = [];
 
     public event PropertyChangedEventHandler PropertyChanged;
 

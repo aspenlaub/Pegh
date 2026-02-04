@@ -15,8 +15,6 @@ public class SecretRepository : ISecretRepository {
     internal readonly Dictionary<string, object> Values;
     internal SecretShouldDefaultSecretsBeStored SecretShouldDefaultSecretsBeStored;
 
-    public ICsArgumentPrompter CsArgumentPrompter { get; }
-
     protected readonly ICsLambdaCompiler CsLambdaCompiler;
     protected readonly IDisguiser Disguiser;
     protected readonly IPeghEnvironment PeghEnvironment;
@@ -24,15 +22,14 @@ public class SecretRepository : ISecretRepository {
     protected readonly IXmlSchemer XmlSchemer;
     protected readonly IXmlSerializer XmlSerializer;
 
-    public SecretRepository(ICsArgumentPrompter csArgumentPrompter, ICsLambdaCompiler csLambdaCompiler, IDisguiser disguiser, IPeghEnvironment peghEnvironment, IXmlDeserializer xmlDeserializer, IXmlSerializer xmlSerializer, IXmlSchemer xmlSchemer) {
-        CsArgumentPrompter = csArgumentPrompter;
+    public SecretRepository(ICsLambdaCompiler csLambdaCompiler, IDisguiser disguiser, IPeghEnvironment peghEnvironment, IXmlDeserializer xmlDeserializer, IXmlSerializer xmlSerializer, IXmlSchemer xmlSchemer) {
         CsLambdaCompiler = csLambdaCompiler;
         Disguiser = disguiser;
         PeghEnvironment = peghEnvironment;
         XmlDeserializer = xmlDeserializer;
         XmlSchemer = xmlSchemer;
         XmlSerializer = xmlSerializer;
-        Values = new Dictionary<string, object>();
+        Values = [];
         string folder = PeghEnvironment.RootWorkFolder + @"\SecretSamples\";
         if (!Directory.Exists(folder)) {
             Directory.CreateDirectory(folder);
@@ -125,9 +122,7 @@ public class SecretRepository : ISecretRepository {
     }
 
     internal void Reset(IGuid secret) {
-        if (Values.ContainsKey(secret.Guid)) {
-            Values.Remove(secret.Guid);
-        }
+        Values.Remove(secret.Guid);
 
         string fileName = FileName(secret, false);
         if (!File.Exists(fileName)) { return; }

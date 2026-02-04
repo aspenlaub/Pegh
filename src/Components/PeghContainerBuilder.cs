@@ -12,9 +12,17 @@ public static class PeghContainerBuilder {
     private static ISimpleLogger _simpleLogger;
     private static ILogConfiguration _logConfiguration;
 
-    public static ContainerBuilder UsePegh(this ContainerBuilder builder, string applicationName, bool useDummyCsLambdaCompiler,
-            ICsArgumentPrompter csArgumentPrompter) {
-        builder.RegisterInstance(csArgumentPrompter).As<ICsArgumentPrompter>();
+    public static ContainerBuilder UsePegh(this ContainerBuilder builder,
+            string applicationName) {
+        return UsePegh(builder, applicationName, false);
+    }
+
+    public static ContainerBuilder UsePeghWithoutCsLambdaCompiler(this ContainerBuilder builder,
+            string applicationName) {
+        return UsePegh(builder, applicationName, true);
+    }
+
+    private static ContainerBuilder UsePegh(this ContainerBuilder builder, string applicationName, bool useDummyCsLambdaCompiler) {
         if (useDummyCsLambdaCompiler) {
             builder.RegisterType<DummyCsLambdaCompiler>().As<ICsLambdaCompiler>();
         } else {
@@ -44,9 +52,15 @@ public static class PeghContainerBuilder {
         return builder;
     }
 
-    public static IServiceCollection UsePegh(this IServiceCollection services, string applicationName, bool useDummyCsLambdaCompiler,
-            ICsArgumentPrompter csArgumentPrompter) {
-        services.AddSingleton(csArgumentPrompter);
+    public static IServiceCollection UsePegh(this IServiceCollection services, string applicationName) {
+        return UsePegh(services, applicationName, false);
+    }
+
+    public static IServiceCollection UsePeghWithoutCsLambdaCompiler(this IServiceCollection services, string applicationName) {
+        return UsePegh(services, applicationName, false);
+    }
+
+    private static IServiceCollection UsePegh(this IServiceCollection services, string applicationName, bool useDummyCsLambdaCompiler) {
         if (useDummyCsLambdaCompiler) {
             services.AddTransient<ICsLambdaCompiler, DummyCsLambdaCompiler>();
         } else {

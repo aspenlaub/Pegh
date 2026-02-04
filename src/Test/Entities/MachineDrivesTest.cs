@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
@@ -14,19 +14,19 @@ public class MachineDrivesTest {
     private static IContainer Container { get; set; }
 
     public MachineDrivesTest() {
-        var builder = new ContainerBuilder().UseForPeghTest();
+        ContainerBuilder builder = new ContainerBuilder().UseForPeghTest();
         Container = builder.Build();
     }
 
     [TestMethod]
     public async Task CanGetMachineDrives() {
-        var secretRepository = Container.Resolve<ISecretRepository>();
+        ISecretRepository secretRepository = Container.Resolve<ISecretRepository>();
         var machineDrivesSecret = new MachineDrivesSecret();
         var errorsAndInfos = new ErrorsAndInfos();
-        var machineDrives = await secretRepository.GetAsync(machineDrivesSecret, errorsAndInfos);
+        MachineDrives machineDrives = await secretRepository.GetAsync(machineDrivesSecret, errorsAndInfos);
         Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
         Assert.Contains(m => m.Name == "CSharpDrive", machineDrives);
-        var drivesOnThisMachine = machineDrives.DrivesOnThisMachine();
+        IEnumerable<MachineDrive> drivesOnThisMachine = machineDrives.DrivesOnThisMachine();
         Assert.ContainsSingle(m => m.Name == "CSharpDrive", drivesOnThisMachine);
     }
 }

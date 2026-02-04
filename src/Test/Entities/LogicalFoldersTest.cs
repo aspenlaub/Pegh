@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
@@ -14,16 +13,16 @@ public class LogicalFoldersTest {
     private static IContainer Container { get; set; }
 
     public LogicalFoldersTest() {
-        var builder = new ContainerBuilder().UseForPeghTest();
+        ContainerBuilder builder = new ContainerBuilder().UseForPeghTest();
         Container = builder.Build();
     }
 
     [TestMethod]
     public async Task CanGetLogicalFolders() {
-        var secretRepository = Container.Resolve<ISecretRepository>();
+        ISecretRepository secretRepository = Container.Resolve<ISecretRepository>();
         var logicalFoldersSecret = new LogicalFoldersSecret();
         var errorsAndInfos = new ErrorsAndInfos();
-        var logicalFolders = await secretRepository.GetAsync(logicalFoldersSecret, errorsAndInfos);
+        LogicalFolders logicalFolders = await secretRepository.GetAsync(logicalFoldersSecret, errorsAndInfos);
         Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
         Assert.Contains(m => m.Name == "MainUserFolder", logicalFolders);
     }

@@ -11,27 +11,21 @@ public class CrewMember : IGuid, INotifyPropertyChanged, ISecretResult<CrewMembe
 
     [XmlAttribute("rank")]
     public string Rank {
-        get { return _Rank; }
-        set { _Rank = value; OnPropertyChanged(nameof(Rank)); }
+        get;
+        set { field = value; OnPropertyChanged(nameof(Rank)); }
     }
-
-    private string _Rank;
 
     [XmlAttribute("firstname")]
     public string FirstName {
-        get { return _FirstName; }
-        set { _FirstName = value; OnPropertyChanged(nameof(FirstName)); }
+        get;
+        set { field = value; OnPropertyChanged(nameof(FirstName)); }
     }
-
-    private string _FirstName;
 
     [XmlAttribute("surname")]
     public string SurName {
-        get { return _SurName; }
-        set { _SurName = value; OnPropertyChanged(nameof(SurName)); }
+        get;
+        set { field = value; OnPropertyChanged(nameof(SurName)); }
     }
-
-    private string _SurName;
 
     public event PropertyChangedEventHandler PropertyChanged;
 

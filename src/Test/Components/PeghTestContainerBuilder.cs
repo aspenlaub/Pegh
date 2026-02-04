@@ -10,16 +10,6 @@ public static class PeghTestContainerBuilder {
         builder.RegisterType<SecretRepository>().As<ISecretRepository>();
         builder.RegisterType<PeghEnvironment>().As<IPeghEnvironment>();
         builder.RegisterType<Disguiser>().As<IDisguiser>();
-        builder.RegisterType<DummyCsArgumentPrompter>().As<ICsArgumentPrompter>();
-        return builder;
-    }
-
-    public static ContainerBuilder UseForPeghTest(this ContainerBuilder builder, ICsArgumentPrompter csArgumentPrompter) {
-        RegisterDefaultTypes(builder);
-        builder.RegisterType<SecretRepository>().As<ISecretRepository>();
-        builder.RegisterType<PeghEnvironment>().As<IPeghEnvironment>();
-        builder.RegisterType<Disguiser>().As<IDisguiser>();
-        builder.RegisterInstance(csArgumentPrompter).As<ICsArgumentPrompter>();
         return builder;
     }
 
@@ -31,21 +21,19 @@ public static class PeghTestContainerBuilder {
         return builder;
     }
 
-    public static ContainerBuilder UseForPeghTest(this ContainerBuilder builder, IPeghEnvironment peghEnvironment, ICsArgumentPrompter csArgumentPrompter) {
+    public static ContainerBuilder UseForPeghTest(this ContainerBuilder builder, IPeghEnvironment peghEnvironment) {
         RegisterDefaultTypes(builder);
         builder.RegisterType<SecretRepository>().As<ISecretRepository>();
         builder.RegisterInstance(peghEnvironment).As<IPeghEnvironment>();
         builder.RegisterType<Disguiser>().As<IDisguiser>();
-        builder.RegisterInstance(csArgumentPrompter).As<ICsArgumentPrompter>();
         return builder;
     }
 
-    public static ContainerBuilder UseForPeghTest(this ContainerBuilder builder, IDisguiser disguiser, ICsArgumentPrompter csArgumentPrompter) {
+    public static ContainerBuilder UseForPeghTest(this ContainerBuilder builder, IDisguiser disguiser) {
         RegisterDefaultTypes(builder);
         builder.RegisterType<SecretRepository>().As<ISecretRepository>();
         builder.RegisterType<PeghEnvironment>().As<IPeghEnvironment>();
         builder.RegisterInstance(disguiser).As<IDisguiser>();
-        builder.RegisterInstance(csArgumentPrompter).As<ICsArgumentPrompter>();
         return builder;
     }
 
