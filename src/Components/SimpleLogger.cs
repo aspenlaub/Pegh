@@ -59,16 +59,29 @@ public class SimpleLogger(ILogConfiguration logConfiguration, ISimpleLogFlusher 
             return;
         }
 
-        IList<string> reducesStackOfScopes = ReduceStackAccordingToCallStack(_StackOfScopes, logMessageWithCallStack.MethodNamesInCallStack);
-        if (reducesStackOfScopes.Count == 0) {
-            WriteErrorToExceptionFolder(string.Format(Properties.Resources.ScopeExistsButOutsideCallStack, string.Join(";", _StackOfScopes)));
-            reducesStackOfScopes = _StackOfScopes;
+        IList<string> reducesStackOfScopes;
+        try {
+            reducesStackOfScopes = ReduceStackAccordingToCallStack(_StackOfScopes, logMessageWithCallStack.MethodNamesInCallStack);
+            if (reducesStackOfScopes.Count == 0) {
+                WriteErrorToExceptionFolder(string.Format(Properties.Resources.ScopeExistsButOutsideCallStack, string.Join(";", _StackOfScopes)));
+                reducesStackOfScopes = _StackOfScopes;
+            }
+        } catch {
+            WriteErrorToExceptionFolder("Could not reduce call stack");
+            return;
         }
 
         lock (_lockObject) {
             _LogEntries.Add(SimpleLogEntry.Create(logLevel, reducesStackOfScopes.Count == 0 ? _StackOfScopes : reducesStackOfScopes, logMessageWithCallStack.Message));
         }
-        simpleLogFlusher.Flush(this, LogSubFolder);
+
+        try {
+            simpleLogFlusher.Flush(this, LogSubFolder);
+        } catch {
+            WriteErrorToExceptionFolder("Could not flush log");
+            // ReSharper disable once RedundantJumpStatement
+            return;
+        }
     }
 
     private IList<string> ReduceStackAccordingToCallStack(IEnumerable<string> stackOfScopes, IEnumerable<string> methodNamesFromCallStack) {

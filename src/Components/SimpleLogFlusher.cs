@@ -17,14 +17,14 @@ public class SimpleLogFlusher(IExceptionFolderProvider exceptionFolderProvider) 
     public bool FlushIsRequired { get; set; }
 
     public void Flush(ISimpleLogger logger, string subFolder) {
-        var folder = new Folder(Path.GetTempPath()).SubFolder(subFolder);
+        IFolder folder = new Folder(Path.GetTempPath()).SubFolder(subFolder);
         folder.CreateIfNecessary();
 
         lock (_lockObject) {
-            var logEntries = logger.FindLogEntries(e => !e.Flushed);
+            IList<ISimpleLogEntry> logEntries = logger.FindLogEntries(e => !e.Flushed);
             var ids = logEntries.Select(GetTopOfStack).Distinct().ToList();
-            foreach (var id in ids) {
-                var fileName = folder.FullName + '\\' + StackIdAsFileName(id) + ".log";
+            foreach (string id in ids) {
+                string fileName = folder.FullName + '\\' + StackIdAsFileName(id) + ".log";
                 var entries = logEntries.Where(e => !e.Flushed && e.Stack[0] == id).ToList();
                 try {
                     File.AppendAllLines(fileName, entries.Select(Format));
@@ -49,9 +49,9 @@ public class SimpleLogFlusher(IExceptionFolderProvider exceptionFolderProvider) 
                 return;
             }
 
-            var minWriteTime = DateTime.Now.AddDays(-1);
+            DateTime minWriteTime = DateTime.Now.AddDays(-1);
             var files = Directory.GetFiles(folder.FullName, "*.log", SearchOption.TopDirectoryOnly).Where(f => File.GetLastWriteTime(f) < minWriteTime).ToList();
-            foreach (var file in files) {
+            foreach (string file in files) {
                 try {
                     File.Delete(file);
                     // ReSharper disable once EmptyGeneralCatchClause
@@ -73,7 +73,7 @@ public class SimpleLogFlusher(IExceptionFolderProvider exceptionFolderProvider) 
     }
 
     private static string StackIdAsFileName(string id) {
-        var pos = id.IndexOf('(');
+        int pos = id.IndexOf('(');
         if (pos < 0) { return id; }
         if (pos + 4 > id.Length) { return id; }
 
@@ -87,8 +87,8 @@ public class SimpleLogFlusher(IExceptionFolderProvider exceptionFolderProvider) 
     }
 
     private void WriteErrorToExceptionFolder(string errorMessage) {
-        var fileName = exceptionFolderProvider.ExceptionFolder().FullName + "\\" + nameof(SimpleLogFlusher) + "-Error-" + Guid.NewGuid().ToString().Replace("-", "") + ".log";
-        var contents = errorMessage + "\r\n\r\n" + Environment.StackTrace;
+        string fileName = exceptionFolderProvider.ExceptionFolder().FullName + "\\" + nameof(SimpleLogFlusher) + "-Error-" + Guid.NewGuid().ToString().Replace("-", "") + ".log";
+        string contents = errorMessage + "\r\n\r\n" + Environment.StackTrace;
         File.WriteAllText(fileName, contents);
     }
 }
