@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
+using Aspenlaub.Net.GitHub.CSharp.Seoa.Extensions;
 using Aspenlaub.Net.GitHub.CSharp.Skladasu.Entities;
 using Aspenlaub.Net.GitHub.CSharp.Skladasu.Extensions;
 using Aspenlaub.Net.GitHub.CSharp.Skladasu.Interfaces;
@@ -33,14 +34,14 @@ public class DisguiserTest {
         string s = "This is a test string";
         var errorsAndInfos = new ErrorsAndInfos();
         string disguised = await sut.Disguise(secretRepository, s, errorsAndInfos);
-        Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
+        Assert.That.ThereWereNoErrors(errorsAndInfos);
         Assert.IsGreaterThanOrEqualTo(3 * s.Length, disguised.Length);
         Assert.DoesNotContain(s, disguised);
         Assert.AreEqual("./*56.D34CD3456/*E./*56.456./*FG7BCD78HBCD456*EF345BCDD342BC/*E", disguised);
 
         s = "Short string";
         disguised = await sut.Disguise(secretRepository, s, errorsAndInfos);
-        Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
+        Assert.That.ThereWereNoErrors(errorsAndInfos);
         Assert.IsGreaterThanOrEqualTo(3 * s.Length, disguised.Length);
         Assert.DoesNotContain(s, disguised);
     }
