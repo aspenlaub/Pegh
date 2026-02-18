@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
-using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components;
+using Aspenlaub.Net.GitHub.CSharp.Seoa.Extensions;
+using Aspenlaub.Net.GitHub.CSharp.Skladasu.Entities;
 using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -24,7 +25,7 @@ public class MachineDrivesTest {
         var machineDrivesSecret = new MachineDrivesSecret();
         var errorsAndInfos = new ErrorsAndInfos();
         MachineDrives machineDrives = await secretRepository.GetAsync(machineDrivesSecret, errorsAndInfos);
-        Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
+        Assert.That.ThereWereNoErrors(errorsAndInfos);
         Assert.Contains(m => m.Name == "CSharpDrive", machineDrives);
         IEnumerable<MachineDrive> drivesOnThisMachine = machineDrives.DrivesOnThisMachine();
         Assert.ContainsSingle(m => m.Name == "CSharpDrive", drivesOnThisMachine);

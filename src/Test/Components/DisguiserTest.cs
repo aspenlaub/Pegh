@@ -1,8 +1,10 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
-using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
+using Aspenlaub.Net.GitHub.CSharp.Skladasu.Entities;
+using Aspenlaub.Net.GitHub.CSharp.Skladasu.Extensions;
+using Aspenlaub.Net.GitHub.CSharp.Skladasu.Interfaces;
 using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -20,17 +22,17 @@ public class DisguiserTest {
         var secretRepositoryMock = new Mock<ISecretRepository>();
         secretRepositoryMock.Setup(repository => repository.GetAsync(It.IsAny<LongSecretString>(), It.IsAny<IErrorsAndInfos>())).Returns(Task.FromResult(secretLongString));
 
-        var builder = new ContainerBuilder().UseForPeghTest(secretRepositoryMock.Object);
+        ContainerBuilder builder = new ContainerBuilder().UseForPeghTest(secretRepositoryMock.Object);
         Container = builder.Build();
     }
 
     [TestMethod]
     public async Task CanDisguise() {
-        var sut = Container.Resolve<IDisguiser>();
-        var secretRepository = Container.Resolve<ISecretRepository>();
-        var s = "This is a test string";
+        IDisguiser sut = Container.Resolve<IDisguiser>();
+        ISecretRepository secretRepository = Container.Resolve<ISecretRepository>();
+        string s = "This is a test string";
         var errorsAndInfos = new ErrorsAndInfos();
-        var disguised = await sut.Disguise(secretRepository, s, errorsAndInfos);
+        string disguised = await sut.Disguise(secretRepository, s, errorsAndInfos);
         Assert.IsFalse(errorsAndInfos.Errors.Any(), errorsAndInfos.ErrorsToString());
         Assert.IsGreaterThanOrEqualTo(3 * s.Length, disguised.Length);
         Assert.DoesNotContain(s, disguised);

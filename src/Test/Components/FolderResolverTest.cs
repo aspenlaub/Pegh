@@ -4,6 +4,9 @@ using Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.Interfaces;
+using Aspenlaub.Net.GitHub.CSharp.Seoa.Extensions;
+using Aspenlaub.Net.GitHub.CSharp.Skladasu.Entities;
+using Aspenlaub.Net.GitHub.CSharp.Skladasu.Interfaces;
 using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -45,18 +48,18 @@ public class FolderResolverTest {
     public async Task DriveResolvesToActualDrive() {
         IErrorsAndInfos errorsAndInfos = new ErrorsAndInfos();
         Assert.AreEqual(@"E:", (await _Sut.ResolveAsync(@"$(SomeDrive)", errorsAndInfos)).FullName);
-        Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
+        Assert.That.ThereWereNoErrors(errorsAndInfos);
         Assert.AreEqual(@"E:", (await _Sut.ResolveAsync(@"$(SomeDrive)\", errorsAndInfos)).FullName);
-        Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
+        Assert.That.ThereWereNoErrors(errorsAndInfos);
     }
 
     [TestMethod]
     public async Task CanResolveLogicalFolder() {
         var errorsAndInfos = new ErrorsAndInfos();
         Assert.AreEqual(@"E:\Logical\Folder", (await _Sut.ResolveAsync(@"$(SomeLogicalFolder)", errorsAndInfos)).FullName);
-        Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
+        Assert.That.ThereWereNoErrors(errorsAndInfos);
         Assert.AreEqual(@"E:\Logical\Folder\Other", (await _Sut.ResolveAsync(@"$(SomeOtherLogicalFolder)", errorsAndInfos)).FullName);
-        Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
+        Assert.That.ThereWereNoErrors(errorsAndInfos);
     }
 
     [TestMethod]
@@ -65,9 +68,9 @@ public class FolderResolverTest {
         var errorsAndInfos = new ErrorsAndInfos();
         IFolder folder = await sut.ResolveAsync("$(MainUserFolder)", errorsAndInfos);
         Assert.IsTrue(folder.SubFolder("CSharp").Exists());
-        Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
+        Assert.That.ThereWereNoErrors(errorsAndInfos);
         Assert.IsTrue(folder.SubFolder("GitHub").Exists());
-        Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
+        Assert.That.ThereWereNoErrors(errorsAndInfos);
     }
 
     [TestMethod]

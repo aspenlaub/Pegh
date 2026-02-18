@@ -1,7 +1,7 @@
 ﻿using Aspenlaub.Net.GitHub.CSharp.Pegh.Components;
-using Aspenlaub.Net.GitHub.CSharp.Pegh.Entities;
-using Aspenlaub.Net.GitHub.CSharp.Pegh.Extensions;
 using Aspenlaub.Net.GitHub.CSharp.Pegh.SampleEntities;
+using Aspenlaub.Net.GitHub.CSharp.Seoa.Extensions;
+using Aspenlaub.Net.GitHub.CSharp.Skladasu.Entities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Aspenlaub.Net.GitHub.CSharp.Pegh.Test.Components;
@@ -28,7 +28,7 @@ public class XmlSchemerTest {
         string xml = serializer.Serialize(crewMember);
         var errorsAndInfos = new ErrorsAndInfos();
         Assert.IsTrue(sut.Valid(CrewMemberSecretGuid, xml, typeof(CrewMember), errorsAndInfos));
-        Assert.IsFalse(errorsAndInfos.AnyErrors(), errorsAndInfos.ErrorsToString());
+        Assert.That.ThereWereNoErrors(errorsAndInfos);
         Assert.IsFalse(sut.Valid(StarShipSecretGuid, xml, typeof(StarShip), errorsAndInfos));
         Assert.Contains(e => e.Contains("The \'http://www.aspenlaub.net:CrewMember\' element is not declared"), errorsAndInfos.Errors);
         string xsd = sut.Create(typeof(CrewMember)).Replace("firstname", "worstname");
