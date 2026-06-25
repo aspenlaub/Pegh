@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-	<Nullable>disable</Nullable>
+    <Nullable>disable</Nullable>
     <AssemblyName>Aspenlaub.Net.GitHub.CSharp.Pegh</AssemblyName>
     <RootNamespace>Aspenlaub.Net.GitHub.CSharp.Pegh</RootNamespace>
     <Deterministic>false</Deterministic>
@@ -17,6 +17,7 @@
     <RepositoryUrl>https://github.com/aspenlaub/Pegh.git</RepositoryUrl>
     <RepositoryBranch>master</RepositoryBranch>
     <PackageId>Pegh</PackageId>
+    <MSBuildEnableWorkloadResolver>false</MSBuildEnableWorkloadResolver>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
