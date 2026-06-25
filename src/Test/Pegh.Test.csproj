@@ -20,7 +20,7 @@
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="Reqnroll.MSTest" Version="3.3.4" />
     <PackageReference Include="Reqnroll.Tools.MsBuild.Generation" Version="3.3.4" />
-    <PackageReference Include="Seoa" Version="2.0.2523.665" />
+    <PackageReference Include="Seoa" Version="2.0.2528.994" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Pegh.csproj" />
