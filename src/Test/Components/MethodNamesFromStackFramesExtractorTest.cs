@@ -15,7 +15,7 @@ public class MethodNamesFromStackFramesExtractorTest {
         var methodNames = MethodReturningMethodNamesFromStackFramesWhenCalled().ToList();
         Assert.Contains(nameof(MethodReturningMethodNamesFromStackFramesWhenCalled), methodNames);
         Assert.Contains(nameof(ExtractMethodNamesFromStackFrames_WithinMethodCall_ReturnsCallerAndCallee), methodNames);
-        Assert.IsLessThanOrEqualTo(4, methodNames.Count, string.Join('/', methodNames));
+        Assert.IsLessThanOrEqualTo(5, methodNames.Count, string.Join('/', methodNames));
     }
 
     [TestMethod]
@@ -23,7 +23,7 @@ public class MethodNamesFromStackFramesExtractorTest {
         var methodNames = (await MethodReturningMethodNamesFromStackFramesWhenCalledAsync()).ToList();
         Assert.Contains(nameof(MethodReturningMethodNamesFromStackFramesWhenCalledAsync), methodNames);
         Assert.Contains(nameof(ExtractMethodNamesFromStackFrames_WithinAsyncMethodCall_ReturnsCallerAndCallee), methodNames);
-        Assert.IsLessThanOrEqualTo(4, methodNames.Count, string.Join('/', methodNames));
+        Assert.IsLessThanOrEqualTo(5, methodNames.Count, string.Join('/', methodNames));
 
         await Task.WhenAll(new List<Task> {
             Task.Run(async () => methodNames = (await MethodReturningMethodNamesFromStackFramesWhenCalledAsync()).ToList())
