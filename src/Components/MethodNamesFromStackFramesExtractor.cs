@@ -39,7 +39,7 @@ public class MethodNamesFromStackFramesExtractor : IMethodNamesFromStackFramesEx
     private readonly List<string> _UnwantedMethods = [
         "BackgroundJobProcessor",
 
-        "Dispatch",
+        "Dispatch", "DispatchContinuations",
 
         "Execute", "ExecuteEntryUnsafe", "ExecuteTestsInSource",
         "ExecuteWithThreadLocal", "ExecuteFromThreadPool",
@@ -49,7 +49,7 @@ public class MethodNamesFromStackFramesExtractor : IMethodNamesFromStackFramesEx
 
         "FinishSlow",
 
-        "Get", "GetInvokeResult",
+        "Get", "GetInvokeResult", "GetInvokeResultWithParameters",
 
         "Invoke",
         "InvokeMethod", "InvokeAsSynchronousTask", "InterpretedInvoke_Method",
@@ -71,6 +71,7 @@ public class MethodNamesFromStackFramesExtractor : IMethodNamesFromStackFramesEx
         "RunTestsFromRightContext",
         "RunTestsInternal",
         "RunOrScheduleAction", "RunContinuations", "ReadFromFile",
+        "RunFromTestElements", "RunUnderApartment", "RunOnApartmentThreadIfNeeded",
 
         "Start", "StartTestRun",
         "SafeProcessJob", "StartCallback",
@@ -78,7 +79,7 @@ public class MethodNamesFromStackFramesExtractor : IMethodNamesFromStackFramesEx
 
         "TrySetResult", "TrySetFromTask",
 
-        "WorkerThreadStart",
+        "WorkerThreadStart", "WorkerDoWork",
 
         ".ctor", ".cctor",
 
